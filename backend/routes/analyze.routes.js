@@ -156,6 +156,106 @@ function parseNoteLocally(text) {
   };
 }
 
+const DOCUMENT_KEYWORDS = {
+  mri: ["mri", "magnetic resonance"],
+  "x-ray": ["x-ray", "xray", "radiograph"],
+  ultrasound: ["ultrasound", "sonograph"],
+  "coronary angiogram": ["angiogram", "angiography", "cath"],
+  electrocardiogram: ["ecg", "electrocardiogram", "ekg"],
+  echocardiogram: ["echo", "echocardiogram", "2d echo"],
+  cbc: ["cbc", "complete blood count", "blood report", "wbc", "haematology"],
+  "cbc & blood": ["cbc", "complete blood count", "blood report", "wbc"],
+  "lab report": ["lab", "blood", "cbc", "panel", "report"],
+  "nerve conduction": ["nerve conduction", "ncs", "emg", "electromyograph"],
+  physiotherapy: ["physical therapy", "physiotherapy", "pt record"],
+  "conservative treatment": ["physical therapy", "physiotherapy", "injection", "chiropractic", "nsaid"],
+  surgeon: null,
+  "surgeon's certificate": null,
+  "certificate of medical": null,
+  "proof of medical necessity": null,
+  "medical necessity": null,
+  "surgical clearance": null,
+  "hospital admission": ["admission", "admit", "inpatient"],
+  "prior endoscopy": ["endoscopy", "scope"],
+  "h. pylori": ["pylori", "h pylori"],
+};
+
+function docIsInEhr(docType, ehr) {
+  const docLower = docType.toLowerCase();
+  for (const [key, kws] of Object.entries(DOCUMENT_KEYWORDS)) {
+    if (docLower.includes(key) && kws === null) return false;
+  }
+  let keywords = null;
+  for (const [key, kws] of Object.entries(DOCUMENT_KEYWORDS)) {
+    if (kws !== null && docLower.includes(key)) {
+      keywords = kws;
+      break;
+    }
+  }
+  if (!keywords) {
+    const words = docLower.split(" ").filter((w) => w.length > 3);
+    keywords = words.length ? words.slice(0, 2) : [docLower.slice(0, 6)];
+  }
+
+  const labs = ehr.lab_reports || [];
+  const treatments = ehr.prior_treatments || [];
+  const diagnoses = ehr.diagnosis_history || [];
+
+  for (const lab of labs) {
+    const labText = `${lab.type || ""} ${lab.result || ""}`.toLowerCase();
+    if (keywords.some((kw) => labText.includes(kw))) return true;
+  }
+
+  for (const tx of treatments) {
+    const txText = `${tx.type || ""} ${tx.outcome || ""}`.toLowerCase();
+    if (keywords.some((kw) => txText.includes(kw))) return true;
+  }
+
+  if (docLower.includes("hospital admission") || docLower.includes("admission form")) {
+    return diagnoses.length > 0;
+  }
+
+  return false;
+}
+
+function extractEhrLocally(ehr, requirements) {
+  const matched_diagnoses = ehr.diagnosis_history || [];
+  const relevant_labs = (ehr.lab_reports || [])
+    .filter((l) => l.relevant !== false)
+    .map((l) => ({ type: l.type, date: l.date || "", findings: l.result || "" }));
+  const prior_treatments = ehr.prior_treatments || [];
+  const medications = ehr.medications || [];
+
+  const found_documents = [];
+  const missing_documents = [];
+  for (const doc of requirements) {
+    if (docIsInEhr(doc, ehr)) {
+      found_documents.push(doc);
+    } else {
+      missing_documents.push(doc);
+    }
+  }
+
+  return {
+    matched_diagnoses,
+    relevant_labs,
+    prior_treatments,
+    medications,
+    missing_documents,
+    found_documents,
+    patient_name: ehr.name || "",
+    policy_number: `POL-${ehr.insurer_id || ""}-2024`,
+    evidence_summary: {
+      total_labs: (ehr.lab_reports || []).length,
+      relevant_labs: relevant_labs.length,
+      treatments_count: prior_treatments.length,
+      diagnoses_count: matched_diagnoses.length,
+      medications_count: medications.length,
+      medications_summary: medications.map((m) => m.name || "").filter(Boolean).join(", "),
+    },
+  };
+}
+
 // POST /api/analyze
 router.post("/", async (req, res) => {
   try {
@@ -282,18 +382,28 @@ router.post("/", async (req, res) => {
         ];
     }
 
-    // ── Step 3: Extract EHR evidence + gaps via FastAPI ─────────────────────
-    const ehrResp = await fetch(`${FASTAPI_URL}/extract_ehr`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ehr, requirements }),
-    });
-
-    if (!ehrResp.ok) {
-      return res.status(502).json({ error: "FastAPI /extract_ehr failed", details: await ehrResp.text() });
+    // ── Step 3: Extract EHR evidence + gaps (FastAPI if online, otherwise local fallback) ──
+    let ehrResult;
+    try {
+      const ctrlEhr = new AbortController();
+      const timerEhr = setTimeout(() => ctrlEhr.abort(), 1500);
+      const ehrResp = await fetch(`${FASTAPI_URL}/extract_ehr`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ehr, requirements }),
+        signal: ctrlEhr.signal,
+      });
+      clearTimeout(timerEhr);
+      if (ehrResp.ok) {
+        ehrResult = await ehrResp.json();
+      }
+    } catch (_) {
+      // Python FastAPI unavailable or timed out; fall through to local extractor
     }
 
-    const ehrResult = await ehrResp.json();
+    if (!ehrResult) {
+      ehrResult = extractEhrLocally(ehr, requirements);
+    }
 
     // ── Step 4: Run Node Logic Modules ─────────────────────────────
     const logicManager = req.logicManager;
