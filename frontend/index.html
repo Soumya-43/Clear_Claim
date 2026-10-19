@@ -3862,11 +3862,11 @@
         <div class="nav-item" onclick="navigate('new-claim')"><span class="nav-icon">＋</span> <span class="nav-text">New
             Claim</span></div>
         <div class="nav-item" onclick="navigate('analysis')"><span class="nav-icon">🔍</span> <span
-            class="nav-text">Claim Analysis</span> <span class="nav-badge">2</span></div>
+            class="nav-text">Claim Analysis</span> <span class="nav-badge" id="nav-badge-analysis">2</span></div>
         <div class="nav-item" onclick="navigate('preauth')"><span class="nav-icon">📋</span> <span
             class="nav-text">Pre-Auth Package</span></div>
         <div class="nav-item" onclick="navigate('appeal')"><span class="nav-icon">⚡</span> <span class="nav-text">Appeal
-            Center</span> <span class="nav-badge">1</span></div>
+            Center</span> <span class="nav-badge" id="nav-badge-appeal">1</span></div>
       </div>
       <div class="nav-section">
         <div class="nav-label">History</div>
@@ -4382,7 +4382,7 @@
             </div>
 
             <div class="risk-reason" id="analysis-risk-reason">Select a patient claim to view AI risk analysis.</div>
-            <div style="margin-top:18px"><button class="btn btn-r btn-sm" style="width:100%;justify-content:center"
+            <div style="margin-top:18px"><button class="btn btn-r btn-sm" id="analysis-appeal-btn" style="width:100%;justify-content:center"
                 onclick="prepareAppeal()">⚡ Prepare Appeal</button></div>
           </div>
         </div>
@@ -5913,6 +5913,32 @@
         riskReason.textContent = data.risk.topDrivers.join('. ') || 'Risk assessed based on clinical parameters.';
       }
 
+      const appealBtn = el('analysis-appeal-btn');
+      if (appealBtn) {
+        const claimId = data?.request?.claimId || window.__currentClaimId;
+        const regClaim = window.CLAIMS_REGISTRY ? window.CLAIMS_REGISTRY[claimId] : null;
+        const isApproved = (regClaim && regClaim.status === 'Approved') || data.risk.level === 'LOW';
+        if (isApproved) {
+          appealBtn.className = 'btn btn-g btn-sm';
+          appealBtn.innerHTML = '✅ Pre-Auth Approved (No Appeal Needed)';
+          appealBtn.disabled = true;
+          appealBtn.style.opacity = '0.9';
+          appealBtn.style.cursor = 'default';
+        } else if (regClaim && regClaim.status === 'Pending') {
+          appealBtn.className = 'btn btn-w btn-sm';
+          appealBtn.innerHTML = '⏳ Under Insurer Review';
+          appealBtn.disabled = true;
+          appealBtn.style.opacity = '0.85';
+          appealBtn.style.cursor = 'default';
+        } else {
+          appealBtn.className = 'btn btn-r btn-sm';
+          appealBtn.innerHTML = '⚡ Prepare Appeal';
+          appealBtn.disabled = false;
+          appealBtn.style.opacity = '1';
+          appealBtn.style.cursor = 'pointer';
+        }
+      }
+
       const checklist = el('analysis-checklist');
       const docsCount = el('analysis-docs-count');
       if (checklist) {
@@ -7333,6 +7359,22 @@
       if (statPen) statPen.textContent = pending;
       if (statRej) statRej.textContent = rejected;
 
+      // 2b. Dynamic sidebar nav badges
+      const unappealedRejections = claims.filter(c => c.status === 'Rejected' && (!c.appeal || c.appeal.status !== 'APPROVED')).length;
+      const analysisAttention = claims.filter(c => (c.status === 'Rejected' && (!c.appeal || c.appeal.status !== 'APPROVED')) || (c.risk && c.risk.level === 'HIGH' && c.status !== 'Approved')).length;
+
+      const bAnalysis = document.getElementById('nav-badge-analysis');
+      if (bAnalysis) {
+        bAnalysis.textContent = analysisAttention;
+        bAnalysis.style.display = analysisAttention > 0 ? 'inline-flex' : 'none';
+      }
+
+      const bAppeal = document.getElementById('nav-badge-appeal');
+      if (bAppeal) {
+        bAppeal.textContent = unappealedRejections;
+        bAppeal.style.display = unappealedRejections > 0 ? 'inline-flex' : 'none';
+      }
+
       // 3. Recent claims table on dashboard
       const dashTbody = document.getElementById('dash-recent-claims-tbody');
       if (dashTbody) {
@@ -7379,7 +7421,7 @@
       if (alertsBody) {
         const alerts = [];
         claims.forEach(c => {
-          if (c.missingDocs && c.missingDocs.length > 0) {
+          if (c.status !== 'Approved' && c.missingDocs && c.missingDocs.length > 0) {
             alerts.push({
               claimId: c.claimId,
               patientName: c.patientName,
@@ -7579,6 +7621,19 @@
 
     function convertRegistryToAnalysisFormat(claim) {
       if (!claim) return null;
+      const isApproved = claim.status === 'Approved' || (claim.appeal && claim.appeal.status === 'APPROVED');
+      const resolvedRisk = (isApproved && claim.appeal && claim.appeal.status === 'APPROVED') ? {
+        level: 'LOW',
+        score: 5,
+        topDrivers: [
+          `Rejection overturned by ${claim.insurerId} via approved clinical appeal`,
+          'All required clinical necessity records verified and accepted'
+        ]
+      } : claim.risk;
+
+      const missingDocs = isApproved ? [] : (claim.missingDocs || []);
+      const foundDocs = isApproved ? (claim.requiredDocs || claim.foundDocs || []) : (claim.foundDocs || []);
+
       return {
         success: true,
         request: {
@@ -7588,7 +7643,7 @@
           insurerId: claim.insurerId,
           procedureId: claim.procedure,
           costEstimate: claim.costEstimate,
-          doctorId: 'Dr. Anand Krishnan'
+          doctorId: claim.doctor || 'Dr. Anand Krishnan'
         },
         parsedNote: {
           procedure: claim.procedure,
@@ -7603,13 +7658,16 @@
           preauth_days: claim.preauthDays,
           required_documents: claim.requiredDocs || []
         },
-        ehrEvidence: claim.ehrEvidence || {
+        ehrEvidence: {
           patient_name: claim.patientName,
           policy_number: claim.policyNumber,
-          missing_documents: claim.missingDocs || [],
-          found_documents: claim.foundDocs || []
+          missing_documents: missingDocs,
+          found_documents: foundDocs,
+          matched_diagnoses: claim.ehrEvidence?.matched_diagnoses || [],
+          relevant_labs: claim.ehrEvidence?.relevant_labs || [],
+          medications: claim.ehrEvidence?.medications || []
         },
-        risk: claim.risk
+        risk: resolvedRisk
       };
     }
 
@@ -7996,6 +8054,41 @@
         claim.status = 'Approved';
         claim.appeal.status = 'APPROVED';
         const approvedAmt = claim.maxApproved || claim.costEstimate || 185000;
+
+        // Resolve missing document
+        const missingName = (claim.missingDocs && claim.missingDocs.length > 0)
+          ? claim.missingDocs[0]
+          : "Surgeon's Certificate of Medical Necessity";
+
+        if (!claim.foundDocs) claim.foundDocs = [];
+        if (!claim.foundDocs.includes(missingName)) claim.foundDocs.push(missingName);
+        claim.missingDocs = [];
+
+        if (claim.ehrEvidence) {
+          claim.ehrEvidence.missing_documents = [];
+          if (!claim.ehrEvidence.found_documents) claim.ehrEvidence.found_documents = [];
+          if (!claim.ehrEvidence.found_documents.includes(missingName)) claim.ehrEvidence.found_documents.push(missingName);
+        }
+
+        // Set low risk score
+        claim.risk = {
+          level: 'LOW',
+          score: 5,
+          topDrivers: [
+            `Rejection overturned by ${claim.insurerId} via approved clinical appeal`,
+            `All clinical necessity records & ${missingName} validated and sanctioned`
+          ]
+        };
+
+        // Refresh cached analysis if loaded
+        if (window.__lastAnalysis && window.__lastAnalysis.request?.claimId === currClaimId) {
+          window.__lastAnalysis = convertRegistryToAnalysisFormat(claim);
+        }
+
+        // If currently viewing this claim in Claim Analysis, refresh it live
+        if (window.__currentClaimId === currClaimId) {
+          switchAnalysisClaim(currClaimId);
+        }
 
         switchAppealClaim(currClaimId);
 
