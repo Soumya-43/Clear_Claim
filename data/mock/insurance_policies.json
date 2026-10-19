@@ -1,0 +1,117 @@
+{
+  "INS_A": {
+    "name": "Star Health Insurance (INS_A)",
+    "insurer_id": "INS_A",
+    "policy_id": "POL_A",
+    "max_claim": 50000,
+    "coverage": ["hospitalization", "diagnostics", "orthopedic_surgery"],
+    "procedures": {
+      "CPT_27447": {
+        "procedure": "Total Knee Arthroplasty",
+        "cpt": "CPT_27447",
+        "required_documents": [
+          "Surgeon Recommendation Letter",
+          "X-Ray or MRI showing Grade 3/4 osteoarthritis",
+          "Proof of failed conservative treatment (min 3 months)",
+          "Certificate of Medical Necessity"
+        ],
+        "qualifying_icd10": ["M17.11", "M17.12", "M17.31", "M17.9"],
+        "preauth_timeline_days": 10,
+        "max_approved_amount": 25000,
+        "notes": "Conservative treatment must be documented for at least 3 months prior."
+      },
+      "CPT_63030": {
+        "procedure": "Lumbar Discectomy",
+        "cpt": "CPT_63030",
+        "required_documents": [
+          "Surgeon Recommendation Letter",
+          "MRI report confirming disc herniation",
+          "Proof of failed conservative treatment (min 6 weeks)",
+          "Certificate of Medical Necessity"
+        ],
+        "qualifying_icd10": ["M51.1", "M51.16", "M51.17"],
+        "preauth_timeline_days": 14,
+        "max_approved_amount": 20000
+      }
+    }
+  },
+  "INS_B": {
+    "name": "HDFC ERGO Health (INS_B)",
+    "insurer_id": "INS_B",
+    "policy_id": "POL_B",
+    "max_claim": 40000,
+    "coverage": ["hospitalization", "diagnostics", "endoscopy"],
+    "procedures": {
+      "CPT_43239": {
+        "procedure": "Upper GI Endoscopy with Biopsy",
+        "cpt": "CPT_43239",
+        "required_documents": [
+          "Referring Physician Note",
+          "Prior endoscopy report (if repeat procedure)",
+          "H. pylori test result",
+          "Certificate of Medical Necessity"
+        ],
+        "qualifying_icd10": ["K25.9", "K27.9", "K29.70", "K21.0"],
+        "preauth_timeline_days": 5,
+        "max_approved_amount": 4500,
+        "notes": "Prior endoscopy required if repeat procedure within 12 months."
+      }
+    }
+  },
+  "INS_C": {
+    "name": "Care Health Insurance (INS_C)",
+    "insurer_id": "INS_C",
+    "policy_id": "POL_C",
+    "max_claim": 60000,
+    "coverage": ["hospitalization", "diagnostics", "neurosurgery", "spine_surgery"],
+    "procedures": {
+      "CPT_63030": {
+        "procedure": "Lumbar Discectomy",
+        "cpt": "CPT_63030",
+        "required_documents": [
+          "Surgeon Recommendation Letter",
+          "MRI report confirming disc herniation",
+          "Nerve Conduction Study or EMG",
+          "Proof of failed conservative treatment (min 6 weeks)",
+          "Certificate of Medical Necessity"
+        ],
+        "qualifying_icd10": ["M51.1", "M51.16", "M51.17"],
+        "preauth_timeline_days": 14,
+        "max_approved_amount": 18000,
+        "notes": "MRI must be within 6 months of surgery date. Conservative treatment must include PT."
+      },
+      "CPT_27447": {
+        "procedure": "Total Knee Arthroplasty",
+        "cpt": "CPT_27447",
+        "required_documents": [
+          "Surgeon Recommendation Letter",
+          "X-Ray or MRI showing Grade 3/4 osteoarthritis",
+          "Certificate of Medical Necessity"
+        ],
+        "qualifying_icd10": ["M17.11", "M17.12", "M17.31", "M17.9"],
+        "preauth_timeline_days": 10,
+        "max_approved_amount": 22000
+      }
+    }
+  },
+  "POL001": {
+    "name": "Standard Plan POL001",
+    "insurer_id": "POL001",
+    "policy_id": "POL001",
+    "max_claim": 50000,
+    "coverage": ["hospitalization", "diagnostics"],
+    "procedures": {
+      "CPT_63030": {
+        "procedure": "Lumbar Discectomy",
+        "cpt": "CPT_63030",
+        "required_documents": [
+          "Surgeon Recommendation Letter",
+          "MRI report confirming disc herniation"
+        ],
+        "qualifying_icd10": ["M51.1"],
+        "preauth_timeline_days": 14,
+        "max_approved_amount": 18000
+      }
+    }
+  }
+}
