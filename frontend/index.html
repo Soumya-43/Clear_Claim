@@ -4957,24 +4957,10 @@
     // ============================================================
     const SUPABASE_URL = 'https://gerrflcvfgidtgueqenx.supabase.co';
     const SUPABASE_ANON = 'sb_publishable_hYqa9RbpiEw9rtOJlcO7-A_KcZ52Bm0';
-    const EC2_BACKEND_HOST = '100.59.190.92:3001';
+    const API_BASE_URL = 'https://rlmzljktw1.execute-api.us-east-1.amazonaws.com/api';
 
     async function apiFetch(endpoint, options = {}) {
-      const isHttps = window.location.protocol === 'https:';
-      const primaryUrl = isHttps ? `/api${endpoint}` : `http://${EC2_BACKEND_HOST}/api${endpoint}`;
-      try {
-        const res = await fetch(primaryUrl, options);
-        if (res.ok) return res;
-        if (isHttps && res.status === 404) {
-          return await fetch(`http://${EC2_BACKEND_HOST}/api${endpoint}`, options);
-        }
-        return res;
-      } catch (err) {
-        if (isHttps) {
-          return await fetch(`http://${EC2_BACKEND_HOST}/api${endpoint}`, options);
-        }
-        throw err;
-      }
+      return fetch(`${API_BASE_URL}${endpoint}`, options);
     }
     
     let sb = null;
