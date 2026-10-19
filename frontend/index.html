@@ -7673,6 +7673,7 @@
 
     function initClaimsRegistry() {
       populateClaimDropdowns();
+      syncDashboardWithClaims();
       if (!window.__currentClaimId) window.__currentClaimId = 'CLM-2402';
       switchAnalysisClaim(window.__currentClaimId);
       switchPreauthClaim(window.__currentClaimId);
