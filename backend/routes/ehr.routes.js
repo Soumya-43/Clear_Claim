@@ -4,8 +4,10 @@ const fs = require("fs/promises");
 
 const router = express.Router();
 
+const { getDataPath } = require("../lib/dataPath");
+
 async function readMockEhr() {
-  const p = path.join(__dirname, "..", "..", "data", "mock", "patient_ehr.json");
+  const p = getDataPath("mock", "patient_ehr.json");
   const raw = await fs.readFile(p, "utf-8");
   return JSON.parse(raw);
 }

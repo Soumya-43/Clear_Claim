@@ -21,13 +21,15 @@ app.use(cors());
 app.use(express.json());
 app.use(morgan("dev"));
 
+const { getDataPath } = require("./lib/dataPath");
+
 const logicManager = new InsuranceLogicManager({
-  gapCsv: path.join(__dirname, "..", "data", "processed", "gap_analysis_data.csv"),
-  riskCsv: path.join(__dirname, "..", "data", "processed", "risk_training_data.csv"),
-  icdCsv: path.join(__dirname, "..", "data", "processed", "icd10_lookup_clean.csv"),
+  gapCsv: getDataPath("processed", "gap_analysis_data.csv"),
+  riskCsv: getDataPath("processed", "risk_training_data.csv"),
+  icdCsv: getDataPath("processed", "icd10_lookup_clean.csv"),
 });
 
-logicManager.init().then(() => {
+const initPromise = logicManager.init().then(() => {
   app.use((req, res, next) => {
     req.logicManager = logicManager;
     next();
@@ -44,16 +46,24 @@ logicManager.init().then(() => {
   app.use("/api/insurance",  insuranceRoutes);
   app.use("/api/insurer",    insurerRoutes);
 
-  // 3. Start the server
-  const PORT = process.env.PORT || 3001;
-  app.listen(PORT, () => {
-    console.log(`🚀 Express API running on port ${PORT}`);
-    startAiEngine();
-  });
-}).catch(err => {
-  console.error("Failed to initialize LogicManager:", err);
-  process.exit(1);
+  return app;
 });
+
+// Start local server if run directly (e.g. `node server.js`)
+if (require.main === module) {
+  initPromise.then(() => {
+    const PORT = process.env.PORT || 3001;
+    app.listen(PORT, () => {
+      console.log(`🚀 Express API running on port ${PORT}`);
+      startAiEngine();
+    });
+  }).catch(err => {
+    console.error("Failed to initialize LogicManager:", err);
+    process.exit(1);
+  });
+}
+
+module.exports = { app, initPromise };
 
 function startAiEngine() {
   const fs = require("fs");

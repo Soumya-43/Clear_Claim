@@ -4,8 +4,10 @@ const fs = require("fs/promises");
 
 const router = express.Router();
 
+const { getDataPath } = require("../lib/dataPath");
+
 async function readPolicies() {
-  const p = path.join(__dirname, "..", "..", "data", "mock", "insurance_policies.json");
+  const p = getDataPath("mock", "insurance_policies.json");
   const raw = await fs.readFile(p, "utf-8");
   return JSON.parse(raw);
 }

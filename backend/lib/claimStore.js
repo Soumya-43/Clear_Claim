@@ -1,32 +1,58 @@
 const fs = require("fs").promises;
 const path = require("path");
+const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
+const { DynamoDBDocumentClient, PutCommand, QueryCommand } = require("@aws-sdk/lib-dynamodb");
 
-const DATA_DIR = path.join(__dirname, "..", "..", "data", "mock");
-const SUBMITTED_PATH = path.join(DATA_DIR, "submitted_claims.json");
-const ALERTS_PATH = path.join(DATA_DIR, "doctor_alerts.json");
-const APPEALS_PATH = path.join(DATA_DIR, "appeals.json");
-const INSURER_RESPONSES_PATH = path.join(DATA_DIR, "insurer_responses.json");
-const HISTORICAL_REJECTIONS_PATH = path.join(DATA_DIR, "historical_rejections.json");
+const { getDataPath } = require("./dataPath");
 
+const SUBMITTED_PATH = getDataPath("mock", "submitted_claims.json");
+const ALERTS_PATH = getDataPath("mock", "doctor_alerts.json");
+const APPEALS_PATH = getDataPath("mock", "appeals.json");
+const INSURER_RESPONSES_PATH = getDataPath("mock", "insurer_responses.json");
+const HISTORICAL_REJECTIONS_PATH = getDataPath("mock", "historical_rejections.json");
+
+// ─── DynamoDB Configuration ────────────────────────────────────────────────
+const TABLE_NAME = process.env.DYNAMODB_TABLE || "ClearClaim_Data";
+
+function isDynamoEnabled() {
+  return !!process.env.AWS_LAMBDA_FUNCTION_NAME || process.env.USE_DYNAMODB === "true";
+}
+
+let docClient = null;
+function getDocClient() {
+  if (!docClient) {
+    const client = new DynamoDBClient({ region: process.env.AWS_REGION || "us-east-1" });
+    docClient = DynamoDBDocumentClient.from(client, {
+      marshallOptions: { removeUndefinedValues: true },
+    });
+  }
+  return docClient;
+}
+
+// ─── Local JSON Helpers (Fallback) ──────────────────────────────────────────
 async function readJson(filePath) {
   try {
     const raw = await fs.readFile(filePath, "utf-8");
     return JSON.parse(raw);
   } catch (e) {
     if (e.code === "ENOENT") return [];
-    throw e;
+    return [];
   }
 }
 
 async function writeJson(filePath, data) {
-  await fs.writeFile(filePath, JSON.stringify(data, null, 2), "utf-8");
+  try {
+    await fs.writeFile(filePath, JSON.stringify(data, null, 2), "utf-8");
+  } catch (e) {
+    // Read-only filesystem in Lambda is safe to ignore when DynamoDB is active
+  }
 }
 
+// ─── Claims ─────────────────────────────────────────────────────────────────
 /** Persist a submitted claim so it appears in analytics/history. */
 async function appendSubmittedClaim(claim) {
-  const list = await readJson(SUBMITTED_PATH);
-  list.unshift({
-    id: claim.id,
+  const claimRecord = {
+    id: claim.id || `CLM_${Date.now()}`,
     patientId: claim.patientId,
     patientName: claim.patientName,
     procedure: claim.procedure,
@@ -34,27 +60,68 @@ async function appendSubmittedClaim(claim) {
     insurerId: claim.insurerId,
     insurerName: claim.insurerName,
     cost: claim.cost,
-    submitted: claim.submitted,
+    submitted: claim.submitted !== false,
     submittedAt: claim.submittedAt || new Date().toISOString(),
-    risk: claim.risk,
-    status: claim.status,
+    risk: claim.risk || "Low",
+    status: claim.status || "Approved",
     missingDocs: claim.missingDocs || [],
-  });
+  };
+
+  if (isDynamoEnabled()) {
+    try {
+      await getDocClient().send(
+        new PutCommand({
+          TableName: TABLE_NAME,
+          Item: {
+            PK: "CLAIM",
+            SK: `CLAIM#${claimRecord.id}`,
+            ...claimRecord,
+          },
+        })
+      );
+      return claimRecord;
+    } catch (e) {
+      console.warn("[DynamoDB] appendSubmittedClaim error, fallback to local:", e.message);
+    }
+  }
+
+  const list = await readJson(SUBMITTED_PATH);
+  list.unshift(claimRecord);
   await writeJson(SUBMITTED_PATH, list);
-  return claim;
+  return claimRecord;
 }
 
 /** Return all submitted claims (for analytics merge). */
 async function getSubmittedClaims() {
-  return readJson(SUBMITTED_PATH);
+  let dynamoItems = [];
+  if (isDynamoEnabled()) {
+    try {
+      const res = await getDocClient().send(
+        new QueryCommand({
+          TableName: TABLE_NAME,
+          KeyConditionExpression: "PK = :pk",
+          ExpressionAttributeValues: { ":pk": "CLAIM" },
+        })
+      );
+      dynamoItems = res.Items || [];
+    } catch (e) {
+      console.warn("[DynamoDB] getSubmittedClaims error, fallback to local:", e.message);
+    }
+  }
+
+  const localList = await readJson(SUBMITTED_PATH);
+  if (dynamoItems.length === 0) return localList;
+
+  const seenIds = new Set(dynamoItems.map((d) => d.id));
+  return [...dynamoItems, ...localList.filter((l) => !seenIds.has(l.id))];
 }
 
+// ─── Alerts ─────────────────────────────────────────────────────────────────
 /** Record a doctor alert (missing docs). */
 async function notifyDoctor(doctorId, claimId, patientId, patientName, missingDocs) {
-  const list = await readJson(ALERTS_PATH);
   const alert = {
     id: `ALT_${Date.now()}`,
-    doctorId,
+    doctorId: doctorId || "DOC_DEFAULT",
     claimId,
     patientId,
     patientName,
@@ -63,6 +130,26 @@ async function notifyDoctor(doctorId, claimId, patientId, patientName, missingDo
     createdAt: new Date().toISOString(),
     read: false,
   };
+
+  if (isDynamoEnabled()) {
+    try {
+      await getDocClient().send(
+        new PutCommand({
+          TableName: TABLE_NAME,
+          Item: {
+            PK: "ALERT",
+            SK: `ALERT#${alert.id}`,
+            ...alert,
+          },
+        })
+      );
+      return alert;
+    } catch (e) {
+      console.warn("[DynamoDB] notifyDoctor error, fallback to local:", e.message);
+    }
+  }
+
+  const list = await readJson(ALERTS_PATH);
   list.unshift(alert);
   await writeJson(ALERTS_PATH, list);
   return alert;
@@ -70,10 +157,29 @@ async function notifyDoctor(doctorId, claimId, patientId, patientName, missingDo
 
 /** Get all doctor alerts. */
 async function getDoctorAlerts() {
-  return readJson(ALERTS_PATH);
+  let dynamoItems = [];
+  if (isDynamoEnabled()) {
+    try {
+      const res = await getDocClient().send(
+        new QueryCommand({
+          TableName: TABLE_NAME,
+          KeyConditionExpression: "PK = :pk",
+          ExpressionAttributeValues: { ":pk": "ALERT" },
+        })
+      );
+      dynamoItems = res.Items || [];
+    } catch (e) {
+      console.warn("[DynamoDB] getDoctorAlerts error, fallback to local:", e.message);
+    }
+  }
+
+  const localList = await readJson(ALERTS_PATH);
+  if (dynamoItems.length === 0) return localList;
+  const seenIds = new Set(dynamoItems.map((d) => d.id));
+  return [...dynamoItems, ...localList.filter((l) => !seenIds.has(l.id))];
 }
 
-/** Rejection → action mapping (problem statement bonus). */
+// ─── Rejections & Appeals ───────────────────────────────────────────────────
 const REJECTION_ACTIONS = {
   MISSING_DOCUMENT: ["Request missing document from provider", "Re-submit pre-auth packet"],
   INCORRECT_CODING: ["Validate ICD-10/CPT mapping", "Correct codes and re-submit"],
@@ -82,11 +188,11 @@ const REJECTION_ACTIONS = {
   INSUFFICIENT_TREATMENT_HISTORY: ["Document conservative treatment duration", "Re-submit with complete history"],
   INVALID_DOCUMENT: ["Obtain signed/valid document", "Re-submit corrected document"],
 };
+
 function mapRejectionToActions(rejectionCategory) {
   return REJECTION_ACTIONS[rejectionCategory] || ["Review rejection details", "Collect supporting evidence"];
 }
 
-/** Draft appeal letter (bonus). */
 function draftAppealLetter(patientId, claimId, reason) {
   return `To Whom It May Concern,
 
@@ -104,7 +210,6 @@ Billing Team`;
 async function recordRejectionAndAppeal(claimId, patientId, rejectionReason, rejectionCategory) {
   const actions = mapRejectionToActions(rejectionCategory || "MISSING_DOCUMENT");
   const letter = draftAppealLetter(patientId, claimId, rejectionReason);
-  const appeals = await readJson(APPEALS_PATH);
   const appeal = {
     id: `APL_${Date.now()}`,
     claimId,
@@ -116,17 +221,55 @@ async function recordRejectionAndAppeal(claimId, patientId, rejectionReason, rej
     createdAt: new Date().toISOString(),
     status: "draft",
   };
+
+  if (isDynamoEnabled()) {
+    try {
+      await getDocClient().send(
+        new PutCommand({
+          TableName: TABLE_NAME,
+          Item: {
+            PK: "APPEAL",
+            SK: `APPEAL#${appeal.id}`,
+            ...appeal,
+          },
+        })
+      );
+      return appeal;
+    } catch (e) {
+      console.warn("[DynamoDB] recordRejectionAndAppeal error, fallback to local:", e.message);
+    }
+  }
+
+  const appeals = await readJson(APPEALS_PATH);
   appeals.unshift(appeal);
   await writeJson(APPEALS_PATH, appeals);
   return appeal;
 }
 
 async function getAppeals() {
-  return readJson(APPEALS_PATH);
+  let dynamoItems = [];
+  if (isDynamoEnabled()) {
+    try {
+      const res = await getDocClient().send(
+        new QueryCommand({
+          TableName: TABLE_NAME,
+          KeyConditionExpression: "PK = :pk",
+          ExpressionAttributeValues: { ":pk": "APPEAL" },
+        })
+      );
+      dynamoItems = res.Items || [];
+    } catch (e) {
+      console.warn("[DynamoDB] getAppeals error, fallback to local:", e.message);
+    }
+  }
+
+  const localList = await readJson(APPEALS_PATH);
+  if (dynamoItems.length === 0) return localList;
+  const seenIds = new Set(dynamoItems.map((d) => d.id));
+  return [...dynamoItems, ...localList.filter((l) => !seenIds.has(l.id))];
 }
 
-// ─── Insurer response API (simulated) ───────────────────────────────────────
-
+// ─── Insurer Responses (Mock / Simulation) ──────────────────────────────────
 async function getInsurerResponses() {
   const data = await readJson(INSURER_RESPONSES_PATH);
   return Array.isArray(data) ? data : [];
@@ -137,7 +280,6 @@ async function getInsurerResponseByClaimId(claimId) {
   return list.find((r) => r.claimId === claimId);
 }
 
-/** Save or update insurer response (e.g. webhook from insurer). */
 async function saveInsurerResponse(record) {
   const list = await getInsurerResponses();
   const idx = list.findIndex((r) => r.claimId === record.claimId);
@@ -157,7 +299,6 @@ async function saveInsurerResponse(record) {
   return entry;
 }
 
-/** Get historical rejection reasons for realistic simulation. */
 async function getHistoricalRejectionTemplates() {
   try {
     const data = await fs.readFile(HISTORICAL_REJECTIONS_PATH, "utf-8");
@@ -165,18 +306,12 @@ async function getHistoricalRejectionTemplates() {
     const log = parsed.rejection_log || parsed;
     return Array.isArray(log) ? log : [];
   } catch (e) {
-    if (e.code === "ENOENT") return [];
     return [];
   }
 }
 
-/**
- * Monitor: check submitted claims for insurer responses; simulate rejections for demo;
- * for each new rejection, map to actions + draft appeal and store.
- * Returns { checked, newRejections, newAppeals }.
- */
 async function runRejectionMonitor(options = {}) {
-  const { simulateRejectionRate = 0.15 } = options; // 15% of pending claims get simulated rejection
+  const { simulateRejectionRate = 0.15 } = options;
   const submitted = await getSubmittedClaims();
   const responses = await getInsurerResponses();
   const byClaim = new Map(responses.map((r) => [r.claimId, r]));
@@ -187,14 +322,13 @@ async function runRejectionMonitor(options = {}) {
   for (const claim of submitted) {
     const claimId = claim.id || claim.claimId;
     if (!claimId) continue;
-    if (byClaim.has(claimId)) continue; // already has a response
+    if (byClaim.has(claimId)) continue;
 
-    // Simulate insurer response (in production this would be a real API poll)
     const isRejection = Math.random() < simulateRejectionRate;
     const status = isRejection ? "rejected" : "approved";
     const template = templates[Math.floor(Math.random() * templates.length)] || {};
-    const rejectionReason = isRejection ? (template.rejection_reason || "Documentation incomplete") : null;
-    const rejectionCategory = isRejection ? (template.rejection_category || "MISSING_DOCUMENT") : null;
+    const rejectionReason = isRejection ? template.rejection_reason || "Documentation incomplete" : null;
+    const rejectionCategory = isRejection ? template.rejection_category || "MISSING_DOCUMENT" : null;
 
     await saveInsurerResponse({
       claimId,

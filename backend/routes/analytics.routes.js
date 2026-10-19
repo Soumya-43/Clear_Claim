@@ -5,9 +5,10 @@ const csv = require("csv-parser");
 const router = express.Router();
 const { getSubmittedClaims } = require("../lib/claimStore");
 
-const DATA_DIR = path.join(__dirname, "..", "..", "data", "processed");
-const RISK_CSV = path.join(DATA_DIR, "risk_training_data.csv");
-const GAP_CSV = path.join(DATA_DIR, "gap_analysis_data.csv");
+const { getDataPath } = require("../lib/dataPath");
+
+const RISK_CSV = getDataPath("processed", "risk_training_data.csv");
+const GAP_CSV = getDataPath("processed", "gap_analysis_data.csv");
 
 const INSURER_NAMES = { INS_A: "Star Health", INS_B: "HDFC ERGO", INS_C: "Bajaj Allianz", INS_D: "Insurer D", INS_E: "Insurer E" };
 const CPT_NAMES = {
