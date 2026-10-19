@@ -3070,6 +3070,20 @@
       background: var(--muted2);
     }
 
+    .tl-dot.pulse {
+      animation: pulseDot 1.6s infinite ease-in-out;
+    }
+
+    @keyframes pulseDot {
+      0% { box-shadow: 0 0 0 2px var(--border), 0 0 0 0 rgba(245, 158, 11, 0.7); }
+      70% { box-shadow: 0 0 0 2px var(--border), 0 0 0 8px rgba(245, 158, 11, 0); }
+      100% { box-shadow: 0 0 0 2px var(--border), 0 0 0 0 rgba(245, 158, 11, 0); }
+    }
+
+    .tl-dot.glow-green {
+      box-shadow: 0 0 0 2px var(--surface), 0 0 12px 2px rgba(16, 185, 129, 0.85) !important;
+    }
+
     .tl-title {
       font-size: 13px;
       font-weight: 600;
@@ -4639,59 +4653,42 @@
             <div class="page-title" id="appeal-page-title">Appeal Center</div>
             <div class="page-sub" id="appeal-page-sub">Select a rejected claim to generate or review appeal dispute package</div>
           </div>
-          <button class="btn btn-g" onclick="showNotif('✉️ Appeal letter sent to insurer!','success')">Send Appeal Letter</button>
+          <button class="btn btn-g" id="btn-send-appeal-action" onclick="handleSendAppeal()">✉️ Send Appeal Letter</button>
         </div>
 
-        <!-- REJECTED CLAIM SELECTOR TOOLBAR -->
-        <div class="card" style="margin-bottom:18px; padding:14px 20px; background:var(--surface); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:14px; border-left:4px solid var(--red); border-radius:var(--radius-sm); box-shadow:var(--shadow-sm);">
+        <!-- PATIENT / CLAIM SELECTOR TOOLBAR -->
+        <div class="card" style="margin-bottom:18px; padding:14px 20px; background:var(--surface); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:14px; border-left:4px solid var(--primary, #3b82f6); border-radius:var(--radius-sm); box-shadow:var(--shadow-sm);">
           <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
             <div style="display:flex; align-items:center; gap:8px;">
-              <span style="font-size:18px;">🚨</span>
-              <span style="font-weight:700; font-size:13px; color:var(--text);">Select Rejected Claim to Appeal:</span>
+              <span style="font-size:18px;">🩺</span>
+              <span style="font-weight:700; font-size:13px; color:var(--text);">Select Patient / Claim:</span>
             </div>
-            <select id="appeal-claim-selector" class="fi" style="margin:0; width:auto; min-width:360px; padding:7px 12px; font-weight:600; border-color:var(--border2); cursor:pointer;" onchange="switchAppealClaim(this.value)">
+            <select id="appeal-claim-selector" class="fi" style="margin:0; width:auto; min-width:380px; padding:7px 12px; font-weight:600; border-color:var(--border2); cursor:pointer;" onchange="switchAppealClaim(this.value)">
               <!-- Populated dynamically via JS -->
             </select>
-            <input type="text" id="appeal-claim-search" placeholder="🔍 Search appeal claims..." class="fi" style="padding:6px 12px; font-size:12px; width:200px; margin:0;" oninput="searchAppealDropdown(this.value)" />
+            <input type="text" id="appeal-claim-search" placeholder="🔍 Search patient/claim..." class="fi" style="padding:6px 12px; font-size:12px; width:180px; margin:0;" oninput="searchAppealDropdown(this.value)" />
+            <div id="appeal-filter-pills" style="display:flex; gap:6px;">
+              <button class="btn btn-p btn-xs" id="pill-appeal-all" onclick="filterAppealSelector('ALL')">All</button>
+              <button class="btn btn-w btn-xs" id="pill-appeal-rejected" onclick="filterAppealSelector('REJECTED')">Rejected</button>
+              <button class="btn btn-w btn-xs" id="pill-appeal-pending" onclick="filterAppealSelector('PENDING')">Pending</button>
+              <button class="btn btn-w btn-xs" id="pill-appeal-approved" onclick="filterAppealSelector('APPROVED')">Approved</button>
+            </div>
           </div>
           <div style="display:flex; align-items:center; gap:8px;">
-            <span style="font-size:12px; color:var(--muted);">Automated dispute letter with clinical justification & corrective attachments</span>
+            <span style="font-size:12px; color:var(--muted);" id="appeal-status-summary">Live tracking across EHR clinical evidence &amp; insurer adjudication</span>
           </div>
         </div>
 
         <div class="ag">
           <div>
             <div class="card" style="margin-bottom:20px">
-              <div class="card-head">
-                <div class="card-title">⚡ Rejection Timeline</div>
+              <div class="card-head" style="display:flex; align-items:center; justify-content:space-between;">
+                <div class="card-title" id="appeal-timeline-title">⚡ Claim Lifecycle &amp; Rejection Timeline</div>
+                <div id="appeal-timeline-badge"><span class="badge b-r">REJECTED</span></div>
               </div>
               <div class="card-body" style="padding:22px 24px">
                 <div class="timeline" id="appeal-timeline">
-                  <div class="tl-item">
-                    <div class="tl-dot g"></div>
-                    <div class="tl-title" id="tl-t1">Claim Submitted</div>
-                    <div class="tl-body" id="tl-b1">Claim submitted to insurer</div>
-                  </div>
-                  <div class="tl-item">
-                    <div class="tl-dot a"></div>
-                    <div class="tl-title" id="tl-t2">Under Review</div>
-                    <div class="tl-body" id="tl-b2">Insurer acknowledged receipt · Review in progress</div>
-                  </div>
-                  <div class="tl-item">
-                    <div class="tl-dot r"></div>
-                    <div class="tl-title" id="tl-t3">Rejection Received</div>
-                    <div class="tl-body" id="tl-b3">Rejection reason cited by payer</div>
-                  </div>
-                  <div class="tl-item">
-                    <div class="tl-dot b"></div>
-                    <div class="tl-title" id="tl-t4">Agent Identified Corrective Action</div>
-                    <div class="tl-body" id="tl-b4">Rejection mapped → Attach required records. Appeal drafted automatically.</div>
-                  </div>
-                  <div class="tl-item">
-                    <div class="tl-dot m"></div>
-                    <div class="tl-title" style="color:var(--muted)">Appeal Pending Submission</div>
-                    <div class="tl-body">Review letter and click Send Appeal</div>
-                  </div>
+                  <!-- Generated dynamically based on patient status -->
                 </div>
               </div>
             </div>
@@ -7671,14 +7668,34 @@
         const apSel = document.getElementById('appeal-claim-selector');
         if (apSel) {
           apSel.innerHTML = '';
-          const rejectedClaims = Object.values(window.CLAIMS_REGISTRY || {}).filter(c => c.status === 'Rejected' || c.appeal !== null || c.risk?.level === 'HIGH');
-          rejectedClaims.forEach(c => {
+          const activeFilter = window.__appealActiveFilter || 'ALL';
+          const allClaims = Object.values(window.CLAIMS_REGISTRY || {});
+          const filtered = allClaims.filter(c => {
+            const status = (c.status || '').toUpperCase();
+            const isAppealApproved = (c.appeal && c.appeal.status === 'APPROVED');
+            if (activeFilter === 'REJECTED') return (status === 'REJECTED' && !isAppealApproved);
+            if (activeFilter === 'PENDING') return status === 'PENDING';
+            if (activeFilter === 'APPROVED') return (status === 'APPROVED' || isAppealApproved);
+            return true;
+          });
+
+          filtered.forEach(c => {
             const opt = document.createElement('option');
             opt.value = c.claimId;
-            opt.textContent = `${c.claimId} — ${c.patientName} (${c.appeal?.rejectionReason || 'High Risk / Gaps'})`;
+            const isAppealApproved = (c.appeal && c.appeal.status === 'APPROVED');
+            const statusIcon = (c.status === 'Approved' || isAppealApproved) ? '✅' : (c.status === 'Pending' ? '⏳' : '❌');
+            const statusTag = isAppealApproved ? 'Appeal Approved' : c.status;
+            opt.textContent = `${statusIcon} ${c.claimId} — ${c.patientName} (${c.procedure}) [${statusTag}]`;
             if (c.claimId === window.__currentAppealClaimId) opt.selected = true;
             apSel.appendChild(opt);
           });
+
+          if (filtered.length === 0) {
+            const opt = document.createElement('option');
+            opt.value = '';
+            opt.textContent = '❌ No matching claims in this filter';
+            apSel.appendChild(opt);
+          }
         }
       }
     }
@@ -7844,14 +7861,42 @@
       }
     }
 
+    function filterAppealSelector(filter) {
+      window.__appealActiveFilter = filter;
+      ['all', 'rejected', 'pending', 'approved'].forEach(f => {
+        const pill = document.getElementById(`pill-appeal-${f}`);
+        if (pill) {
+          if (f.toUpperCase() === filter) {
+            pill.className = 'btn btn-p btn-xs';
+          } else {
+            pill.className = 'btn btn-w btn-xs';
+          }
+        }
+      });
+      populateClaimDropdowns('ALL', 'APPEAL');
+      const sel = document.getElementById('appeal-claim-selector');
+      if (sel && sel.value) {
+        switchAppealClaim(sel.value);
+      }
+    }
+
     function searchAppealDropdown(query) {
       const q = (query || '').toLowerCase().trim();
       const sel = document.getElementById('appeal-claim-selector');
       if (!sel) return;
 
       sel.innerHTML = '';
-      const rejectedClaims = Object.values(window.CLAIMS_REGISTRY || {}).filter(c => c.status === 'Rejected' || c.appeal !== null || c.risk?.level === 'HIGH');
-      const matched = rejectedClaims.filter(c => {
+      const activeFilter = window.__appealActiveFilter || 'ALL';
+      const allClaims = Object.values(window.CLAIMS_REGISTRY || {}).filter(c => {
+        const status = (c.status || '').toUpperCase();
+        const isAppealApproved = (c.appeal && c.appeal.status === 'APPROVED');
+        if (activeFilter === 'REJECTED') return (status === 'REJECTED' && !isAppealApproved);
+        if (activeFilter === 'PENDING') return status === 'PENDING';
+        if (activeFilter === 'APPROVED') return (status === 'APPROVED' || isAppealApproved);
+        return true;
+      });
+
+      const matched = allClaims.filter(c => {
         if (!q) return true;
         const text = `${c.claimId} ${c.patientName} ${c.procedure} ${c.insurerId || ''} ${c.appeal?.rejectionReason || ''}`.toLowerCase();
         return text.includes(q);
@@ -7860,7 +7905,10 @@
       matched.forEach(c => {
         const opt = document.createElement('option');
         opt.value = c.claimId;
-        opt.textContent = `${c.claimId} — ${c.patientName} (${c.appeal?.rejectionReason || 'High Risk / Gaps'})`;
+        const isAppealApproved = (c.appeal && c.appeal.status === 'APPROVED');
+        const statusIcon = (c.status === 'Approved' || isAppealApproved) ? '✅' : (c.status === 'Pending' ? '⏳' : '❌');
+        const statusTag = isAppealApproved ? 'Appeal Approved' : c.status;
+        opt.textContent = `${statusIcon} ${c.claimId} — ${c.patientName} (${c.procedure}) [${statusTag}]`;
         if (c.claimId === window.__currentAppealClaimId) opt.selected = true;
         sel.appendChild(opt);
       });
@@ -7873,13 +7921,94 @@
       } else {
         const opt = document.createElement('option');
         opt.value = '';
-        opt.textContent = '❌ No matching appeal claims found';
+        opt.textContent = '❌ No matching claims found';
         sel.appendChild(opt);
       }
     }
 
+    function handleSendAppeal() {
+      const currClaimId = window.__currentAppealClaimId;
+      if (!currClaimId || !window.CLAIMS_REGISTRY || !window.CLAIMS_REGISTRY[currClaimId]) {
+        showNotif('⚠️ Please select a claim to appeal.', 'error');
+        return;
+      }
+      const claim = window.CLAIMS_REGISTRY[currClaimId];
+      if (claim.status === 'Approved') {
+        showNotif('ℹ️ This claim is already approved. No appeal is required.', 'info');
+        return;
+      }
+      if (claim.status === 'Pending') {
+        showNotif('ℹ️ This claim is still under review by the insurer.', 'info');
+        return;
+      }
+
+      const sendBtn = document.getElementById('btn-send-appeal-action');
+      if (sendBtn) {
+        sendBtn.disabled = true;
+        sendBtn.innerHTML = '<span style="display:inline-block;width:12px;height:12px;border:2px solid #fff;border-top-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite;margin-right:6px"></span> Transmitting Appeal Package...';
+      }
+
+      if (!claim.appeal) claim.appeal = {};
+      claim.appeal.status = 'IN_REVIEW';
+
+      const timelineEl = document.getElementById('appeal-timeline');
+      const nowStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+      if (timelineEl) {
+        timelineEl.innerHTML = `
+          <div class="tl-item">
+            <div class="tl-dot g"></div>
+            <div class="tl-title">Claim Submitted</div>
+            <div class="tl-body">${claim.claimId} submitted to ${claim.insurerId} · Initial clinical package uploaded.</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot a"></div>
+            <div class="tl-title">Under Review</div>
+            <div class="tl-body">${claim.insurerId} acknowledged receipt · Clinical necessity assessment.</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot r"></div>
+            <div class="tl-title">Rejection Received</div>
+            <div class="tl-body">Reason: "${claim.appeal.rejectionReason || 'Clinical necessity verification required'}"</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot b"></div>
+            <div class="tl-title">Agent Identified Corrective Action</div>
+            <div class="tl-body">Rejection mapped → ${claim.appeal.actionPlan || 'Attached verified clinical records'}.</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot b"></div>
+            <div class="tl-title">Appeal Dispatched to Insurer</div>
+            <div class="tl-body">Formal dispute letter &amp; supplemental clinical evidence transmitted to ${claim.insurerId} Appeals Board · Today, ${nowStr}.</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot a pulse"></div>
+            <div class="tl-title" style="color:var(--amber);">Payer Expedited Dispute Adjudication</div>
+            <div class="tl-body">${claim.insurerId} Medical Review Board re-evaluating clinical records &amp; physician endorsement...</div>
+          </div>
+        `;
+      }
+
+      showNotif(`✉️ Appeal letter & corrective evidence sent to ${claim.insurerId}! Medical board re-evaluating...`, 'info');
+
+      // Realistic simulated turnaround: 5.5 seconds later, insurer overturns rejection!
+      setTimeout(() => {
+        claim.status = 'Approved';
+        claim.appeal.status = 'APPROVED';
+        const approvedAmt = claim.maxApproved || claim.costEstimate || 185000;
+
+        switchAppealClaim(currClaimId);
+
+        if (typeof syncDashboardWithClaims === 'function') syncDashboardWithClaims();
+        if (typeof renderAllClaimsTable === 'function') renderAllClaimsTable();
+        if (typeof populateClaimDropdowns === 'function') populateClaimDropdowns();
+
+        showNotif(`🎉 SUCCESS: ${claim.insurerId} has APPROVED the appeal for ${claim.claimId} (${claim.patientName})! Pre-Authorization clearance issued.`, 'success');
+      }, 5500);
+    }
+
     function switchAppealClaim(claimId) {
-      if (!claimId || !window.CLAIMS_REGISTRY[claimId]) return;
+      if (!claimId || !window.CLAIMS_REGISTRY || !window.CLAIMS_REGISTRY[claimId]) return;
       window.__currentAppealClaimId = claimId;
 
       const claim = window.CLAIMS_REGISTRY[claimId];
@@ -7888,10 +8017,21 @@
 
       const el = (id) => document.getElementById(id);
       const setText = (id, text) => { const e = el(id); if (e) e.textContent = text; };
-      const setLines = (id, text) => { const e = el(id); if (e) e.innerText = text || ''; };
 
-      setText('appeal-page-title', `Appeal Center — ${claim.claimId}`);
-      setText('appeal-page-sub', `Rejected claim · Auto-generated appeal · ${claim.patientName} · ${claim.insurerId}`);
+      setText('appeal-page-title', `Claim Lifecycle & Appeal — ${claim.claimId}`);
+      setText('appeal-page-sub', `${claim.patientName} (Age: ${claim.age || 45}) · ${claim.procedure} · ${claim.insurerId} · Policy: ${claim.policyNumber || 'N/A'}`);
+
+      const sendBtn = el('btn-send-appeal-action');
+      const badgeEl = el('appeal-timeline-badge');
+      const titleEl = el('appeal-timeline-title');
+      const timelineEl = el('appeal-timeline');
+      const letterDiv = el('appeal-letter');
+      const editBtn = el('btn-edit-appeal');
+      const sumEl = el('appeal-status-summary');
+
+      const isAppealApproved = (claim.appeal && claim.appeal.status === 'APPROVED');
+      const isApproved = (claim.status === 'Approved' || isAppealApproved);
+      const isPending = (claim.status === 'Pending');
 
       const appeal = claim.appeal || {
         rejectionReason: (claim.missingDocs && claim.missingDocs.length) ? `Missing: ${claim.missingDocs[0]}` : 'Clinical necessity verification required',
@@ -7901,40 +8041,299 @@
         appealLetter: `To,\nThe Appeals Committee,\n${claim.insurerId}\n\nSubject: Formal Dispute — Claim ${claim.claimId}\nPatient: ${claim.patientName}\n\nWe hereby appeal the rejection for procedure ${claim.procedure}. All required clinical parameters have been satisfied.`
       };
 
-      setText('appeal-reason', appeal.rejectionReason);
-      setText('appeal-action', appeal.actionPlan);
-      setText('appeal-doc-status', appeal.docStatus || '✅ Obtained');
-      setText('appeal-deadline', appeal.deadline || '14 days');
+      if (isAppealApproved) {
+        // CASE 1: REJECTION OVERTURNED VIA APPEAL
+        if (titleEl) titleEl.innerHTML = '⚡ Appeal Approved &amp; Sanctioned Timeline';
+        if (badgeEl) badgeEl.innerHTML = '<span class="badge b-g" style="box-shadow:0 0 8px rgba(16,185,129,0.5)">🎉 APPEAL APPROVED</span>';
+        if (sumEl) sumEl.textContent = `Payer overturned rejection · Full pre-auth granted for ₹${Number(claim.maxApproved || claim.costEstimate).toLocaleString('en-IN')}`;
 
-      // Update timeline
-      if (appeal.timeline && appeal.timeline.length >= 4) {
-        setText('tl-t1', appeal.timeline[0].title);
-        setText('tl-b1', appeal.timeline[0].desc);
-        setText('tl-t2', appeal.timeline[1].title);
-        setText('tl-b2', appeal.timeline[1].desc);
-        setText('tl-t3', appeal.timeline[2].title);
-        setText('tl-b3', appeal.timeline[2].desc);
-        setText('tl-t4', appeal.timeline[3].title);
-        setText('tl-b4', appeal.timeline[3].desc);
+        if (sendBtn) {
+          sendBtn.innerHTML = '🎉 Appeal Approved &amp; Pre-Auth Issued';
+          sendBtn.className = 'btn btn-g btn-sm';
+          sendBtn.disabled = true;
+          sendBtn.style.opacity = '1';
+          sendBtn.style.cursor = 'default';
+        }
+
+        setText('appeal-reason', `Rejection Overturned (${appeal.rejectionReason})`);
+        setText('appeal-action', 'Dispute Accepted & Pre-Authorization Granted');
+        setText('appeal-doc-status', '✅ Approved by Insurer Appeals Board');
+        setText('appeal-deadline', 'N/A — Pre-Auth Clearance Issued');
+
+        if (letterDiv) {
+          letterDiv.innerHTML = `
+<div style="padding:16px 18px; background:rgba(16,185,129,0.08); border:1px solid rgba(16,185,129,0.25); border-radius:var(--radius-sm); margin-bottom:14px;">
+  <div style="font-weight:700; color:var(--green); font-size:14px; margin-bottom:6px;">🎉 APPEAL SUCCESSFUL — REJECTION OVERTURNED</div>
+  <div style="font-size:12.5px; color:var(--text); line-height:1.6;">
+    <strong>${claim.insurerId}</strong> has officially reviewed the supplemental clinical justification and overturned the prior rejection. Pre-Authorization clearance has been sanctioned for <strong>₹${Number(claim.maxApproved || claim.costEstimate).toLocaleString('en-IN')}</strong>.
+  </div>
+</div>
+<div style="font-family:monospace; font-size:12px; line-height:1.8; color:var(--text2); white-space:pre-wrap;">
+PRE-AUTHORIZATION CLEARANCE NOTE
+----------------------------------------------------------------------
+Claim ID:              ${claim.claimId}
+Patient:               ${claim.patientName} (Policy: ${claim.policyNumber || 'N/A'})
+Insurer:               ${claim.insurerId}
+Procedure:             ${claim.procedure} (CPT: ${claim.cpt_code || 'N/A'})
+Authorization Code:    REV-${claim.claimId.replace('CLM-','')}-GRANTED
+Cleared Amount:        ₹${Number(claim.maxApproved || claim.costEstimate).toLocaleString('en-IN')}
+Clearance Date:        ${new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+Dispatch Recipient:    Hospital Billing & Admission Desk
+
+Summary of Dispute Resolution:
+The Medical Appeals Board confirmed that all requested clinical documentation (including surgeon necessity certifications and diagnostic imaging) has been verified. The claim is now cleared for hospital admission.
+</div>`;
+        }
+        if (editBtn) editBtn.style.display = 'none';
+
+        if (timelineEl) {
+          timelineEl.innerHTML = `
+            <div class="tl-item">
+              <div class="tl-dot g"></div>
+              <div class="tl-title">Claim Submitted</div>
+              <div class="tl-body">${claim.claimId} submitted to ${claim.insurerId} · Initial clinical package uploaded.</div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-dot a"></div>
+              <div class="tl-title">Under Review</div>
+              <div class="tl-body">${claim.insurerId} acknowledged receipt · Clinical necessity assessment.</div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-dot r"></div>
+              <div class="tl-title">Rejection Received</div>
+              <div class="tl-body">Reason: "${appeal.rejectionReason}" · Adverse determination notice issued.</div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-dot b"></div>
+              <div class="tl-title">Agent Identified Corrective Action</div>
+              <div class="tl-body">Rejection mapped → ${appeal.actionPlan}. Dispute package assembled automatically.</div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-dot b"></div>
+              <div class="tl-title">Appeal Dispatched to Insurer</div>
+              <div class="tl-body">Formal dispute letter &amp; supplemental clinical evidence transmitted to ${claim.insurerId} Appeals Board.</div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-dot g"></div>
+              <div class="tl-title">Payer Clinical Review Completed</div>
+              <div class="tl-body">${claim.insurerId} Medical Board confirmed supplemental records satisfy all policy criteria.</div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-dot g glow-green"></div>
+              <div class="tl-title" style="color:var(--green); font-weight:700;">🎉 Appeal Approved &amp; Denial Overturned!</div>
+              <div class="tl-body" style="color:var(--text);">Pre-authorization sanctioned for ₹${Number(claim.maxApproved || claim.costEstimate).toLocaleString('en-IN')}. Clearance Token: REV-${claim.claimId.replace('CLM-','')}-OK. Hospital admission desk notified.</div>
+            </div>
+          `;
+        }
+
+      } else if (isApproved) {
+        // CASE 2: FIRST-PASS APPROVED PATIENT (e.g. Ramesh Kumar)
+        if (titleEl) titleEl.innerHTML = '⚡ Pre-Authorization Approval Timeline';
+        if (badgeEl) badgeEl.innerHTML = '<span class="badge b-g">APPROVED</span>';
+        if (sumEl) sumEl.textContent = 'All clinical criteria satisfied · First-pass pre-authorization granted';
+
+        if (sendBtn) {
+          sendBtn.innerHTML = '✅ Pre-Auth Approved (No Appeal Needed)';
+          sendBtn.className = 'btn btn-g btn-sm';
+          sendBtn.disabled = true;
+          sendBtn.style.opacity = '0.85';
+          sendBtn.style.cursor = 'default';
+        }
+
+        setText('appeal-reason', 'None (Clean Claim — First-Pass Approval)');
+        setText('appeal-action', 'Full surgical & clinical necessity verified in EHR');
+        setText('appeal-doc-status', `✅ 100% Policy Records Verified (${claim.requiredDocs?.length || 4} of ${claim.requiredDocs?.length || 4})`);
+        setText('appeal-deadline', 'N/A — Pre-Authorization Granted');
+
+        if (letterDiv) {
+          letterDiv.innerHTML = `
+<div style="padding:16px 18px; background:rgba(16,185,129,0.08); border:1px solid rgba(16,185,129,0.25); border-radius:var(--radius-sm); margin-bottom:14px;">
+  <div style="font-weight:700; color:var(--green); font-size:14px; margin-bottom:6px;">✅ FIRST-PASS PRE-AUTHORIZATION SANCTIONED</div>
+  <div style="font-size:12.5px; color:var(--text); line-height:1.6;">
+    This claim satisfied all medical necessity guidelines and underwriting documentation upon initial submission. No rejection or dispute letter was required.
+  </div>
+</div>
+<div style="font-family:monospace; font-size:12px; line-height:1.8; color:var(--text2); white-space:pre-wrap;">
+PRE-AUTHORIZATION APPROVAL CLEARANCE CERTIFICATE
+----------------------------------------------------------------------
+Claim ID:              ${claim.claimId}
+Patient:               ${claim.patientName} (Age: ${claim.age || 58}, ${claim.gender || 'Male'})
+Empaneled Insurer:     ${claim.insurerId}
+Policy Number:         ${claim.policyNumber || 'N/A'}
+Procedure:             ${claim.procedure} (CPT: ${claim.cpt_code || 'N/A'})
+Approved Amount:       ₹${Number(claim.maxApproved || claim.costEstimate).toLocaleString('en-IN')}
+Authorization Ref:     AUTH-${claim.claimId.replace('CLM-','')}-8821
+Hospital:              ${claim.hospital || 'Apollo Hospitals, Chennai'}
+Decision Status:       SANCTIONED / APPROVED
+
+Clinical Verification Notes:
+All prerequisite documentation was cross-referenced and verified in the Electronic Health Record:
+${(claim.foundDocs || claim.requiredDocs || ['Clinical evaluation notes', 'Diagnostic imaging', 'Pre-op clearance']).map(d => `• Verified: ${d}`).join('\n')}
+
+Admission authorization token has been dispatched to the hospital desk.
+</div>`;
+        }
+        if (editBtn) editBtn.style.display = 'none';
+
+        if (timelineEl) {
+          timelineEl.innerHTML = `
+            <div class="tl-item">
+              <div class="tl-dot g"></div>
+              <div class="tl-title">Claim &amp; Clinical Dossier Submitted</div>
+              <div class="tl-body">${claim.claimId} submitted to ${claim.insurerId} · All ${claim.requiredDocs?.length || 4} policy required documents verified via EHR evidence.</div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-dot g"></div>
+              <div class="tl-title">Insurer Clinical Adjudication</div>
+              <div class="tl-body">${claim.insurerId} Medical Review Board verified clinical necessity for ${claim.procedure} (CPT: ${claim.cpt_code || 'N/A'}). Full policy guidelines satisfied.</div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-dot g"></div>
+              <div class="tl-title">Pre-Authorization Approved</div>
+              <div class="tl-body">Sanctioned for full estimated cost: ₹${Number(claim.maxApproved || claim.costEstimate).toLocaleString('en-IN')}. Authorization Ref: AUTH-${claim.claimId.replace('CLM-','')}-8821.</div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-dot b"></div>
+              <div class="tl-title">Hospital Billing &amp; Procedure Cleared</div>
+              <div class="tl-body">Digital clearance pass issued to ${claim.hospital || 'hospital admission desk'}. Zero clinical dispute — Claim in optimal standing.</div>
+            </div>
+          `;
+        }
+
+      } else if (isPending) {
+        // CASE 3: PENDING PATIENT (e.g. Arun Mehta)
+        if (titleEl) titleEl.innerHTML = '⚡ Pre-Authorization Review Timeline';
+        if (badgeEl) badgeEl.innerHTML = '<span class="badge b-a">PENDING ADJUDICATION</span>';
+        if (sumEl) sumEl.textContent = `Awaiting ${claim.insurerId} determination · Turnaround ~${claim.preauthDays || 3} days`;
+
+        if (sendBtn) {
+          sendBtn.innerHTML = '⏳ Pending Insurer Decision';
+          sendBtn.className = 'btn btn-w btn-sm';
+          sendBtn.disabled = true;
+          sendBtn.style.opacity = '0.85';
+          sendBtn.style.cursor = 'default';
+        }
+
+        setText('appeal-reason', 'Under active payer adjudication (No rejection issued)');
+        setText('appeal-action', `Awaiting formal decision from ${claim.insurerId}`);
+        setText('appeal-doc-status', `⏳ ${claim.foundDocs?.length || 3} of ${(claim.requiredDocs?.length || 4)} documents verified & in review`);
+        setText('appeal-deadline', `Decision expected within ${claim.preauthDays || 3} business days`);
+
+        if (letterDiv) {
+          letterDiv.innerHTML = `
+<div style="padding:16px 18px; background:rgba(245,158,11,0.08); border:1px solid rgba(245,158,11,0.25); border-radius:var(--radius-sm); margin-bottom:14px;">
+  <div style="font-weight:700; color:var(--amber); font-size:14px; margin-bottom:6px;">⏳ PRE-AUTHORIZATION UNDER PAYER EVALUATION</div>
+  <div style="font-size:12.5px; color:var(--text); line-height:1.6;">
+    This claim was submitted to <strong>${claim.insurerId}</strong> and is currently undergoing clinical underwriter review. A decision is expected within ${claim.preauthDays || 3} business days.
+  </div>
+</div>
+<div style="font-family:monospace; font-size:12px; line-height:1.8; color:var(--text2); white-space:pre-wrap;">
+PRE-AUTHORIZATION STATUS REPORT
+----------------------------------------------------------------------
+Claim ID:              ${claim.claimId}
+Patient:               ${claim.patientName} (Age: ${claim.age || 62}, ${claim.gender || 'Male'})
+Insurer:               ${claim.insurerId}
+Policy Number:         ${claim.policyNumber || 'N/A'}
+Procedure:             ${claim.procedure} (CPT: ${claim.cpt_code || 'N/A'})
+Estimated Amount:      ₹${Number(claim.costEstimate).toLocaleString('en-IN')}
+Status:                PENDING MEDICAL BOARD EVALUATION
+
+Clinical Package Notes:
+• Verified Evidence: ${(claim.foundDocs || []).join(', ') || 'Diagnostic Labs & Notes'}
+${claim.missingDocs && claim.missingDocs.length ? `• Awaiting: ${claim.missingDocs.join(', ')}` : '• All prerequisite files attached'}
+
+AI Agent Readiness:
+Our dispute model has mapped this claim against ${claim.insurerId} policy rules. If an adverse determination is received, an immediate dispute appeal with supplemental evidence can be drafted and dispatched in seconds.
+</div>`;
+        }
+        if (editBtn) editBtn.style.display = 'none';
+
+        if (timelineEl) {
+          timelineEl.innerHTML = `
+            <div class="tl-item">
+              <div class="tl-dot g"></div>
+              <div class="tl-title">Pre-Auth Package Transmitted</div>
+              <div class="tl-body">${claim.claimId} submitted to ${claim.insurerId} for ${claim.procedure}. Estimated cost: ₹${Number(claim.costEstimate).toLocaleString('en-IN')}.</div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-dot a pulse"></div>
+              <div class="tl-title" style="color:var(--amber);">Payer Underwriting Review In Progress</div>
+              <div class="tl-body">Acknowledged by ${claim.insurerId}. Medical board evaluating physician clinical notes and diagnostic evidence.</div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-dot m"></div>
+              <div class="tl-title" style="color:var(--muted);">Awaiting Payer Determination</div>
+              <div class="tl-body">Estimated decision turnaround: within ${claim.preauthDays || 3} business days. AI agent monitoring clearinghouse webhook.</div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-dot m"></div>
+              <div class="tl-title" style="color:var(--muted);">Automated Appeal Readiness</div>
+              <div class="tl-body">Dispute model pre-compiled. In the event of a query or adverse determination, targeted clinical dispute letter will formulate immediately.</div>
+            </div>
+          `;
+        }
+
       } else {
-        setText('tl-b1', `${claim.claimId} submitted to ${claim.insurerId}`);
-        setText('tl-b3', `Reason: "${appeal.rejectionReason}"`);
-      }
+        // CASE 4: REJECTED PATIENT (e.g. Priya Subramaniam, Suresh Patel)
+        if (titleEl) titleEl.innerHTML = '⚡ Rejection &amp; Appeal Timeline';
+        if (badgeEl) badgeEl.innerHTML = '<span class="badge b-r">REJECTED</span>';
+        if (sumEl) sumEl.textContent = 'Adverse determination received · AI corrective dispute package ready';
 
-      setLines('appeal-letter', appeal.appealLetter);
+        if (sendBtn) {
+          sendBtn.innerHTML = '✉️ Send Appeal Letter';
+          sendBtn.className = 'btn btn-g btn-sm';
+          sendBtn.disabled = false;
+          sendBtn.style.opacity = '1';
+          sendBtn.style.cursor = 'pointer';
+        }
 
-      // Reset edit button state if previously editing
-      const letterDiv = document.getElementById('appeal-letter');
-      const editBtn = document.getElementById('btn-edit-appeal');
-      if (letterDiv) {
-        letterDiv.setAttribute('contenteditable', 'false');
-        letterDiv.style.outline = 'none';
-        letterDiv.style.background = 'transparent';
-        letterDiv.style.padding = '0';
-      }
-      if (editBtn) {
-        editBtn.innerHTML = '✏️ Edit';
-        editBtn.className = 'btn btn-w btn-sm';
+        setText('appeal-reason', appeal.rejectionReason);
+        setText('appeal-action', appeal.actionPlan);
+        setText('appeal-doc-status', appeal.docStatus || '✅ Obtained');
+        setText('appeal-deadline', appeal.deadline || 'Within 14 days');
+
+        if (letterDiv) {
+          letterDiv.innerText = appeal.appealLetter || '';
+          letterDiv.setAttribute('contenteditable', 'false');
+          letterDiv.style.outline = 'none';
+          letterDiv.style.background = 'transparent';
+          letterDiv.style.padding = '0';
+        }
+        if (editBtn) {
+          editBtn.style.display = 'inline-block';
+          editBtn.innerHTML = '✏️ Edit';
+          editBtn.className = 'btn btn-w btn-sm';
+        }
+
+        if (timelineEl) {
+          timelineEl.innerHTML = `
+            <div class="tl-item">
+              <div class="tl-dot g"></div>
+              <div class="tl-title">Claim Submitted</div>
+              <div class="tl-body">${claim.claimId} submitted to ${claim.insurerId} · Initial dossier uploaded.</div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-dot a"></div>
+              <div class="tl-title">Under Review</div>
+              <div class="tl-body">${claim.insurerId} acknowledged receipt · Clinical necessity assessment.</div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-dot r"></div>
+              <div class="tl-title">Rejection Received</div>
+              <div class="tl-body">Reason: "${appeal.rejectionReason}" · Adverse determination notice issued.</div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-dot b"></div>
+              <div class="tl-title">Agent Identified Corrective Action</div>
+              <div class="tl-body">Rejection mapped → ${appeal.actionPlan}. Dispute package assembled automatically.</div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-dot m"></div>
+              <div class="tl-title" style="color:var(--muted);">Appeal Pending Submission</div>
+              <div class="tl-body">Review clinical dispute letter on the right and click "Send Appeal Letter" to dispatch.</div>
+            </div>
+          `;
+        }
       }
 
       window.__lastAppealDraft = {
