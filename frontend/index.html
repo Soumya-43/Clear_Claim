@@ -1769,7 +1769,7 @@
     #main {
       margin-left: var(--sidebar-w);
       flex: 1;
-      padding: 36px 40px;
+      padding: 24px 32px;
       height: 100vh;
       max-height: 100vh;
       overflow-y: auto;
@@ -1840,15 +1840,15 @@
       display: flex;
       align-items: flex-start;
       justify-content: space-between;
-      margin-bottom: 32px;
-      padding-bottom: 22px;
+      margin-bottom: 22px;
+      padding-bottom: 16px;
       border-bottom: 1.5px solid var(--border);
     }
 
     .breadcrumb {
       font-size: 12px;
       color: var(--muted);
-      margin-bottom: 8px;
+      margin-bottom: 6px;
       display: flex;
       align-items: center;
       gap: 6px;
@@ -1861,16 +1861,16 @@
 
     .page-title {
       font-family: 'Outfit', sans-serif;
-      font-size: 32px;
+      font-size: 28px;
       font-weight: 900;
-      letter-spacing: -1.5px;
+      letter-spacing: -0.8px;
       color: var(--text);
     }
 
     .page-sub {
-      font-size: 14px;
+      font-size: 13.5px;
       color: var(--muted);
-      margin-top: 5px;
+      margin-top: 4px;
     }
 
     .topbar-right {
@@ -2199,48 +2199,71 @@
     }
 
     .card-head {
-      padding: 18px 24px;
+      padding: 14px 20px;
       border-bottom: 1.5px solid var(--border);
       display: flex;
       align-items: center;
       justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
     }
 
     .card-title {
-      font-family: 'Fraunces', serif;
-      font-size: 15px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 16px;
       font-weight: 700;
       color: var(--text);
+      letter-spacing: -0.2px;
     }
 
     .card-body {
       padding: 0;
     }
 
+    /* Table Wrap with smooth horizontal scrolling */
+    .table-wrap {
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .table-wrap::-webkit-scrollbar {
+      height: 6px;
+    }
+
+    .table-wrap::-webkit-scrollbar-thumb {
+      background: var(--border2);
+      border-radius: 4px;
+    }
+
     /* Table */
     table {
       width: 100%;
       border-collapse: collapse;
+      min-width: 720px;
     }
 
     th {
       text-align: left;
       font-size: 11px;
-      letter-spacing: 1.2px;
+      letter-spacing: 0.8px;
       text-transform: uppercase;
       color: var(--muted);
-      padding: 16px 24px;
+      padding: 12px 18px;
       background: var(--surface);
-      border-bottom: 2px solid var(--border);
+      border-bottom: 1.5px solid var(--border);
       font-weight: 800;
+      white-space: nowrap;
     }
 
     td {
-      padding: 16px 24px;
+      padding: 13px 18px;
       font-size: 13px;
       border-bottom: 1px solid var(--border);
       color: var(--text);
       font-weight: 500;
+      vertical-align: middle;
+      line-height: 1.4;
       transition: background var(--transition);
     }
 
@@ -3448,6 +3471,224 @@
       }
     }
 
+    /* Mobile Top Bar & Drawer Navigation */
+    .mobile-top-bar {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 56px;
+      background: var(--surface);
+      border-bottom: 1.5px solid var(--border);
+      padding: 0 16px;
+      z-index: 1000;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .mobile-menu-btn {
+      background: transparent;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      width: 38px;
+      height: 38px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      cursor: pointer;
+      padding: 0;
+    }
+
+    .mobile-menu-btn span {
+      display: block;
+      width: 20px;
+      height: 2px;
+      background: var(--text);
+      border-radius: 2px;
+      transition: all 0.25s ease;
+    }
+
+    .mobile-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+    }
+
+    .mobile-brand-title {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 800;
+      font-size: 17px;
+      color: var(--text);
+      letter-spacing: -0.3px;
+    }
+
+    .mobile-theme-btn {
+      background: var(--surface2);
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      width: 38px;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .sidebar-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(3px);
+      z-index: 9998;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .sidebar-backdrop.active {
+      display: block;
+      opacity: 1;
+    }
+
+    /* Claims toolbar styling */
+    .claims-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    /* RESPONSIVE LAYOUT */
+    @media (max-width: 992px) {
+      .ag {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+      .ag3 {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+      .fgrid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+      .dash-hero {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .dh-right {
+        margin-top: 20px;
+        padding-right: 0;
+        justify-content: center;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .mobile-top-bar {
+        display: flex;
+      }
+
+      #sidebar {
+        position: fixed !important;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        width: 280px !important;
+        max-width: 85vw;
+        z-index: 9999 !important;
+        transform: translateX(-100%);
+        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        box-shadow: 0 0 35px rgba(0, 0, 0, 0.6);
+      }
+
+      #sidebar.mobile-open {
+        transform: translateX(0) !important;
+      }
+
+      body.sidebar-collapsed #main,
+      #main {
+        margin-left: 0 !important;
+        padding: 16px 14px !important;
+        padding-top: 72px !important;
+        height: 100vh;
+        max-height: 100vh;
+      }
+
+      .topbar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+        margin-bottom: 16px;
+        padding-bottom: 14px;
+      }
+
+      .topbar > div:first-child {
+        width: 100%;
+      }
+
+      .topbar .btn,
+      .topbar-right .btn {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .page-title {
+        font-size: 24px;
+        letter-spacing: -0.5px;
+      }
+
+      .card-head {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+        padding: 14px 16px;
+      }
+
+      .claims-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+        width: 100%;
+      }
+
+      .claims-toolbar input,
+      .claims-toolbar select,
+      .claims-toolbar button {
+        width: 100% !important;
+      }
+
+      .stats-grid,
+      .bold-stats-grid {
+        grid-template-columns: 1fr !important;
+        gap: 12px;
+        margin-bottom: 24px;
+      }
+
+      .dh-title {
+        font-size: 34px !important;
+        letter-spacing: -1px;
+      }
+
+      .dh-sub {
+        font-size: 14px;
+      }
+
+      .dh-graphic-frame {
+        gap: 10px;
+      }
+
+      .bracket-left,
+      .bracket-right {
+        height: 120px;
+        width: 18px;
+      }
+    }
+
     /* ============================================================
    CLEAR CLAIM — THEME-AWARE LOGO IMAGES
    ============================================================ */
@@ -3842,6 +4083,28 @@
   <!-- ===================== APP ===================== -->
   <div class="screen" id="screen-app">
 
+    <!-- MOBILE TOP BAR -->
+    <header class="mobile-top-bar" id="mobile-top-bar">
+      <button class="mobile-menu-btn" onclick="toggleMobileSidebar()" aria-label="Toggle Navigation">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <div class="mobile-brand" onclick="navigate('dashboard')">
+        <div class="logo-icon" style="width:28px; height:28px;">
+          <div class="cross-v"></div>
+          <div class="cross-h"></div>
+        </div>
+        <span class="mobile-brand-title">Clear Claim</span>
+      </div>
+      <button class="mobile-theme-btn" onclick="toggleTheme()" title="Toggle Theme">
+        <span id="mobile-theme-icon">🌙</span>
+      </button>
+    </header>
+
+    <!-- SIDEBAR BACKDROP FOR MOBILE -->
+    <div class="sidebar-backdrop" id="sidebar-backdrop" onclick="closeMobileSidebar()"></div>
+
     <!-- SIDEBAR -->
     <aside id="sidebar">
       <div class="logo">
@@ -3973,23 +4236,25 @@
             <button class="btn btn-w btn-sm" onclick="navigate('history')">View All →</button>
           </div>
           <div class="card-body">
-            <table>
-              <thead>
-                <tr>
-                  <th>Claim ID</th>
-                  <th>Patient</th>
-                  <th>Procedure</th>
-                  <th>Insurer</th>
-                  <th>Deadline</th>
-                  <th>Risk</th>
-                  <th>Status</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody id="dash-recent-claims-tbody">
-                <!-- Dynamically populated via syncDashboardWithClaims() -->
-              </tbody>
-            </table>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Claim ID</th>
+                    <th>Patient</th>
+                    <th>Procedure</th>
+                    <th>Insurer</th>
+                    <th>Deadline</th>
+                    <th>Risk</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="dash-recent-claims-tbody">
+                  <!-- Dynamically populated via syncDashboardWithClaims() -->
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
 
@@ -4744,38 +5009,40 @@
               <div class="card-title">All Claims</div>
               <div style="font-size:12px; color:var(--muted); margin-top:2px;">Registry records synchronized across dashboard, analysis &amp; appeals</div>
             </div>
-            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-              <input type="text" class="fi" id="claims-search-input" placeholder="Search claims..."
-                style="padding:7px 12px;font-size:12px;width:180px;margin:0" oninput="renderAllClaimsTable()" />
-              <select class="fi" id="claims-status-filter" style="padding:7px 12px;font-size:12px;width:auto;margin:0;cursor:pointer;" onchange="renderAllClaimsTable()">
+            <div class="claims-toolbar">
+              <input type="text" class="fi" id="claims-search-input" placeholder="🔍 Search claims..."
+                style="height:36px;padding:0 12px;font-size:12.5px;width:190px;margin:0;border-radius:8px;" oninput="renderAllClaimsTable()" />
+              <select class="fi" id="claims-status-filter" style="height:36px;padding:0 12px;font-size:12.5px;width:auto;margin:0;cursor:pointer;border-radius:8px;" onchange="renderAllClaimsTable()">
                 <option value="ALL">All Status</option>
                 <option value="APPROVED">Approved</option>
                 <option value="REJECTED">Rejected</option>
                 <option value="PENDING">Pending</option>
               </select>
-              <button class="btn btn-r btn-sm" onclick="clearAllClaimRecords()" title="Remove all claim records from history and reset dashboard">🗑️ Clear All Records</button>
-              <button class="btn btn-w btn-sm" onclick="restoreSampleClaimRecords()" title="Restore default sample claim records">🔄 Restore Demo Data</button>
+              <button class="btn btn-r btn-sm" style="height:36px;border-radius:8px;padding:0 14px;font-size:12px;" onclick="clearAllClaimRecords()" title="Remove all claim records from history and reset dashboard">🗑️ Clear All</button>
+              <button class="btn btn-w btn-sm" style="height:36px;border-radius:8px;padding:0 14px;font-size:12px;" onclick="restoreSampleClaimRecords()" title="Restore default sample claim records">🔄 Restore Demo</button>
             </div>
           </div>
           <div class="card-body">
-            <table>
-              <thead>
-                <tr>
-                  <th>Claim ID</th>
-                  <th>Patient</th>
-                  <th>Procedure</th>
-                  <th>Insurer</th>
-                  <th>Cost</th>
-                  <th>Deadline</th>
-                  <th>Risk</th>
-                  <th>Status</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody id="claims-history-tbody">
-                <!-- Dynamically populated via renderAllClaimsTable() -->
-              </tbody>
-            </table>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Claim ID</th>
+                    <th>Patient</th>
+                    <th>Procedure</th>
+                    <th>Insurer</th>
+                    <th>Cost</th>
+                    <th>Deadline</th>
+                    <th>Risk</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="claims-history-tbody">
+                  <!-- Dynamically populated via renderAllClaimsTable() -->
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
@@ -4940,6 +5207,8 @@
         sIcon.innerHTML = isDark ? moonSvg : sunSvg;
       }
       if (sPill) sPill.textContent = isDark ? 'DARK' : 'LIGHT';
+      const mIcon = document.getElementById('mobile-theme-icon');
+      if (mIcon) mIcon.textContent = isDark ? '🌙' : '☀️';
     }
 
     function toggleTheme() {
@@ -5585,6 +5854,7 @@
     //  APP NAVIGATION
     // ============================================================
     function navigate(page) {
+      if (typeof closeMobileSidebar === 'function') closeMobileSidebar();
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
       document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
       const targetPage = document.getElementById('page-' + page);
@@ -7517,18 +7787,18 @@
         const costFormatted = c.costEstimate ? `₹${Number(c.costEstimate).toLocaleString('en-IN')}` : '—';
         return `
           <tr>
-            <td><span class="code-chip">${c.claimId}</span></td>
-            <td><strong>${c.patientName}</strong></td>
-            <td>${c.procedure}</td>
-            <td>${c.insurerId}</td>
-            <td><strong>${costFormatted}</strong></td>
-            <td>${c.deadline || 'Recent'}</td>
-            <td><span class="badge b-${riskLevel}">● ${c.risk?.level || 'Medium'}</span></td>
-            <td><span class="badge ${statusBadge}">${c.status}</span></td>
-            <td>
-              <div style="display:flex; align-items:center; gap:6px;">
+            <td style="white-space:nowrap;"><span class="code-chip">${c.claimId}</span></td>
+            <td style="white-space:nowrap;"><strong>${c.patientName}</strong></td>
+            <td style="min-width:180px; max-width:260px; line-height:1.4;"><div style="font-weight:600; font-size:13px; color:var(--text);">${c.procedure}</div></td>
+            <td style="white-space:nowrap; color:var(--text2); font-size:12.5px;">${c.insurerId}</td>
+            <td style="white-space:nowrap; font-weight:700; font-variant-numeric:tabular-nums;">${costFormatted}</td>
+            <td style="white-space:nowrap; color:var(--muted); font-size:12px;">${c.deadline || 'Recent'}</td>
+            <td style="white-space:nowrap;"><span class="badge b-${riskLevel}">● ${c.risk?.level || 'Medium'}</span></td>
+            <td style="white-space:nowrap;"><span class="badge ${statusBadge}">${c.status}</span></td>
+            <td style="white-space:nowrap;">
+              <div style="display:inline-flex; align-items:center; gap:8px;">
                 ${actionBtn}
-                <button class="btn btn-w btn-sm" style="color:var(--red); border-color:var(--red-mid); padding:3px 7px;" onclick="deleteSingleClaimRecord('${c.claimId}')" title="Delete claim record">🗑️</button>
+                <button class="btn btn-w btn-sm" style="color:var(--red); border-color:var(--red-mid); width:32px; height:32px; padding:0; display:inline-flex; align-items:center; justify-content:center; border-radius:8px;" onclick="deleteSingleClaimRecord('${c.claimId}')" title="Delete claim record">🗑️</button>
               </div>
             </td>
           </tr>
@@ -8664,12 +8934,49 @@ Our dispute model has mapped this claim against ${claim.insurerId} policy rules.
     updateClock();
 
     // ============================================================
-    //  SIDEBAR
+    //  SIDEBAR & MOBILE NAVIGATION
     // ============================================================
-    function toggleSidebar() {
-      document.getElementById('sidebar').classList.toggle('collapsed');
-      document.body.classList.toggle('sidebar-collapsed');
+    function toggleMobileSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const backdrop = document.getElementById('sidebar-backdrop');
+      if (!sidebar) return;
+      const isOpen = sidebar.classList.contains('mobile-open');
+      if (isOpen) {
+        closeMobileSidebar();
+      } else {
+        sidebar.classList.add('mobile-open');
+        if (backdrop) backdrop.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
     }
+
+    function closeMobileSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const backdrop = document.getElementById('sidebar-backdrop');
+      if (sidebar) sidebar.classList.remove('mobile-open');
+      if (backdrop) backdrop.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    function toggleSidebar() {
+      if (window.innerWidth <= 768) {
+        toggleMobileSidebar();
+      } else {
+        const sidebar = document.getElementById('sidebar');
+        if (sidebar) sidebar.classList.toggle('collapsed');
+        document.body.classList.toggle('sidebar-collapsed');
+      }
+    }
+
+    window.addEventListener('resize', () => {
+      if (window.innerWidth > 768) {
+        closeMobileSidebar();
+      }
+    });
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') closeMobileSidebar();
+    });
 
     // Enter key → login
     document.addEventListener('keydown', e => {
