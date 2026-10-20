@@ -6474,7 +6474,7 @@
         labFind: 'MRI Lumbar Spine: disc herniation at L4-L5 with nerve root compression; reduced disc height and Modic changes.',
         certSurg: 'Dr. Sharma', lic: 'TN-20458',
         certNotes: 'Certificate of Medical Necessity: Lumbar discectomy indicated after failure of conservative management.',
-        claimId: 'CLM_011', claimDate: '2026-03-09',
+        claimId: 'CLM-2401', claimDate: '2026-03-09',
         reqAmt: '450000', procEst: '450000', bmi: '32', age: '46', consDur: '6 weeks', mriDate: '2023-11-20', label: '✅ Lumbar discectomy case loaded! (1/3)'
       },
       {
@@ -6489,7 +6489,7 @@
         labFind: 'Appendix 9mm, non-compressible. Consistent with acute appendicitis.',
         certSurg: 'Dr. Anand Krishnan', lic: 'TN-18472',
         certNotes: 'Surgeon\'s Certificate of Medical Necessity provided. Surgery clinically necessary to prevent perforation and sepsis.',
-        claimId: 'CLM_2402', claimDate: '2026-03-07',
+        claimId: 'CLM-2402', claimDate: '2026-03-07',
         reqAmt: '180000', procEst: '180000', bmi: '24', age: '35', consDur: '5 days', mriDate: '', label: '✅ Acute appendicitis case loaded! (2/3)'
       },
       {
@@ -6504,7 +6504,7 @@
         labFind: '72% stenosis in the proximal Left Anterior Descending (LAD) artery. Normal left ventricular function.',
         certSurg: 'Dr. Suresh Rajan', lic: 'MH-54321',
         certNotes: 'PCI is medically necessary to relieve angina and prevent myocardial infarction.',
-        claimId: 'CLM_2403', claimDate: '2026-03-06',
+        claimId: 'CLM-2403', claimDate: '2026-03-06',
         reqAmt: '280000', procEst: '280000', bmi: '28', age: '60', consDur: '3 months', mriDate: '', label: '✅ Cardiac stenting case loaded! (3/4)'
       },
       {
@@ -6519,7 +6519,7 @@
         labFind: 'Multiple gallstones (largest 12mm). Thickened gallbladder wall. Consistent with calculous cholecystitis. No bile duct dilatation.',
         certSurg: 'Dr. Priya Menon', lic: 'KL-07832',
         certNotes: 'Laparoscopic cholecystectomy is clinically indicated. All required imaging and lab reports are available.',
-        claimId: 'CLM_2404', claimDate: '2026-03-08',
+        claimId: 'CLM-2404', claimDate: '2026-03-08',
         reqAmt: '210000', procEst: '210000', bmi: '26', age: '42', consDur: '4 months', mriDate: '', label: '🟢 Very Low Risk — Cholecystectomy loaded! (4/4)'
       }
     ];
@@ -7271,26 +7271,46 @@
         ]
       };
 
+      // Document verification: Strictly evaluate against attached clinical files (both custom uploaded & 1-click bundle)
+      const hasAttachedImaging = Boolean(providedEvidence.imagingFiles && providedEvidence.imagingFiles.length > 0);
+      const hasAttachedReco = Boolean(providedEvidence.recoFiles && providedEvidence.recoFiles.length > 0);
+      const hasAttachedHistory = Boolean(providedEvidence.historyFiles && providedEvidence.historyFiles.length > 0);
+      const hasAttachedLabs = Boolean(providedEvidence.labsFiles && providedEvidence.labsFiles.length > 0);
+
+      const totalAttachedDocs = (providedEvidence.imagingFiles?.length || 0) +
+                                (providedEvidence.recoFiles?.length || 0) +
+                                (providedEvidence.historyFiles?.length || 0) +
+                                (providedEvidence.labsFiles?.length || 0);
+
       const requiredDocs = [...catalogEntry.requiredDocs];
       const foundDocs = [];
       const missingDocs = [];
 
-      requiredDocs.forEach(doc => {
-        const dLower = doc.toLowerCase();
+      requiredDocs.forEach((doc, idx) => {
         let isFound = false;
 
-        if (dLower.includes('surgeon') || dLower.includes('recommendation') || dLower.includes('intake') || dLower.includes('evaluation') || dLower.includes('clinical note') || dLower.includes('referral')) {
-          isFound = providedEvidence.hasSurgeonNote || providedEvidence.hasClinicalNote;
-        } else if (dLower.includes('certificate') || dLower.includes('medical necessity') || dLower.includes('clearance') || dLower.includes('consent') || dLower.includes('admission')) {
-          isFound = providedEvidence.hasCert || providedEvidence.hasSurgeonNote;
-        } else if (dLower.includes('conservative') || dLower.includes('therapy') || dLower.includes('physio') || dLower.includes('rehab')) {
-          isFound = providedEvidence.hasConservativeHistory;
-        } else if (['mri', 'x-ray', 'xray', 'ultrasound', 'usg', 'ct', 'angiogram', 'echo', 'biometry', 'pns'].some(term => dLower.includes(term))) {
-          isFound = providedEvidence.hasImaging;
-        } else if (['cbc', 'lft', 'blood', 'lab', 'pylori', 'biopsy', 'psa', 'fobt', 'pre-op'].some(term => dLower.includes(term))) {
-          isFound = providedEvidence.hasLabs;
+        if (totalAttachedDocs === 0) {
+          // If no documents were attached in Step 4 (or cleared), NO document is found
+          isFound = false;
         } else {
-          isFound = providedEvidence.hasClinicalNote || providedEvidence.hasLabs || providedEvidence.hasImaging;
+          // Direct 1-to-1 slot mapping matching the 4 intake cards & file inputs
+          if (idx === 0) isFound = hasAttachedReco;
+          else if (idx === 1) isFound = hasAttachedImaging;
+          else if (idx === 2) isFound = hasAttachedHistory;
+          else if (idx === 3) isFound = hasAttachedLabs;
+          else {
+            // Keyword fallback for any custom or additional documents beyond 4
+            const dLower = (doc || '').toLowerCase();
+            if (['mri', 'x-ray', 'xray', 'ultrasound', 'usg', 'ct', 'angiogram', 'angiography', 'echo', 'biometry', 'pns', 'scan'].some(term => dLower.includes(term))) {
+              isFound = hasAttachedImaging;
+            } else if (dLower.includes('surgeon') || dLower.includes('recommendation') || dLower.includes('intake') || dLower.includes('clinical note') || dLower.includes('referral') || dLower.includes('evaluation')) {
+              isFound = hasAttachedReco;
+            } else if (dLower.includes('conservative') || dLower.includes('therapy') || dLower.includes('physio') || dLower.includes('rehab') || dLower.includes('prior trial')) {
+              isFound = hasAttachedHistory;
+            } else {
+              isFound = hasAttachedLabs;
+            }
+          }
         }
 
         if (isFound) foundDocs.push(doc);
@@ -7302,20 +7322,45 @@
       let calculatedDrivers = ['All policy prerequisite documents verified in EHR submission.'];
       let calculatedStatus = 'Approved';
 
-      if (missingDocs.length === 1) {
+      if (missingDocs.length === 0) {
+        calculatedRiskLevel = 'LOW';
+        calculatedRiskScore = 15;
+        calculatedDrivers = [
+          'All 4 required clinical documents verified in EHR dossier',
+          'Clinical indications conform to insurer medical necessity guidelines'
+        ];
+        calculatedStatus = 'Approved';
+      } else if (missingDocs.length === 1) {
         calculatedRiskLevel = 'MEDIUM';
         calculatedRiskScore = 45;
         calculatedDrivers = [
           `Missing required policy document: ${missingDocs[0]}`,
-          'Action required: Submit supplemental clinical records to satisfy payer underwriting rules'
+          'Action required: Submit supplemental clinical record to satisfy payer underwriting rules'
         ];
         calculatedStatus = 'Pending';
-      } else if (missingDocs.length >= 2) {
+      } else if (missingDocs.length === 2) {
         calculatedRiskLevel = 'HIGH';
-        calculatedRiskScore = Math.min(65 + missingDocs.length * 10, 95);
+        calculatedRiskScore = 75;
         calculatedDrivers = [
           `Multiple critical policy documents missing: ${missingDocs.join(', ')}`,
-          'Payer underwriting guidelines require full clinical documentation prior to sanction'
+          'Payer underwriting guidelines require verified clinical records prior to sanction'
+        ];
+        calculatedStatus = 'Rejected';
+      } else if (missingDocs.length === 3) {
+        calculatedRiskLevel = 'HIGH';
+        calculatedRiskScore = 85;
+        calculatedDrivers = [
+          `Critical clinical documentation deficit: 3 required documents missing (${missingDocs.join(', ')})`,
+          'Incomplete pre-authorization filing — high probability of claim denial'
+        ];
+        calculatedStatus = 'Rejected';
+      } else {
+        // All 4 documents missing (e.g. user cleared all documents)
+        calculatedRiskLevel = 'HIGH';
+        calculatedRiskScore = 95;
+        calculatedDrivers = [
+          `Severe documentation omission: All 4 required policy documents missing (${missingDocs.join(', ')})`,
+          'Zero supporting clinical documents attached — immediate rejection by payer underwriting rules'
         ];
         calculatedStatus = 'Rejected';
       }
@@ -7377,6 +7422,8 @@
           patientName: patientName,
           age: Number(get('f-age')) || 45,
           gender: get('f-gender') || 'Unknown',
+          doctor: get('f-doc') || 'Dr. Anand Krishnan, MS',
+          hospital: get('f-hospital') || 'Apollo Hospitals',
           procedure: catalogEntry.name,
           cpt_code: catalogEntry.cpt,
           icd10_code: get('f-icd') || catalogEntry.icd10,
@@ -7401,10 +7448,19 @@
             missing_documents: missingDocs,
             found_documents: foundDocs,
             matched_diagnoses: [{ condition: get('f-diagnosis-desc') || catalogEntry.diagDesc, description: get('f-icd') || catalogEntry.icd10, date: 'Recent' }],
-            relevant_labs: providedEvidence.hasImaging ? [{ type: 'Diagnostic Imaging', findings: get('f-lab-findings') || 'Imaging attached', date: 'Recent' }] : [],
-            prior_treatments: providedEvidence.hasConservativeHistory ? [{ type: get('f-prev-treatments') || 'Conservative Therapy', duration: get('f-treat-duration') || 'Completed' }] : []
+            relevant_labs: hasAttachedImaging ? [{ type: 'Diagnostic Imaging', findings: get('f-lab-findings') || 'Imaging attached', date: 'Recent' }] : [],
+            prior_treatments: hasAttachedHistory ? [{ type: get('f-prev-treatments') || 'Conservative Therapy', duration: get('f-treat-duration') || 'Completed' }] : []
           },
-          appeal: null
+          appeal: calculatedStatus === 'Rejected' ? {
+            rejectionReason: missingDocs.length === 4
+              ? 'All required clinical policy documents missing from intake submission'
+              : `Missing required policy document(s): ${missingDocs.join(', ')}`,
+            rejectionCategory: 'MISSING_DOCUMENT',
+            actionPlan: `Obtain and attach verified ${missingDocs.join(', ')}`,
+            docStatus: `⚠️ ${missingDocs.length} of ${requiredDocs.length} documents missing (${foundDocs.length} verified)`,
+            deadline: 'Within 14 days',
+            appealLetter: `To,\nThe Pre-Authorization Appeals Committee,\n${insurer}\n\nSubject: Formal Dispute & Clinical Appeal — Claim ID: ${newClaimId}\nPatient: ${patientName} | Policy No.: ${get('f-policy') || 'N/A'}\n\nDear Sir/Madam,\n\nWe are writing to formally appeal the adverse pre-authorization determination for ${catalogEntry.name} (CPT Code: ${catalogEntry.cpt}, ICD-10: ${get('f-icd') || catalogEntry.icd10}) on behalf of our patient, ${patientName}.\n\nReason for Rejection Cited:\nThe claim was flagged due to missing clinical evidence: ${missingDocs.join('; ')}.\n\nCorrective Action & Supporting Clinical Evidence:\nWe have now attached the required clinical dossier:\n${missingDocs.map(d => `• ${d}: Formally verified and signed by attending physician ${get('f-doc') || 'Dr. Anand Krishnan, MS'}`).join('\n')}\n\nClinical Justification:\nThe patient presented with ${get('f-diagnosis-desc') || catalogEntry.diagDesc}. Symptoms: ${get('f-diagnosis-notes') || 'Severe functional deficit and pain'}. Operative intervention is medically necessary to prevent clinical deterioration.\n\nWe respectfully request immediate reconsideration and pre-authorization sanction.\n\nYours sincerely,\nClinical Authorization Desk\n${get('f-hospital') || 'Kathir Memorial Hospital'}`
+          } : null
         };
 
         if (window.CLAIMS_REGISTRY) {
@@ -10262,27 +10318,44 @@ Our dispute model has mapped this claim against ${claim.insurerId} policy rules.
         : (topDrivers.length ? `High rejection risk: ${topDrivers.join('; ')}` : 'High rejection risk — missing necessary clinical documentation.');
 
       try {
-        const res = await apiFetch('/appeals/reject', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            claimId,
-            patientId,
-            rejectionReason,
-            rejectionCategory,
-          }),
-        });
-        const payload = await res.json();
-        if (!res.ok) throw new Error(payload?.error || 'Failed to prepare appeal');
+        let payload = null;
+        try {
+          const res = await apiFetch('/appeals/reject', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              claimId,
+              patientId,
+              rejectionReason,
+              rejectionCategory,
+            }),
+          });
+          if (res.ok) payload = await res.json();
+        } catch (apiErr) {
+          console.warn('[prepareAppeal] Backend unreachable, generating local clinical appeal:', apiErr.message);
+        }
+
+        const patientName = data?.ehrEvidence?.patient_name || claimObj?.patientName || 'Patient';
+        const insurerName = data?.request?.insurerId || claimObj?.insurerId || 'Insurance Provider';
+        const procedureName = data?.parsedNote?.procedure || claimObj?.procedure || 'Procedure';
+        const docName = claimObj?.doctor || 'Dr. Anand Krishnan, MS';
+        const missingListStr = missingDocs.length ? missingDocs.join(', ') : 'Certificate of Medical Necessity';
+
+        const appealData = payload?.appeal || {
+          rejectionReason,
+          rejectionCategory,
+          recommendedActions: [`Obtain and attach verified ${missingListStr}`, 'Submit formal clinical dispute package'],
+          appealLetter: `To,\nThe Medical Review & Appeals Committee,\n${insurerName}\n\nSubject: Formal Clinical Appeal & Request for Reconsideration — Claim ${claimId}\nPatient: ${patientName} (Policy: ${claimObj?.policyNumber || data?.ehrEvidence?.policy_number || 'N/A'})\n\nDear Appeals Committee,\n\nWe are writing to formally appeal the adverse pre-authorization determination for ${procedureName} regarding patient ${patientName}.\n\nReason for Rejection Cited:\n${rejectionReason}\n\nCorrective Action & Supporting Clinical Evidence:\nWe have reviewed the underwriting requirements and hereby enclose the complete, verified clinical records satisfying all policy stipulations:\n• ${missingListStr}: Formally verified and signed by attending physician ${docName}.\n• All diagnostic imaging findings and conservative therapy logs have been verified in the patient's EHR.\n\nMedical Necessity Confirmation:\nThe patient presents with documented pathology requiring timely surgical intervention. Conservative management has been evaluated and surgical clearance confirmed. Delay in treatment poses substantial clinical risk.\n\nWe respectfully request immediate review and issuance of pre-authorization approval.\n\nSincerely,\nRevenue Cycle & Clinical Authorization Desk`
+        };
 
         if (claimObj) {
           claimObj.appeal = {
-            rejectionReason: payload.appeal.rejectionReason,
+            rejectionReason: appealData.rejectionReason || rejectionReason,
             rejectionCategory,
-            actionPlan: Array.isArray(payload.appeal.recommendedActions) ? payload.appeal.recommendedActions.join(' · ') : 'Attach required documents and resubmit',
+            actionPlan: Array.isArray(appealData.recommendedActions) ? appealData.recommendedActions.join(' · ') : `Obtain and attach verified ${missingListStr}`,
             docStatus: '✅ Action plan generated',
             deadline: 'Within 14 days',
-            appealLetter: payload.appeal.appealLetter
+            appealLetter: appealData.appealLetter
           };
           claimObj.status = 'Rejected';
           if (typeof saveClaimsRegistryToStorage === 'function') saveClaimsRegistryToStorage();
