@@ -4733,7 +4733,7 @@
               <div class="fgrid">
                 <div>
                   <label class="fg-lbl">Surgeon Name</label>
-                  <input type="text" class="fi" id="f-cert-surgeon" list="dl-doc" placeholder="e.g. Dr. Anand Krishnan, MS" />
+                  <input type="text" class="fi" id="f-cert-surgeon" list="dl-doc" placeholder="e.g. Dr. Anand Krishnan, MS" oninput="syncCertToDoc(this.value)" />
                 </div>
                 <div>
                   <label class="fg-lbl">Medical License ID</label>
@@ -4753,11 +4753,11 @@
                 </div>
                 <div>
                   <label class="fg-lbl">Requested Amount (₹)</label>
-                  <input type="number" class="fi" id="f-requested-amount" list="dl-cost" placeholder="e.g. 220000" />
+                  <input type="number" class="fi" id="f-requested-amount" list="dl-cost" placeholder="e.g. 220000" oninput="syncCertToCost(this.value)" />
                 </div>
                 <div>
                   <label class="fg-lbl">Procedure Cost Estimate (₹)</label>
-                  <input type="number" class="fi" id="f-proc-cost-est" list="dl-cost" placeholder="e.g. 220000" />
+                  <input type="number" class="fi" id="f-proc-cost-est" list="dl-cost" placeholder="e.g. 220000" oninput="syncCertToCost(this.value)" />
                 </div>
                 <div class="fg-full">
                   <label class="fg-lbl">Internal Claim Notes</label>
@@ -4776,7 +4776,7 @@
                 </div>
                 <div>
                   <label class="fg-lbl">Conservative Treatment Duration</label>
-                  <input type="text" class="fi" id="f-conservative-duration" list="dl-treat-duration" placeholder="e.g. 6 weeks" />
+                  <input type="text" class="fi" id="f-conservative-duration" list="dl-treat-duration" placeholder="e.g. 6 weeks" oninput="syncCertToDuration(this.value)" />
                 </div>
                 <div>
                   <label class="fg-lbl">MRI / Key Imaging Date</label>
@@ -7006,26 +7006,45 @@
     }
 
     function syncDocToCert(val) {
-      const el = document.getElementById('f-doc-name-cert');
-      if (el) el.value = val;
-      const el2 = document.getElementById('f-cert-surgeon');
-      if (el2) el2.value = val;
+      const el = document.getElementById('f-cert-surgeon');
+      if (el && val) el.value = val;
+      const el2 = document.getElementById('f-doc-name-cert');
+      if (el2 && val) el2.value = val;
+    }
+
+    function syncCertToDoc(val) {
+      const el = document.getElementById('f-doc');
+      if (el && val) el.value = val;
     }
 
     function syncCostToCert(val) {
       const el = document.getElementById('f-est-cost-cert');
-      if (el) el.value = val;
+      if (el && val) el.value = val;
       const el2 = document.getElementById('f-requested-amount');
-      if (el2) el2.value = val;
+      if (el2 && val) el2.value = val;
       const el3 = document.getElementById('f-proc-cost-est');
-      if (el3) el3.value = val;
+      if (el3 && val) el3.value = val;
+    }
+
+    function syncCertToCost(val) {
+      const el = document.getElementById('f-cost');
+      if (el && val) el.value = val;
+      const el2 = document.getElementById('f-est-cost-cert');
+      if (el2 && val) el2.value = val;
     }
 
     function syncDurationToCert(val) {
       const el = document.getElementById('f-conservative-duration');
-      if (el) el.value = val;
+      if (el && val) el.value = val;
       const el2 = document.getElementById('f-treat-dur-cert');
-      if (el2) el2.value = val;
+      if (el2 && val) el2.value = val;
+    }
+
+    function syncCertToDuration(val) {
+      const el = document.getElementById('f-treat-duration');
+      if (el && val) el.value = val;
+      const el2 = document.getElementById('f-treat-dur-cert');
+      if (el2 && val) el2.value = val;
     }
 
     function syncAllToCert() {
@@ -7036,15 +7055,30 @@
         const fAge = document.getElementById('f-age');
         if (fAge && age !== '') fAge.value = age;
       }
-      // Sync doctor name
+      // Sync doctor name bidirectionally: preserve surgeon name if entered in Step 6
+      const certDoc = document.getElementById('f-cert-surgeon')?.value;
       const doc = document.getElementById('f-doc')?.value;
-      if (doc) syncDocToCert(doc);
+      if (certDoc && certDoc.trim()) {
+        syncCertToDoc(certDoc);
+      } else if (doc && doc.trim()) {
+        syncDocToCert(doc);
+      }
       // Sync cost
+      const reqCost = document.getElementById('f-requested-amount')?.value || document.getElementById('f-proc-cost-est')?.value;
       const cost = document.getElementById('f-cost')?.value;
-      if (cost) syncCostToCert(cost);
+      if (reqCost && reqCost.trim()) {
+        syncCertToCost(reqCost);
+      } else if (cost && cost.trim()) {
+        syncCostToCert(cost);
+      }
       // Sync duration
+      const consDur = document.getElementById('f-conservative-duration')?.value;
       const dur = document.getElementById('f-treat-duration')?.value;
-      if (dur) syncDurationToCert(dur);
+      if (consDur && consDur.trim()) {
+        syncCertToDuration(consDur);
+      } else if (dur && dur.trim()) {
+        syncDurationToCert(dur);
+      }
     }
 
     function onInsurerChange(val) {
@@ -7390,6 +7424,13 @@
 
       try {
         let backendData = null;
+        const effectiveDoctor = get('f-cert-surgeon') || get('f-doc') || 'Attending Physician';
+        const effectiveCost = Number(get('f-proc-cost-est') || get('f-requested-amount') || get('f-cost') || catalogEntry.cost);
+        const effectiveDuration = get('f-conservative-duration') || get('f-treat-duration') || '6 weeks';
+        const effectiveHospital = get('f-hospital') || 'Apollo Hospitals';
+        const effectivePatient = get('f-pname') || 'Patient';
+        const effectivePolicy = get('f-policy') || `POL-${insurer}-2026`;
+
         try {
           const res = await apiFetch('/analyze', {
             method: 'POST',
@@ -7399,28 +7440,28 @@
               insurerId: insurer,
               procedureId: proc,
               surgeonNoteText: surgeonNoteText || get('f-cert-notes'),
-              patientName: get('f-pname'),
+              patientName: effectivePatient,
               dob: get('f-dob'),
               age: get('f-age'),
               gender: get('f-gender'),
-              policyNumber: get('f-policy'),
-              doctorId: get('f-doc'),
-              hospital: get('f-hospital'),
+              policyNumber: effectivePolicy,
+              doctorId: effectiveDoctor,
+              hospital: effectiveHospital,
               diagnosisDesc: get('f-diagnosis-desc') || catalogEntry.diagDesc,
               icd10: get('f-icd') || catalogEntry.icd10,
               diagnosisDate: get('f-diagnosis-date'),
               diagnosisNotes: get('f-diagnosis-notes'),
               surgeryDate: get('f-sdate'),
-              costEstimate: get('f-cost') || get('f-proc-cost-est') || catalogEntry.cost,
+              costEstimate: effectiveCost,
               prevTreatments: get('f-prev-treatments'),
-              treatDuration: get('f-treat-duration') || get('f-conservative-duration'),
+              treatDuration: effectiveDuration,
               treatOutcome: get('f-treat-outcome'),
               labType: get('f-lab-type'),
               labDate: get('f-lab-date') || get('f-lab-latest-date'),
               labFindings: get('f-lab-findings'),
               mriDate: get('f-mri-date'),
               ultrasoundDate: get('f-ultrasound-date'),
-              certSurgeon: get('f-cert-surgeon'),
+              certSurgeon: effectiveDoctor,
               medicalLicense: get('f-license'),
               claimId: get('f-claim-id'),
               submissionDate: get('f-claim-date'),
@@ -7436,8 +7477,8 @@
         }
 
         const newClaimId = get('f-claim-id') || backendData?.request?.claimId || `CLM_${Date.now().toString().slice(-4)}`;
-        const patientName = get('f-pname') || backendData?.ehrEvidence?.patient_name || 'Patient';
-        const costEst = Number(get('f-cost') || get('f-proc-cost-est') || catalogEntry.cost);
+        const patientName = effectivePatient || backendData?.ehrEvidence?.patient_name || 'Patient';
+        const costEst = effectiveCost;
 
         const finalClaim = {
           claimId: newClaimId,
@@ -7445,15 +7486,17 @@
           patientName: patientName,
           age: Number(get('f-age')) || 45,
           gender: get('f-gender') || 'Unknown',
-          doctor: get('f-doc') || 'Dr. Anand Krishnan, MS',
-          hospital: get('f-hospital') || 'Apollo Hospitals',
+          doctor: effectiveDoctor,
+          certSurgeon: effectiveDoctor,
+          hospital: effectiveHospital,
           procedure: catalogEntry.name,
           cpt_code: catalogEntry.cpt,
           icd10_code: get('f-icd') || catalogEntry.icd10,
           icd10_desc: get('f-diagnosis-desc') || catalogEntry.diagDesc,
           insurerId: insurer,
-          policyNumber: get('f-policy') || `POL-${insurer}-2026`,
+          policyNumber: effectivePolicy,
           costEstimate: costEst,
+          conservativeDuration: effectiveDuration,
           maxApproved: catalogEntry.cost,
           preauthDays: catalogEntry.timeline,
           status: calculatedStatus,
@@ -7467,12 +7510,12 @@
           foundDocs: foundDocs,
           ehrEvidence: {
             patient_name: patientName,
-            policy_number: get('f-policy') || `POL-${insurer}-2026`,
+            policy_number: effectivePolicy,
             missing_documents: missingDocs,
             found_documents: foundDocs,
             matched_diagnoses: [{ condition: get('f-diagnosis-desc') || catalogEntry.diagDesc, description: get('f-icd') || catalogEntry.icd10, date: 'Recent' }],
             relevant_labs: hasAttachedImaging ? [{ type: 'Diagnostic Imaging', findings: get('f-lab-findings') || 'Imaging attached', date: 'Recent' }] : [],
-            prior_treatments: hasAttachedHistory ? [{ type: get('f-prev-treatments') || 'Conservative Therapy', duration: get('f-treat-duration') || 'Completed' }] : []
+            prior_treatments: hasAttachedHistory ? [{ type: get('f-prev-treatments') || 'Conservative Therapy', duration: effectiveDuration }] : []
           },
           appeal: calculatedStatus === 'Rejected' ? {
             rejectionReason: missingDocs.length === 4
@@ -7482,7 +7525,7 @@
             actionPlan: `Obtain and attach verified ${missingDocs.join(', ')}`,
             docStatus: `⚠️ ${missingDocs.length} of ${requiredDocs.length} documents missing (${foundDocs.length} verified)`,
             deadline: 'Within 14 days',
-            appealLetter: `To,\nThe Pre-Authorization Appeals Committee,\n${insurer}\n\nSubject: Formal Dispute & Clinical Appeal — Claim ID: ${newClaimId}\nPatient: ${patientName} | Policy No.: ${get('f-policy') || 'N/A'}\n\nDear Sir/Madam,\n\nWe are writing to formally appeal the adverse pre-authorization determination for ${catalogEntry.name} (CPT Code: ${catalogEntry.cpt}, ICD-10: ${get('f-icd') || catalogEntry.icd10}) on behalf of our patient, ${patientName}.\n\nReason for Rejection Cited:\nThe claim was flagged due to missing clinical evidence: ${missingDocs.join('; ')}.\n\nCorrective Action & Supporting Clinical Evidence:\nWe have now attached the required clinical dossier:\n${missingDocs.map(d => `• ${d}: Formally verified and signed by attending physician ${get('f-doc') || 'Dr. Anand Krishnan, MS'}`).join('\n')}\n\nClinical Justification:\nThe patient presented with ${get('f-diagnosis-desc') || catalogEntry.diagDesc}. Symptoms: ${get('f-diagnosis-notes') || 'Severe functional deficit and pain'}. Operative intervention is medically necessary to prevent clinical deterioration.\n\nWe respectfully request immediate reconsideration and pre-authorization sanction.\n\nYours sincerely,\nClinical Authorization Desk\n${get('f-hospital') || 'Kathir Memorial Hospital'}`
+            appealLetter: `To,\nThe Pre-Authorization Appeals Committee,\n${insurer}\n\nSubject: Formal Dispute & Clinical Appeal — Claim ID: ${newClaimId}\nPatient: ${patientName} | Policy No.: ${effectivePolicy}\n\nDear Sir/Madam,\n\nWe are writing to formally appeal the adverse pre-authorization determination for ${catalogEntry.name} (CPT Code: ${catalogEntry.cpt}, ICD-10: ${get('f-icd') || catalogEntry.icd10}) on behalf of our patient, ${patientName}.\n\nReason for Rejection Cited:\nThe claim was flagged due to missing clinical evidence: ${missingDocs.join('; ')}.\n\nCorrective Action & Supporting Clinical Evidence:\nWe have now attached the required clinical dossier:\n${missingDocs.map(d => `• ${d}: Formally verified and signed by attending physician ${effectiveDoctor}`).join('\n')}\n\nClinical Justification:\nThe patient presented with ${get('f-diagnosis-desc') || catalogEntry.diagDesc}. Symptoms: ${get('f-diagnosis-notes') || 'Severe functional deficit and pain'}. Operative intervention is medically necessary to prevent clinical deterioration.\n\nWe respectfully request immediate reconsideration and pre-authorization sanction.\n\nYours sincerely,\nClinical Authorization Desk\n${effectiveHospital}`
           } : null
         };
 
@@ -7724,9 +7767,8 @@
       setText('preauth-icd', data?.parsedNote?.icd10_code ? `${data.parsedNote.icd10_code} — ${data?.parsedNote?.icd10_desc || ''}`.trim() : (regClaim?.icd10_code ? `${regClaim.icd10_code} — ${regClaim.icd10_desc || ''}` : '—'));
       setText('preauth-icd-src', '📎 Confirmed via EHR');
       setText('preauth-justification', data?.preauth_form?.evidenceSummary?.topDrivers?.join('. ') || 'See attached clinical evidence and policy rules.');
-      setText('preauth-justification-src', '📎 Cited: EHR labs, diagnosis history, prior treatments');
       setText('preauth-cost', data?.request?.costEstimate ? `₹${Number(data.request.costEstimate).toLocaleString('en-IN')}` : (regClaim?.costEstimate ? `₹${Number(regClaim.costEstimate).toLocaleString('en-IN')}` : money(data?.policy_used?.max_approved || 0)));
-      setText('preauth-doctor', regClaim?.doctor || data?.request?.doctorId || 'Dr. Anand Krishnan, MS');
+      setText('preauth-doctor', regClaim?.doctor || regClaim?.certSurgeon || data?.request?.certSurgeon || data?.request?.doctorId || 'Attending Physician');
 
       const deadline = regClaim?.deadline || (data?.policy_used?.preauth_days ? `Within ${data.policy_used.preauth_days} days` : 'Within 3 days');
       setText('preauth-deadline', deadline);
@@ -9404,7 +9446,7 @@
           insurerId: claim.insurerId,
           procedureId: claim.procedure,
           costEstimate: claim.costEstimate,
-          doctorId: claim.doctor || 'Dr. Anand Krishnan'
+          doctorId: claim.doctor || claim.certSurgeon || 'Attending Physician'
         },
         parsedNote: {
           procedure: claim.procedure,
@@ -10850,17 +10892,26 @@ Surgical intervention via ${entry.name} is medically urgent and necessary to res
       }
 
       const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-      const textColor = isDark ? '#f8fafc' : '#0f172a';
-      const subtextColor = isDark ? '#94a3b8' : '#64748b';
-      const nodeBg = isDark ? '#1e2430' : '#ffffff';
-      const nodeBorder = isDark ? '#334155' : '#cbd5e1';
-      const edgeColor = isDark ? '#64748b' : '#94a3b8';
+      const textColor = isDark ? '#ffffff' : '#0f172a';
+      const subtextColor = isDark ? '#cbd5e1' : '#475569';
+      const edgeLineColor = isDark ? '#475569' : '#94a3b8';
+
+      // Helper for high-contrast legible edge label pills
+      const makeEdgeFont = (lblColor, isBold = false) => ({
+        color: isDark ? (lblColor || '#f8fafc') : (lblColor || '#0f172a'),
+        size: 11,
+        face: 'Outfit',
+        bold: isBold,
+        background: isDark ? '#0f172a' : '#ffffff',
+        strokeWidth: 2,
+        strokeColor: isDark ? '#0f172a' : '#ffffff'
+      });
 
       // Extract comprehensive patient, clinical, and policy attributes
-      const pName = data.request?.patientName || regClaim?.patientName || 'Rajesh Kumar';
+      const pName = data.request?.patientName || regClaim?.patientName || 'Patient';
       const pId = data.request?.patientId || regClaim?.patientId || 'PAT-1042';
-      const docName = data.request?.doctorId || regClaim?.doctor || 'Dr. Anand Krishnan, MS';
-      const hospName = regClaim?.hospital || 'Apollo Hospitals';
+      const docName = regClaim?.doctor || regClaim?.certSurgeon || data.request?.doctorId || data.request?.certSurgeon || 'Attending Physician';
+      const hospName = regClaim?.hospital || data.request?.hospital || 'Apollo Hospitals';
       const insurer = data.request?.insurerId || regClaim?.insurerId || 'Star Health';
       const policyNo = data.ehrEvidence?.policy_number || regClaim?.policyNumber || 'POL-88321';
       const claimId = data.request?.claimId || regClaim?.claimId || activeClaimId;
@@ -10897,10 +10948,10 @@ Surgical intervention via ${entry.name} is medically urgent and necessary to res
 
       const baseNode = {
         shape: 'box',
-        borderWidth: 1.8,
-        margin: { top: 9, bottom: 9, left: 12, right: 12 },
-        font: { color: textColor, face: 'Outfit', size: 12 },
-        shadow: { enabled: true, color: 'rgba(0,0,0,0.12)', size: 6, x: 0, y: 3 }
+        borderWidth: 2,
+        margin: { top: 10, bottom: 10, left: 14, right: 14 },
+        font: { color: textColor, face: 'Outfit', size: 12.5, bold: true },
+        shadow: { enabled: true, color: 'rgba(0,0,0,0.25)', size: 8, x: 0, y: 4 }
       };
 
       // 1. Patient Demographics Node
@@ -10908,8 +10959,8 @@ Surgical intervention via ${entry.name} is medically urgent and necessary to res
         ...baseNode,
         id: 'node_patient',
         label: `👤 Patient Profile\n${pName}\n(${pId})`,
-        color: { background: isDark ? '#172554' : '#eff6ff', border: '#3b82f6', highlight: { border: '#60a5fa', background: isDark ? '#1e3a8a' : '#dbeafe' } },
-        font: { color: isDark ? '#bfdbfe' : '#1d4ed8', face: 'Outfit', size: 12, bold: true },
+        color: { background: isDark ? '#1e3a8a' : '#eff6ff', border: isDark ? '#60a5fa' : '#3b82f6', highlight: { border: '#93c5fd', background: isDark ? '#2563eb' : '#dbeafe' } },
+        font: { color: isDark ? '#ffffff' : '#1e3a8a', face: 'Outfit', size: 12.5, bold: true },
         title: `Patient Demographics\nName: ${pName}\nID: ${pId}\nCoverage: Active`
       });
 
@@ -10918,8 +10969,8 @@ Surgical intervention via ${entry.name} is medically urgent and necessary to res
         ...baseNode,
         id: 'node_provider',
         label: `🏥 Attending Provider\n${docName}\n${hospName}`,
-        color: { background: isDark ? '#134e4a' : '#f0fdfa', border: '#14b8a6', highlight: { border: '#2dd4bf', background: isDark ? '#115e59' : '#ccfbf1' } },
-        font: { color: isDark ? '#99f6e4' : '#0f766e', face: 'Outfit', size: 12 },
+        color: { background: isDark ? '#065f46' : '#f0fdf4', border: isDark ? '#34d399' : '#10b981', highlight: { border: '#6ee7b7', background: isDark ? '#047857' : '#ccfbf1' } },
+        font: { color: isDark ? '#ffffff' : '#065f46', face: 'Outfit', size: 12.5, bold: true },
         title: `Healthcare Provider\nPhysician: ${docName}\nFacility: ${hospName}`
       });
 
@@ -10928,8 +10979,8 @@ Surgical intervention via ${entry.name} is medically urgent and necessary to res
         ...baseNode,
         id: 'node_insurer',
         label: `🛡️ Payer & Policy\n${insurer}\nPolicy: ${policyNo}`,
-        color: { background: isDark ? '#312e81' : '#eef2ff', border: '#6366f1', highlight: { border: '#818cf8', background: isDark ? '#3730a3' : '#e0e7ff' } },
-        font: { color: isDark ? '#c7d2fe' : '#4338ca', face: 'Outfit', size: 12 },
+        color: { background: isDark ? '#3730a3' : '#eef2ff', border: isDark ? '#818cf8' : '#6366f1', highlight: { border: '#a5b4fc', background: isDark ? '#4338ca' : '#e0e7ff' } },
+        font: { color: isDark ? '#ffffff' : '#3730a3', face: 'Outfit', size: 12.5, bold: true },
         title: `Payer Organization\nInsurer: ${insurer}\nPolicy Number: ${policyNo}`
       });
 
@@ -10939,9 +10990,9 @@ Surgical intervention via ${entry.name} is medically urgent and necessary to res
         id: 'node_claim',
         label: `📄 Pre-Auth Request\n${claimId} • ₹${formattedCost}\n${procName}`,
         shape: 'box',
-        borderWidth: 2.8,
-        color: { background: isDark ? '#1e293b' : '#f8fafc', border: '#0284c7', highlight: { border: '#38bdf8', background: isDark ? '#0f172a' : '#f1f5f9' } },
-        font: { color: textColor, face: 'Outfit', size: 13, bold: true },
+        borderWidth: 3,
+        color: { background: isDark ? '#0369a1' : '#f0f9ff', border: isDark ? '#38bdf8' : '#0284c7', highlight: { border: '#7dd3fc', background: isDark ? '#0284c7' : '#e0f2fe' } },
+        font: { color: isDark ? '#ffffff' : '#0369a1', face: 'Outfit', size: 14, bold: true },
         title: `Claim Submission\nID: ${claimId}\nProcedure: ${procName} (CPT ${cptCode})\nRequested Amount: ₹${formattedCost}`
       });
 
@@ -10950,8 +11001,8 @@ Surgical intervention via ${entry.name} is medically urgent and necessary to res
         ...baseNode,
         id: 'node_diag',
         label: `🩺 ICD-10: ${icdCode}\n${icdDesc}`,
-        color: { background: isDark ? '#3b0764' : '#faf5ff', border: '#a855f7', highlight: { border: '#c084fc', background: isDark ? '#581c87' : '#f3e8ff' } },
-        font: { color: isDark ? '#e9d5ff' : '#7e22ce', face: 'Outfit', size: 12 },
+        color: { background: isDark ? '#6b21a8' : '#faf5ff', border: isDark ? '#c084fc' : '#a855f7', highlight: { border: '#d8b4fe', background: isDark ? '#7e22ce' : '#f3e8ff' } },
+        font: { color: isDark ? '#ffffff' : '#6b21a8', face: 'Outfit', size: 12.5, bold: true },
         title: `Clinical Diagnosis\nICD-10 Code: ${icdCode}\nIndication: ${icdDesc}`
       });
 
@@ -10960,8 +11011,8 @@ Surgical intervention via ${entry.name} is medically urgent and necessary to res
         ...baseNode,
         id: 'node_imaging',
         label: `🩻 Imaging Evidence\n${imagingLabel}`,
-        color: { background: isDark ? '#064e3b' : '#ecfdf5', border: '#10b981', highlight: { border: '#34d399', background: isDark ? '#065f46' : '#d1fae5' } },
-        font: { color: isDark ? '#a7f3d0' : '#047857', face: 'Outfit', size: 12 },
+        color: { background: isDark ? '#047857' : '#ecfdf5', border: isDark ? '#34d399' : '#10b981', highlight: { border: '#6ee7b7', background: isDark ? '#065f46' : '#d1fae5' } },
+        font: { color: isDark ? '#ffffff' : '#047857', face: 'Outfit', size: 12, bold: true },
         title: `Diagnostic Imaging Study\nFindings: ${imagingLabel}\nStatus: Corroborated with radiologist report`
       });
 
@@ -10970,8 +11021,8 @@ Surgical intervention via ${entry.name} is medically urgent and necessary to res
         ...baseNode,
         id: 'node_labs',
         label: `🔬 Labs & Pathology\n${labLabel}`,
-        color: { background: isDark ? '#064e3b' : '#ecfdf5', border: '#10b981', highlight: { border: '#34d399', background: isDark ? '#065f46' : '#d1fae5' } },
-        font: { color: isDark ? '#a7f3d0' : '#047857', face: 'Outfit', size: 12 },
+        color: { background: isDark ? '#047857' : '#ecfdf5', border: isDark ? '#34d399' : '#10b981', highlight: { border: '#6ee7b7', background: isDark ? '#065f46' : '#d1fae5' } },
+        font: { color: isDark ? '#ffffff' : '#047857', face: 'Outfit', size: 12, bold: true },
         title: `Laboratory Diagnostics\nFindings: ${labLabel}`
       });
 
@@ -10980,8 +11031,8 @@ Surgical intervention via ${entry.name} is medically urgent and necessary to res
         ...baseNode,
         id: 'node_therapy',
         label: `⏱️ Prior Conservative Care\n${consTrial}\nOutcome: ${consOutcome}`,
-        color: { background: isDark ? '#451a03' : '#fffbeb', border: '#f59e0b', highlight: { border: '#fbbf24', background: isDark ? '#78350f' : '#fef3c7' } },
-        font: { color: isDark ? '#fde68a' : '#b45309', face: 'Outfit', size: 12 },
+        color: { background: isDark ? '#92400e' : '#fffbeb', border: isDark ? '#fbbf24' : '#f59e0b', highlight: { border: '#fcd34d', background: isDark ? '#b45309' : '#fef3c7' } },
+        font: { color: isDark ? '#ffffff' : '#92400e', face: 'Outfit', size: 12, bold: true },
         title: `Prior Conservative Trial\nProtocol: ${consTrial}\nResult: ${consOutcome}`
       });
 
@@ -10991,8 +11042,8 @@ Surgical intervention via ${entry.name} is medically urgent and necessary to res
           ...baseNode,
           id: `doc_f_${i}`,
           label: `✓ Verified in EHR\n${doc}`,
-          color: { background: isDark ? '#052e16' : '#f0fdf4', border: '#16a34a', highlight: { border: '#4ade80', background: isDark ? '#14532d' : '#dcfce7' } },
-          font: { color: isDark ? '#86efac' : '#15803d', face: 'Outfit', size: 11.5, bold: true },
+          color: { background: isDark ? '#14532d' : '#f0fdf4', border: isDark ? '#4ade80' : '#16a34a', highlight: { border: '#86efac', background: isDark ? '#166534' : '#dcfce7' } },
+          font: { color: isDark ? '#ffffff' : '#15803d', face: 'Outfit', size: 12, bold: true },
           title: `Required Clinical Record: ${doc}\nStatus: Verified and attached to package`
         });
       });
@@ -11003,8 +11054,8 @@ Surgical intervention via ${entry.name} is medically urgent and necessary to res
           ...baseNode,
           id: `doc_m_${i}`,
           label: `⚠️ Missing Evidence\n${doc}`,
-          color: { background: isDark ? '#450a0a' : '#fef2f2', border: '#dc2626', highlight: { border: '#f87171', background: isDark ? '#7f1d1d' : '#fee2e2' } },
-          font: { color: isDark ? '#fca5a5' : '#b91c1c', face: 'Outfit', size: 11.5, bold: true },
+          color: { background: isDark ? '#881337' : '#fef2f2', border: isDark ? '#f87171' : '#dc2626', highlight: { border: '#fca5a5', background: isDark ? '#9f1239' : '#fee2e2' } },
+          font: { color: isDark ? '#ffffff' : '#991b1b', face: 'Outfit', size: 12, bold: true },
           title: `Missing Clinical Requirement: ${doc}\nAction: Needs supplementary filing or peer-to-peer appeal`
         });
       });
@@ -11014,8 +11065,8 @@ Surgical intervention via ${entry.name} is medically urgent and necessary to res
         ...baseNode,
         id: 'rule_necessity',
         label: `📜 Policy Clinical Rule\nMedical Necessity (CPT ${cptCode})`,
-        color: { background: nodeBg, border: nodeBorder, highlight: { border: '#0ea5e9' } },
-        font: { color: textColor, face: 'Outfit', size: 12 },
+        color: { background: isDark ? '#334155' : '#f8fafc', border: isDark ? '#94a3b8' : '#64748b', highlight: { border: '#cbd5e1' } },
+        font: { color: isDark ? '#ffffff' : '#1e293b', face: 'Outfit', size: 12, bold: true },
         title: `Clinical Policy Criteria\nRequires documented structural pathology on imaging and failure of conservative management.`
       });
 
@@ -11023,8 +11074,8 @@ Surgical intervention via ${entry.name} is medically urgent and necessary to res
         ...baseNode,
         id: 'rule_docs',
         label: `📜 Documentation Rule\nEvidence Protocol Checklist`,
-        color: { background: nodeBg, border: nodeBorder, highlight: { border: '#0ea5e9' } },
-        font: { color: textColor, face: 'Outfit', size: 12 },
+        color: { background: isDark ? '#334155' : '#f8fafc', border: isDark ? '#94a3b8' : '#64748b', highlight: { border: '#cbd5e1' } },
+        font: { color: isDark ? '#ffffff' : '#1e293b', face: 'Outfit', size: 12, bold: true },
         title: `Documentation Completeness Policy\nAll required clinical reports must be filed before final authorization approval.`
       });
 
@@ -11032,112 +11083,114 @@ Surgical intervention via ${entry.name} is medically urgent and necessary to res
         ...baseNode,
         id: 'rule_finance',
         label: `💰 Tariff & Cost Rule\nApproved Cap: ₹${formattedCost}`,
-        color: { background: nodeBg, border: nodeBorder, highlight: { border: '#0ea5e9' } },
-        font: { color: textColor, face: 'Outfit', size: 12 },
+        color: { background: isDark ? '#334155' : '#f8fafc', border: isDark ? '#94a3b8' : '#64748b', highlight: { border: '#cbd5e1' } },
+        font: { color: isDark ? '#ffffff' : '#1e293b', face: 'Outfit', size: 12, bold: true },
         title: `Financial Coverage Policy\nEstimated cost falls within agreed institutional tariff and insurer sub-limits.`
       });
 
       // 12. AI Risk Scoring Engine Node
       const isHigh = riskLevel === 'HIGH';
       const isMed = riskLevel === 'MEDIUM';
-      const riskBorder = isHigh ? '#dc2626' : (isMed ? '#d97706' : '#16a34a');
-      const riskBg = isHigh ? (isDark ? '#450a0a' : '#fef2f2') : (isMed ? (isDark ? '#451a03' : '#fffbeb') : (isDark ? '#052e16' : '#f0fdf4'));
-      const riskColor = isHigh ? '#ef4444' : (isMed ? '#f59e0b' : '#10b981');
+      const riskBorder = isHigh ? (isDark ? '#ef4444' : '#dc2626') : (isMed ? (isDark ? '#f59e0b' : '#d97706') : (isDark ? '#22c55e' : '#16a34a'));
+      const riskBg = isHigh ? (isDark ? '#7f1d1d' : '#fee2e2') : (isMed ? (isDark ? '#78350f' : '#fef3c7') : (isDark ? '#14532d' : '#dcfce7'));
+      const riskTextColor = isDark ? '#ffffff' : (isHigh ? '#991b1b' : (isMed ? '#92400e' : '#14532d'));
 
       nodes.push({
         ...baseNode,
         id: 'node_risk',
         label: `⚡ AI Risk Engine\n${riskLevel} RISK (${riskScore}%)\n${missingDocsList.length > 0 ? `${missingDocsList.length} Evidence Gap(s)` : 'Full Policy Compliance'}`,
-        borderWidth: 2.5,
+        borderWidth: 3,
         color: { background: riskBg, border: riskBorder, highlight: { border: riskBorder, background: riskBg } },
-        font: { color: riskColor, face: 'Outfit', size: 13, bold: true },
+        font: { color: riskTextColor, face: 'Outfit', size: 13.5, bold: true },
         title: `Risk Engine Assessment\nScore: ${riskScore}%\nLevel: ${riskLevel}\nAudit: ${missingDocsList.length === 0 ? 'Optimal pre-auth approval readiness' : 'Evidence gaps detected'}`
       });
 
       // 13. Final Adjudication Recommendation Verdict
       const verdictLabel = isApprovedStatus ? 'APPROVED\nAuthorized by Insurer' : (missingDocsList.length > 0 ? 'PENDING EVIDENCE\nAdditional Docs Required' : 'OPTIMAL\nReady for Instant Filing');
-      const verdictBorder = isApprovedStatus ? '#16a34a' : (missingDocsList.length > 0 ? '#d97706' : '#0284c7');
-      const verdictColor = isApprovedStatus ? '#10b981' : (missingDocsList.length > 0 ? '#f59e0b' : '#0ea5e9');
+      const verdictBorder = isApprovedStatus ? (isDark ? '#22c55e' : '#16a34a') : (missingDocsList.length > 0 ? (isDark ? '#f59e0b' : '#d97706') : (isDark ? '#38bdf8' : '#0284c7'));
+      const verdictBg = isApprovedStatus ? (isDark ? '#14532d' : '#dcfce7') : (missingDocsList.length > 0 ? (isDark ? '#78350f' : '#fef3c7') : (isDark ? '#0369a1' : '#f0f9ff'));
+      const verdictTextColor = isDark ? '#ffffff' : (isApprovedStatus ? '#15803d' : (missingDocsList.length > 0 ? '#b45309' : '#0369a1'));
 
       nodes.push({
         ...baseNode,
         id: 'node_verdict',
         label: `⚖️ Adjudication\n${verdictLabel}`,
         shape: 'box',
-        borderWidth: 2.5,
-        color: { background: isDark ? '#1e2430' : '#ffffff', border: verdictBorder },
-        font: { color: verdictColor, face: 'Outfit', size: 12.5, bold: true },
+        borderWidth: 3,
+        color: { background: verdictBg, border: verdictBorder, highlight: { border: verdictBorder, background: verdictBg } },
+        font: { color: verdictTextColor, face: 'Outfit', size: 13, bold: true },
         title: `Adjudication Decision Status\nStatus: ${verdictLabel.replace('\n', ' - ')}`
       });
 
       // ==========================================
-      //  EDGES / CONNECTIONS
+      //  EDGES / CONNECTIONS WITH LEGIBLE BADGES
       // ==========================================
       // Demographics & Facility -> Claim
-      edges.push({ from: 'node_patient', to: 'node_claim', color: edgeColor, arrows: 'to', label: 'Patient', font: { color: subtextColor, size: 10 } });
-      edges.push({ from: 'node_provider', to: 'node_claim', color: edgeColor, arrows: 'to', label: 'Recommends', font: { color: subtextColor, size: 10 } });
-      edges.push({ from: 'node_insurer', to: 'rule_necessity', color: '#6366f1', arrows: 'to', label: 'Guidelines', font: { color: '#6366f1', size: 10 } });
-      edges.push({ from: 'node_insurer', to: 'rule_docs', color: '#6366f1', arrows: 'to' });
-      edges.push({ from: 'node_insurer', to: 'rule_finance', color: '#6366f1', arrows: 'to' });
+      edges.push({ from: 'node_patient', to: 'node_claim', color: edgeLineColor, arrows: 'to', label: 'Patient', font: makeEdgeFont(isDark ? '#60a5fa' : '#2563eb') });
+      edges.push({ from: 'node_provider', to: 'node_claim', color: edgeLineColor, arrows: 'to', label: 'Recommends', font: makeEdgeFont(isDark ? '#34d399' : '#059669') });
+      edges.push({ from: 'node_insurer', to: 'rule_necessity', color: '#818cf8', arrows: 'to', label: 'Guidelines', font: makeEdgeFont('#818cf8') });
+      edges.push({ from: 'node_insurer', to: 'rule_docs', color: '#818cf8', arrows: 'to' });
+      edges.push({ from: 'node_insurer', to: 'rule_finance', color: '#818cf8', arrows: 'to' });
 
       // Claim -> Clinical Findings
-      edges.push({ from: 'node_claim', to: 'node_diag', color: '#a855f7', arrows: 'to', label: 'Primary Dx', font: { color: '#a855f7', size: 10 } });
-      edges.push({ from: 'node_claim', to: 'node_imaging', color: edgeColor, arrows: 'to', label: 'Diagnostic', font: { color: subtextColor, size: 10 } });
-      edges.push({ from: 'node_claim', to: 'node_labs', color: edgeColor, arrows: 'to', label: 'Pathology', font: { color: subtextColor, size: 10 } });
-      edges.push({ from: 'node_claim', to: 'node_therapy', color: edgeColor, arrows: 'to', label: 'Prior Care', font: { color: subtextColor, size: 10 } });
-      edges.push({ from: 'node_claim', to: 'rule_finance', color: edgeColor, arrows: 'to', label: 'Package Cost', font: { color: subtextColor, size: 10 } });
+      edges.push({ from: 'node_claim', to: 'node_diag', color: '#c084fc', arrows: 'to', label: 'Primary Dx', font: makeEdgeFont('#c084fc') });
+      edges.push({ from: 'node_claim', to: 'node_imaging', color: edgeLineColor, arrows: 'to', label: 'Diagnostic', font: makeEdgeFont(subtextColor) });
+      edges.push({ from: 'node_claim', to: 'node_labs', color: edgeLineColor, arrows: 'to', label: 'Pathology', font: makeEdgeFont(subtextColor) });
+      edges.push({ from: 'node_claim', to: 'node_therapy', color: edgeLineColor, arrows: 'to', label: 'Prior Care', font: makeEdgeFont(subtextColor) });
+      edges.push({ from: 'node_claim', to: 'rule_finance', color: edgeLineColor, arrows: 'to', label: 'Package Cost', font: makeEdgeFont(subtextColor) });
 
       // Clinical Findings -> Policy Rules
-      edges.push({ from: 'node_diag', to: 'rule_necessity', color: edgeColor, arrows: 'to', label: 'Covers CPT', font: { color: subtextColor, size: 10 } });
-      edges.push({ from: 'node_imaging', to: 'rule_necessity', color: '#10b981', arrows: 'to', label: 'Confirms', font: { color: '#10b981', size: 10 } });
-      edges.push({ from: 'node_therapy', to: 'rule_necessity', color: '#f59e0b', arrows: 'to', label: 'Failed Trial', font: { color: '#f59e0b', size: 10 } });
+      edges.push({ from: 'node_diag', to: 'rule_necessity', color: edgeLineColor, arrows: 'to', label: 'Covers CPT', font: makeEdgeFont(subtextColor) });
+      edges.push({ from: 'node_imaging', to: 'rule_necessity', color: '#34d399', arrows: 'to', label: 'Confirms', font: makeEdgeFont('#34d399') });
+      edges.push({ from: 'node_therapy', to: 'rule_necessity', color: '#fbbf24', arrows: 'to', label: 'Failed Trial', font: makeEdgeFont('#fbbf24') });
 
       // Documents -> Documentation Rule
       foundDocsList.forEach((_, i) => {
-        edges.push({ from: 'node_claim', to: `doc_f_${i}`, color: '#10b981', arrows: 'to' });
-        edges.push({ from: `doc_f_${i}`, to: 'rule_docs', color: '#10b981', arrows: 'to', label: 'Satisfies', font: { color: '#10b981', size: 10 } });
+        edges.push({ from: 'node_claim', to: `doc_f_${i}`, color: '#22c55e', arrows: 'to' });
+        edges.push({ from: `doc_f_${i}`, to: 'rule_docs', color: '#22c55e', arrows: 'to', label: 'Satisfies', font: makeEdgeFont('#22c55e') });
       });
 
       missingDocsList.forEach((_, i) => {
-        edges.push({ from: 'node_claim', to: `doc_m_${i}`, color: '#dc2626', arrows: 'to', dashes: true });
-        edges.push({ from: `doc_m_${i}`, to: 'rule_docs', color: '#dc2626', arrows: 'to', label: 'Gap', dashes: true, font: { color: '#dc2626', size: 10 } });
+        edges.push({ from: 'node_claim', to: `doc_m_${i}`, color: '#ef4444', arrows: 'to', dashes: true });
+        edges.push({ from: `doc_m_${i}`, to: 'rule_docs', color: '#ef4444', arrows: 'to', label: 'Gap', dashes: true, font: makeEdgeFont('#ef4444', true) });
       });
 
       // Rules -> AI Risk Engine
-      edges.push({ from: 'rule_necessity', to: 'node_risk', color: edgeColor, arrows: 'to', label: 'Clinical Weight', font: { color: subtextColor, size: 10 } });
-      edges.push({ from: 'rule_docs', to: 'node_risk', color: missingDocsList.length > 0 ? '#dc2626' : '#10b981', arrows: 'to', label: 'Completeness', font: { color: missingDocsList.length > 0 ? '#dc2626' : '#10b981', size: 10 } });
-      edges.push({ from: 'rule_finance', to: 'node_risk', color: edgeColor, arrows: 'to', label: 'Financial Limit', font: { color: subtextColor, size: 10 } });
+      edges.push({ from: 'rule_necessity', to: 'node_risk', color: edgeLineColor, arrows: 'to', label: 'Clinical Weight', font: makeEdgeFont(subtextColor) });
+      edges.push({ from: 'rule_docs', to: 'node_risk', color: missingDocsList.length > 0 ? '#ef4444' : '#22c55e', arrows: 'to', label: 'Completeness', font: makeEdgeFont(missingDocsList.length > 0 ? '#ef4444' : '#22c55e', true) });
+      edges.push({ from: 'rule_finance', to: 'node_risk', color: edgeLineColor, arrows: 'to', label: 'Financial Limit', font: makeEdgeFont(subtextColor) });
 
       // AI Risk Engine -> Final Adjudication Verdict
       edges.push({
         from: 'node_risk',
         to: 'node_verdict',
         color: verdictBorder,
-        width: 2.2,
+        width: 2.5,
         arrows: 'to',
         label: isApprovedStatus ? 'Approved' : 'Evaluation',
-        font: { color: verdictColor, size: 11, bold: true }
+        font: makeEdgeFont(verdictTextColor, true)
       });
 
       const visData = { nodes: new vis.DataSet(nodes), edges: new vis.DataSet(edges) };
 
-      // Dynamic Force-Directed Physics Layout
+      // Physics layout with automatic freeze upon stabilization to prevent spinning
       const options = {
         physics: {
           enabled: true,
           solver: 'forceAtlas2Based',
           forceAtlas2Based: {
-            gravitationalConstant: -75,
-            centralGravity: 0.015,
-            springLength: 135,
-            springConstant: 0.08,
-            damping: 0.48,
-            avoidOverlap: 0.7
+            gravitationalConstant: -90,
+            centralGravity: 0.018,
+            springLength: 140,
+            springConstant: 0.09,
+            damping: 0.8,
+            avoidOverlap: 1.0
           },
           stabilization: {
             enabled: true,
-            iterations: 140,
-            updateInterval: 25
+            iterations: 160,
+            updateInterval: 30,
+            fit: true
           }
         },
         interaction: {
@@ -11161,15 +11214,17 @@ Surgical intervention via ${entry.name} is medically urgent and necessary to res
 
       window.__currentEvidenceNetwork = new vis.Network(container, visData, options);
 
-      // Fit to container after physics settle
-      window.__currentEvidenceNetwork.once('stabilizationIterationsDone', function () {
+      // Permanently stop continuous physics simulation once stabilized so the graph is completely static in place
+      function freezeNetwork() {
         if (window.__currentEvidenceNetwork) {
-          window.__currentEvidenceNetwork.fit({ animation: { duration: 400, easingFunction: 'easeInOutQuad' } });
+          window.__currentEvidenceNetwork.setOptions({ physics: { enabled: false } });
+          window.__currentEvidenceNetwork.fit({ animation: { duration: 300, easingFunction: 'easeInOutQuad' } });
         }
-      });
-      setTimeout(() => {
-        if (window.__currentEvidenceNetwork) window.__currentEvidenceNetwork.fit();
-      }, 350);
+      }
+
+      window.__currentEvidenceNetwork.once('stabilizationIterationsDone', freezeNetwork);
+      window.__currentEvidenceNetwork.once('stabilized', freezeNetwork);
+      setTimeout(freezeNetwork, 450);
     }
 
     // Ensure the graph refreshes if theme changes

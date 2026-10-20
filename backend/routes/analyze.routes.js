@@ -52,7 +52,8 @@ function applyEhrOverrides(ehr, body, parsedNote) {
 
   if (patientName) ehr.name = patientName;
   if (gender) ehr.gender = gender;
-  if (doctorId) ehr.doctor_id = doctorId;
+  const effectiveDoctor = certSurgeon || doctorId;
+  if (effectiveDoctor) ehr.doctor_id = effectiveDoctor;
   if (insurerId) ehr.insurer_id = insurerId;
   if (age !== undefined && age !== null && String(age).trim() !== "") {
     const n = Number(age);
@@ -534,7 +535,7 @@ router.post("/", async (req, res) => {
         score:      logicResult.risk.riskScore,
         topDrivers: logicResult.risk.reasons || [],
       },
-      request: { patientId, insurerId: insurerKey, claimId: claimIdForStore, costEstimate },
+      request: { patientId, insurerId: insurerKey, claimId: claimIdForStore, costEstimate, doctorId: certSurgeon || doctorId || ehr?.doctor_id, certSurgeon: certSurgeon || doctorId },
       policy_used: {
         cpt:                cptKey,
         required_documents: requirements,
