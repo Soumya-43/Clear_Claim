@@ -34,7 +34,21 @@ function applyEhrOverrides(ehr, body, parsedNote) {
     treatOutcome,
     mriDate,
     ultrasoundDate,
+    surgeonNoteText,
+    note,
+    certNotes,
+    certSurgeon,
+    medicalLicense,
+    providedEvidence
   } = body || {};
+
+  const noteContent = (surgeonNoteText || note || certNotes || "").trim();
+  ehr.has_surgeon_letter = !!(providedEvidence?.hasSurgeonNote || noteContent.length > 20 || (certSurgeon && medicalLicense));
+  ehr.surgeon_notes = noteContent;
+  ehr.has_imaging = !!(providedEvidence?.hasImaging || mriDate || ultrasoundDate || (labType && /mri|x-?ray|ultrasound|ct|echo|angiogram|biometry|pns/i.test(labType)));
+  ehr.has_conservative_history = !!(providedEvidence?.hasConservativeHistory || prevTreatments || treatDuration);
+  ehr.has_labs = !!(providedEvidence?.hasLabs || labType || labFindings || labDate);
+  ehr.has_cert = !!(providedEvidence?.hasCert || (certSurgeon && medicalLicense) || noteContent.length > 20);
 
   if (patientName) ehr.name = patientName;
   if (gender) ehr.gender = gender;
@@ -107,14 +121,25 @@ function applyEhrOverrides(ehr, body, parsedNote) {
 
 const CPT_DESCRIPTIONS = {
   "63030": "Lumbar Discectomy",
-  "27447": "Total Knee Arthroplasty",
+  "27447": "Total Knee Arthroplasty (Knee Replacement)",
+  "27130": "Total Hip Replacement (Hip Arthroplasty)",
+  "29888": "ACL Reconstruction (Knee Ligament Repair)",
+  "29827": "Rotator Cuff Repair / Shoulder Arthroscopy",
+  "22551": "Anterior Cervical Discectomy & Fusion (ACDF)",
   "47562": "Laparoscopic Cholecystectomy",
+  "44950": "Laparoscopic Appendectomy",
+  "49505": "Inguinal Hernia Repair",
+  "92928": "Percutaneous Coronary Intervention (PCI) with Stenting",
+  "33533": "Coronary Artery Bypass Graft (CABG)",
   "43239": "Upper GI Endoscopy with Biopsy",
+  "45378": "Diagnostic & Therapeutic Colonoscopy",
+  "66984": "Cataract Surgery with Phacoemulsification & IOL",
+  "31255": "Functional Endoscopic Sinus Surgery (FESS)",
+  "58571": "Total Laparoscopic Hysterectomy",
+  "52601": "Transurethral Resection of Prostate (TURP)",
   "70553": "MRI Brain with Contrast",
   "93306": "Echocardiography",
   "99283": "Emergency Department Visit",
-  "44950": "Laparoscopic Appendectomy",
-  "92928": "Percutaneous Coronary Intervention (PCI) with Stenting",
 };
 
 function parseNoteLocally(text) {
@@ -129,18 +154,34 @@ function parseNoteLocally(text) {
   if (!cptRaw) {
     if (lower.includes("discectomy") || lower.includes("lumbar disc")) cptRaw = "63030";
     else if (lower.includes("knee replacement") || lower.includes("knee arthroplasty")) cptRaw = "27447";
-    else if (lower.includes("cholecystectomy")) cptRaw = "47562";
-    else if (lower.includes("endoscopy")) cptRaw = "43239";
+    else if (lower.includes("hip replacement") || lower.includes("hip arthroplasty")) cptRaw = "27130";
+    else if (lower.includes("acl") || lower.includes("cruciate ligament")) cptRaw = "29888";
+    else if (lower.includes("rotator cuff") || lower.includes("shoulder arthroscopy")) cptRaw = "29827";
+    else if (lower.includes("cervical fusion") || lower.includes("acdf") || lower.includes("cervical discectomy")) cptRaw = "22551";
+    else if (lower.includes("cholecystectomy") || lower.includes("gallbladder")) cptRaw = "47562";
     else if (lower.includes("appendectomy") || lower.includes("appendicitis") || lower.includes("appendix")) cptRaw = "44950";
-    else if (lower.includes("stenting") || lower.includes("percutaneous coronary") || lower.includes("pci") || lower.includes("cardiac")) cptRaw = "92928";
+    else if (lower.includes("hernia")) cptRaw = "49505";
+    else if (lower.includes("cabg") || lower.includes("bypass graft")) cptRaw = "33533";
+    else if (lower.includes("stenting") || lower.includes("pci") || lower.includes("coronary")) cptRaw = "92928";
+    else if (lower.includes("endoscopy") || lower.includes("gastroscopy")) cptRaw = "43239";
+    else if (lower.includes("colonoscopy")) cptRaw = "45378";
+    else if (lower.includes("cataract") || lower.includes("phaco")) cptRaw = "66984";
+    else if (lower.includes("sinus") || lower.includes("fess")) cptRaw = "31255";
+    else if (lower.includes("hysterectomy")) cptRaw = "58571";
+    else if (lower.includes("prostate") || lower.includes("turp")) cptRaw = "52601";
   }
 
   if (!icd10) {
     if (lower.includes("disc herniation") || lower.includes("discectomy") || lower.includes("lumbar")) icd10 = "M51.1";
     else if (lower.includes("knee") && (lower.includes("osteoarthritis") || lower.includes("replacement"))) icd10 = "M17.11";
+    else if (lower.includes("hip") && (lower.includes("osteoarthritis") || lower.includes("replacement"))) icd10 = "M16.11";
     else if (lower.includes("cholecystitis") || lower.includes("gallbladder")) icd10 = "K80.20";
     else if (lower.includes("appendicitis") || lower.includes("appendectomy") || lower.includes("appendix")) icd10 = "K37";
+    else if (lower.includes("hernia")) icd10 = "K40.90";
     else if (lower.includes("coronary") || lower.includes("stenosis") || lower.includes("angina") || lower.includes("atherosclerotic")) icd10 = "I25.10";
+    else if (lower.includes("cataract")) icd10 = "H25.11";
+    else if (lower.includes("sinus")) icd10 = "J32.9";
+    else if (lower.includes("prostate") || lower.includes("bph")) icd10 = "N40.1";
   }
 
   let urgency = "STANDARD";
@@ -156,63 +197,51 @@ function parseNoteLocally(text) {
   };
 }
 
-const DOCUMENT_KEYWORDS = {
-  mri: ["mri", "magnetic resonance"],
-  "x-ray": ["x-ray", "xray", "radiograph"],
-  ultrasound: ["ultrasound", "sonograph"],
-  "coronary angiogram": ["angiogram", "angiography", "cath"],
-  electrocardiogram: ["ecg", "electrocardiogram", "ekg"],
-  echocardiogram: ["echo", "echocardiogram", "2d echo"],
-  cbc: ["cbc", "complete blood count", "blood report", "wbc", "haematology"],
-  "cbc & blood": ["cbc", "complete blood count", "blood report", "wbc"],
-  "lab report": ["lab", "blood", "cbc", "panel", "report"],
-  "nerve conduction": ["nerve conduction", "ncs", "emg", "electromyograph"],
-  physiotherapy: ["physical therapy", "physiotherapy", "pt record"],
-  "conservative treatment": ["physical therapy", "physiotherapy", "injection", "chiropractic", "nsaid"],
-  surgeon: null,
-  "surgeon's certificate": null,
-  "certificate of medical": null,
-  "proof of medical necessity": null,
-  "medical necessity": null,
-  "surgical clearance": null,
-  "hospital admission": ["admission", "admit", "inpatient"],
-  "prior endoscopy": ["endoscopy", "scope"],
-  "h. pylori": ["pylori", "h pylori"],
-};
-
 function docIsInEhr(docType, ehr) {
   const docLower = docType.toLowerCase();
-  for (const [key, kws] of Object.entries(DOCUMENT_KEYWORDS)) {
-    if (docLower.includes(key) && kws === null) return false;
-  }
-  let keywords = null;
-  for (const [key, kws] of Object.entries(DOCUMENT_KEYWORDS)) {
-    if (kws !== null && docLower.includes(key)) {
-      keywords = kws;
-      break;
-    }
-  }
-  if (!keywords) {
-    const words = docLower.split(" ").filter((w) => w.length > 3);
-    keywords = words.length ? words.slice(0, 2) : [docLower.slice(0, 6)];
+
+  // Clinician / Surgeon notes & recommendation
+  if (docLower.includes("surgeon") || docLower.includes("recommendation") || docLower.includes("physician intake") || docLower.includes("evaluat") || docLower.includes("clinical note") || docLower.includes("referr")) {
+    return !!(ehr.has_surgeon_letter || (ehr.surgeon_notes && ehr.surgeon_notes.length > 20) || (ehr.clinical_notes && ehr.clinical_notes.length > 20));
   }
 
+  // Certificate of medical necessity / clearance
+  if (docLower.includes("certificate") || docLower.includes("medical necessity") || docLower.includes("clearance") || docLower.includes("consent")) {
+    return !!(ehr.has_cert || ehr.has_surgeon_letter || (ehr.surgeon_notes && ehr.surgeon_notes.length > 20));
+  }
+
+  // Conservative treatment / Physical therapy / Rehab
+  if (docLower.includes("conservative") || docLower.includes("therapy") || docLower.includes("physio") || docLower.includes("rehab")) {
+    return !!(ehr.has_conservative_history || (Array.isArray(ehr.prior_treatments) && ehr.prior_treatments.length > 0));
+  }
+
+  // Imaging checks (MRI, X-Ray, CT, Ultrasound, Echo, Angiogram, Biometry, PNS)
+  if (["mri", "x-ray", "xray", "ultrasound", "usg", "ct", "angiogram", "echo", "biometry", "pns"].some(term => docLower.includes(term))) {
+    if (ehr.has_imaging) return true;
+    const labs = ehr.lab_reports || [];
+    return labs.some(l => {
+      const txt = `${l.type || ""} ${l.result || ""}`.toLowerCase();
+      return ["mri", "x-ray", "xray", "ultrasound", "usg", "ct", "angiogram", "echo", "biometry", "pns"].some(term => txt.includes(term));
+    });
+  }
+
+  // Lab reports (CBC, LFT, Blood, H. Pylori, Biopsy, PSA, FOBT, Pre-op labs)
+  if (["cbc", "lft", "blood", "lab", "pylori", "biopsy", "psa", "fobt", "pre-op"].some(term => docLower.includes(term))) {
+    if (ehr.has_labs) return true;
+    const labs = ehr.lab_reports || [];
+    return labs.length > 0;
+  }
+
+  // General fallback keyword matching
   const labs = ehr.lab_reports || [];
   const treatments = ehr.prior_treatments || [];
-  const diagnoses = ehr.diagnosis_history || [];
-
   for (const lab of labs) {
     const labText = `${lab.type || ""} ${lab.result || ""}`.toLowerCase();
-    if (keywords.some((kw) => labText.includes(kw))) return true;
+    if (docLower.split(' ').some(w => w.length > 3 && labText.includes(w))) return true;
   }
-
   for (const tx of treatments) {
     const txText = `${tx.type || ""} ${tx.outcome || ""}`.toLowerCase();
-    if (keywords.some((kw) => txText.includes(kw))) return true;
-  }
-
-  if (docLower.includes("hospital admission") || docLower.includes("admission form")) {
-    return diagnoses.length > 0;
+    if (docLower.split(' ').some(w => w.length > 3 && txText.includes(w))) return true;
   }
 
   return false;
@@ -485,6 +514,7 @@ router.post("/", async (req, res) => {
         prior_treatments:  ehrResult.prior_treatments || [],
         medications:       ehrResult.medications || [],
         missing_documents: missingDocs,
+        found_documents:   ehrResult.found_documents || [],
         evidence_summary:  ehrResult.evidence_summary || {},
       },
       gapAnalysis: {

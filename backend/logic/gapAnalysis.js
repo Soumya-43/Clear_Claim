@@ -90,25 +90,30 @@ class GapAnalysisService {
      * @param {string} procedureCode  e.g. "CPT_44950"
      * @param {Array}  providedDocs   documents found by the Python EHR extractor
      */
-    checkDocumentAvailability(insurerId, procedureCode, providedDocs) {
-        const insurer = this.policies?.[insurerId];
+    checkDocumentAvailability(insurerId, procedureCode, providedDocs = []) {
+        let insurer = this.policies?.[insurerId];
         if (!insurer) {
-            return { status: "error", message: `No policy found for insurer: ${insurerId}`, hasGap: false, missingDocs: [] };
+            const firstKey = Object.keys(this.policies || {})[0];
+            insurer = this.policies?.[firstKey];
         }
 
-        const procedure = insurer.procedures?.[procedureCode];
+        let procedure = insurer?.procedures?.[procedureCode];
         if (!procedure) {
-            // Fallback: flag surgeon letter as missing (safe default)
-            return {
-                insurerId, procedureCode,
-                hasGap: true,
-                missingDocs: ["Surgeon Recommendation Letter"],
-                status: "Action Required",
-                timestamp: new Date().toISOString(),
-            };
+            // Check other insurers for this procedure code
+            for (const ins of Object.values(this.policies || {})) {
+                if (ins?.procedures?.[procedureCode]) {
+                    procedure = ins.procedures[procedureCode];
+                    break;
+                }
+            }
         }
 
-        const requiredDocs = procedure.required_documents || [];
+        const requiredDocs = procedure?.required_documents || [
+            "Surgeon Recommendation Letter",
+            "Diagnostic Imaging / Lab Report",
+            "Proof of Conservative Treatment",
+            "Certificate of Medical Necessity"
+        ];
 
         const missingDocs = requiredDocs.filter(
             doc => !this._isDocSatisfied(doc, providedDocs)

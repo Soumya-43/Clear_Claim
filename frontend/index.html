@@ -4397,14 +4397,37 @@
               <div class="nc-section-sub">Describe the requested procedure and financials.</div>
               <div class="fgrid">
                 <div><label class="fg-lbl">Planned Procedure</label>
-                  <select class="fi" id="f-proc">
+                  <select class="fi" id="f-proc" onchange="onProcedureSelect(this.value)">
                     <option value="">Select procedure...</option>
-                    <option value="CPT_63030">Lumbar Discectomy (CPT 63030)</option>
-                    <option value="CPT_27447">Knee Replacement (CPT 27447)</option>
-                    <option value="CPT_47562">Cholecystectomy (CPT 47562)</option>
-                    <option value="CPT_43239">Upper GI Endoscopy (CPT 43239)</option>
-                    <option value="CPT_92928">Cardiac Stenting (CPT 92928)</option>
-                    <option value="CPT_44950">Appendectomy (CPT 44950)</option>
+                    <optgroup label="🦴 Orthopedics &amp; Spine">
+                      <option value="CPT_63030">Lumbar Discectomy (CPT 63030)</option>
+                      <option value="CPT_27447">Total Knee Arthroplasty / Knee Replacement (CPT 27447)</option>
+                      <option value="CPT_27130">Total Hip Replacement / Hip Arthroplasty (CPT 27130)</option>
+                      <option value="CPT_29888">ACL Reconstruction (CPT 29888)</option>
+                      <option value="CPT_29827">Rotator Cuff Repair / Shoulder Arthroscopy (CPT 29827)</option>
+                      <option value="CPT_22551">Anterior Cervical Discectomy &amp; Fusion - ACDF (CPT 22551)</option>
+                    </optgroup>
+                    <optgroup label="🩺 General &amp; Abdominal Surgery">
+                      <option value="CPT_47562">Laparoscopic Cholecystectomy (CPT 47562)</option>
+                      <option value="CPT_44950">Laparoscopic Appendectomy (CPT 44950)</option>
+                      <option value="CPT_49505">Inguinal Hernia Repair (CPT 49505)</option>
+                    </optgroup>
+                    <optgroup label="🫀 Cardiology &amp; Vascular">
+                      <option value="CPT_92928">Percutaneous Coronary Intervention - PCI / Stenting (CPT 92928)</option>
+                      <option value="CPT_33533">Coronary Artery Bypass Graft - CABG (CPT 33533)</option>
+                    </optgroup>
+                    <optgroup label="🔬 Gastroenterology">
+                      <option value="CPT_43239">Upper GI Endoscopy with Biopsy (CPT 43239)</option>
+                      <option value="CPT_45378">Diagnostic &amp; Therapeutic Colonoscopy (CPT 45378)</option>
+                    </optgroup>
+                    <optgroup label="👁️ Ophthalmology &amp; ENT">
+                      <option value="CPT_66984">Cataract Surgery with Phacoemulsification &amp; IOL (CPT 66984)</option>
+                      <option value="CPT_31255">Functional Endoscopic Sinus Surgery - FESS (CPT 31255)</option>
+                    </optgroup>
+                    <optgroup label="🩺 Gynecology &amp; Urology">
+                      <option value="CPT_58571">Total Laparoscopic Hysterectomy (CPT 58571)</option>
+                      <option value="CPT_52601">Transurethral Resection of Prostate - TURP (CPT 52601)</option>
+                    </optgroup>
                   </select>
                 </div>
                 <div><label class="fg-lbl">Surgery Date</label><input type="date" class="fi" id="f-sdate" /></div>
@@ -6008,16 +6031,366 @@
     }
 
     // ============================================================
-    //  AGENT LOADER
+    //  EXPANDED PROCEDURE CATALOG & SUGGESTION MAP
+    // ============================================================
+    const PROCEDURE_CATALOG = {
+      'CPT_63030': {
+        name: 'Lumbar Discectomy',
+        cpt: '63030',
+        icd10: 'M51.1',
+        diagDesc: 'Lumbar Disc Herniation with Radiculopathy',
+        cost: 220000,
+        timeline: 14,
+        requiredDocs: [
+          'Surgeon Recommendation Letter',
+          'MRI report confirming disc herniation',
+          'Proof of failed conservative treatment (min 6 weeks)',
+          'Certificate of Medical Necessity'
+        ],
+        prevTreatments: 'Physiotherapy, NSAIDs, epidural steroid injection',
+        treatDuration: '6 weeks',
+        treatOutcome: 'Partial relief; persistent L5-S1 radicular pain'
+      },
+      'CPT_27447': {
+        name: 'Total Knee Arthroplasty (Knee Replacement)',
+        cpt: '27447',
+        icd10: 'M17.11',
+        diagDesc: 'Severe Primary Osteoarthritis, Right Knee (Grade 4)',
+        cost: 450000,
+        timeline: 10,
+        requiredDocs: [
+          'Surgeon Recommendation Letter',
+          'Weight-Bearing Knee X-Ray / MRI showing Grade 3/4 osteoarthritis',
+          'Proof of failed conservative treatment (min 8 weeks)',
+          'Certificate of Medical Necessity'
+        ],
+        prevTreatments: 'Physical therapy, intra-articular hyaluronic acid injections, analgesics',
+        treatDuration: '3 months',
+        treatOutcome: 'Severe pain on weight bearing, bone-on-bone medial articulation'
+      },
+      'CPT_27130': {
+        name: 'Total Hip Replacement (Hip Arthroplasty)',
+        cpt: '27130',
+        icd10: 'M16.11',
+        diagDesc: 'Primary Osteoarthritis of Right Hip (Severe)',
+        cost: 420000,
+        timeline: 12,
+        requiredDocs: [
+          'Orthopedic Surgeon Recommendation Letter',
+          'Pelvis & Hip AP X-Ray / CT Scans',
+          'Proof of failed conservative treatment (min 8 weeks)',
+          'Certificate of Medical Necessity'
+        ],
+        prevTreatments: 'Oral NSAIDs, supervised physical therapy, walking aid trial',
+        treatDuration: '8 weeks',
+        treatOutcome: 'Severe functional immobility and subchondral joint sclerosis'
+      },
+      'CPT_29888': {
+        name: 'ACL Reconstruction (Knee Ligament Repair)',
+        cpt: '29888',
+        icd10: 'S83.511A',
+        diagDesc: 'Complete Tear of Anterior Cruciate Ligament, Right Knee',
+        cost: 240000,
+        timeline: 7,
+        requiredDocs: [
+          'Orthopedic Sports Medicine Clinical Notes',
+          'MRI Knee confirming complete ACL tear',
+          'Pre-Operative Rehabilitation Plan',
+          'Surgical Clearance Certificate'
+        ],
+        prevTreatments: 'Immobilizer brace, ice therapy, pre-habilitation PT',
+        treatDuration: '4 weeks',
+        treatOutcome: 'Persistent gross instability and Lachman grade III laxity'
+      },
+      'CPT_29827': {
+        name: 'Rotator Cuff Repair / Shoulder Arthroscopy',
+        cpt: '29827',
+        icd10: 'M75.121',
+        diagDesc: 'Complete Rotator Cuff Tear, Right Shoulder',
+        cost: 220000,
+        timeline: 10,
+        requiredDocs: [
+          'Shoulder Surgeon Recommendation Letter',
+          'MRI Shoulder confirming full-thickness tendon tear',
+          'Physiotherapy Trial Log (min 6 weeks)',
+          'Certificate of Medical Necessity'
+        ],
+        prevTreatments: 'Subacromial corticosteroid injection, physical therapy',
+        treatDuration: '6 weeks',
+        treatOutcome: 'Weakness in abduction, persistent nighttime pain'
+      },
+      'CPT_22551': {
+        name: 'Anterior Cervical Discectomy & Fusion (ACDF)',
+        cpt: '22551',
+        icd10: 'M50.20',
+        diagDesc: 'Cervical Disc Protrusion with Radiculopathy (C5-C6)',
+        cost: 350000,
+        timeline: 14,
+        requiredDocs: [
+          'Spine Surgeon Clinical Justification Note',
+          'MRI Cervical Spine Study',
+          'EMG / Nerve Conduction Study',
+          'Certificate of Medical Necessity'
+        ],
+        prevTreatments: 'Cervical traction, collar support, oral steroids',
+        treatDuration: '6 weeks',
+        treatOutcome: 'Progressive numbness in C6 dermatome and motor deficit'
+      },
+      'CPT_47562': {
+        name: 'Laparoscopic Cholecystectomy',
+        cpt: '47562',
+        icd10: 'K80.20',
+        diagDesc: 'Calculous Cholecystitis with Biliary Colic',
+        cost: 210000,
+        timeline: 5,
+        requiredDocs: [
+          'Surgeon Recommendation Note',
+          'Ultrasound Abdomen showing gallstones / wall thickening',
+          'Liver Function Tests (LFT) & CBC',
+          'Surgical Clearance Certificate'
+        ],
+        prevTreatments: 'Dietary fat restriction, antispasmodics, bile acid therapy',
+        treatDuration: '4 weeks',
+        treatOutcome: 'Recurrent severe biliary colic attacks and vomiting'
+      },
+      'CPT_44950': {
+        name: 'Laparoscopic Appendectomy',
+        cpt: '44950',
+        icd10: 'K37',
+        diagDesc: 'Acute Appendicitis with Localized Peritonitis',
+        cost: 180000,
+        timeline: 3,
+        requiredDocs: [
+          'Emergency / Surgeon Clinical Notes',
+          'Ultrasound Abdomen or CT Abdomen',
+          'CBC & Blood Work (WBC Leukocytosis)',
+          'Emergency Admission & Consent Form'
+        ],
+        prevTreatments: 'IV hydration, empiric antibiotic administration',
+        treatDuration: '2 days',
+        treatOutcome: 'Persistent acute RLQ rebound tenderness and leukocytosis'
+      },
+      'CPT_49505': {
+        name: 'Inguinal Hernia Repair',
+        cpt: '49505',
+        icd10: 'K40.90',
+        diagDesc: 'Unilateral Inguinal Hernia without Obstruction',
+        cost: 150000,
+        timeline: 7,
+        requiredDocs: [
+          'General Surgeon Evaluation Note',
+          'Groin Ultrasound / Clinical Examination Record',
+          'Routine Pre-Op Blood Profile & ECG',
+          'Certificate of Medical Necessity'
+        ],
+        prevTreatments: 'Hernia truss support, activity reduction',
+        treatDuration: '8 weeks',
+        treatOutcome: 'Increasing bulge size, aching groin discomfort on exertion'
+      },
+      'CPT_92928': {
+        name: 'Percutaneous Coronary Intervention (PCI) with Stenting',
+        cpt: '92928',
+        icd10: 'I25.10',
+        diagDesc: 'Coronary Artery Disease with 85% LAD Stenosis',
+        cost: 320000,
+        timeline: 7,
+        requiredDocs: [
+          'Cardiologist Clinical Evaluation Note',
+          'Coronary Angiogram documenting significant stenosis',
+          '12-Lead ECG & 2D Echocardiogram',
+          'Interventional Pre-Auth Clearance Certificate'
+        ],
+        prevTreatments: 'Dual antiplatelets, beta-blockers, statin therapy',
+        treatDuration: '3 months',
+        treatOutcome: 'Exertional angina and positive stress test (TMT)'
+      },
+      'CPT_33533': {
+        name: 'Coronary Artery Bypass Graft (CABG)',
+        cpt: '33533',
+        icd10: 'I25.110',
+        diagDesc: 'Severe Triple Vessel Coronary Artery Disease (TVD)',
+        cost: 550000,
+        timeline: 10,
+        requiredDocs: [
+          'Cardiothoracic Surgeon Operative Plan Note',
+          'Coronary Angiography (Multi-Vessel Disease)',
+          '2D Echocardiogram & Left Ventricular Function',
+          'Pre-Anesthesia Medical Clearance'
+        ],
+        prevTreatments: 'Guideline-directed medical therapy (GDMT)',
+        treatDuration: '6 months',
+        treatOutcome: 'Diffuse multi-vessel disease unsuitable for PCI stenting'
+      },
+      'CPT_43239': {
+        name: 'Upper GI Endoscopy with Biopsy',
+        cpt: '43239',
+        icd10: 'K29.70',
+        diagDesc: 'Chronic Gastroduodenitis / Dyspepsia with Ulceration',
+        cost: 45000,
+        timeline: 5,
+        requiredDocs: [
+          'Referring Physician Note',
+          'Prior Trial of Medical Therapy (min 4 weeks)',
+          'H. Pylori / Lab Findings',
+          'Certificate of Medical Necessity'
+        ],
+        prevTreatments: 'High-dose Proton Pump Inhibitors (PPI), antacids',
+        treatDuration: '4 weeks',
+        treatOutcome: 'Refractory epigastric pain, early satiety'
+      },
+      'CPT_45378': {
+        name: 'Diagnostic & Therapeutic Colonoscopy',
+        cpt: '45378',
+        icd10: 'K63.5',
+        diagDesc: 'Colonic Polyp / Altered Bowel Habits',
+        cost: 55000,
+        timeline: 5,
+        requiredDocs: [
+          'Gastroenterologist Referral & Indications Note',
+          'Fecal Occult Blood Test (FOBT) / CBC Report',
+          'Previous Colonoscopy or Screening History',
+          'Certificate of Medical Necessity'
+        ],
+        prevTreatments: 'Dietary fiber, antispasmodics, iron supplementation',
+        treatDuration: '6 weeks',
+        treatOutcome: 'Positive FOBT test and persistent lower abdominal discomfort'
+      },
+      'CPT_66984': {
+        name: 'Cataract Surgery with Phacoemulsification & IOL',
+        cpt: '66984',
+        icd10: 'H25.11',
+        diagDesc: 'Age-Related Nuclear Cataract, Right Eye (Grade 3)',
+        cost: 95000,
+        timeline: 5,
+        requiredDocs: [
+          'Ophthalmologist Evaluation Letter',
+          'Optical Biometry & IOL Calculation',
+          'Slit Lamp Examination & Visual Acuity Report',
+          'Certificate of Medical Necessity'
+        ],
+        prevTreatments: 'Refractive correction / spectacles trial',
+        treatDuration: '6 months',
+        treatOutcome: 'Best corrected visual acuity degraded to 6/36, disabling glare'
+      },
+      'CPT_31255': {
+        name: 'Functional Endoscopic Sinus Surgery (FESS)',
+        cpt: '31255',
+        icd10: 'J32.9',
+        diagDesc: 'Chronic Rhinosinusitis with Nasal Polyposis',
+        cost: 160000,
+        timeline: 7,
+        requiredDocs: [
+          'ENT Specialist Clinical Note',
+          'CT Paranasal Sinuses (PNS Study)',
+          'Proof of Medical Therapy Trial (min 4 weeks)',
+          'Certificate of Medical Necessity'
+        ],
+        prevTreatments: 'Oral corticosteroids, broad-spectrum antibiotics, saline rinses',
+        treatDuration: '4 weeks',
+        treatOutcome: 'Persistent bilateral ostiomeatal complex obstruction on CT'
+      },
+      'CPT_58571': {
+        name: 'Total Laparoscopic Hysterectomy',
+        cpt: '58571',
+        icd10: 'D25.9',
+        diagDesc: 'Multiple Symptomatic Uterine Leiomyomas (Fibroids)',
+        cost: 240000,
+        timeline: 10,
+        requiredDocs: [
+          'Gynecologist Evaluation & Recommendation Letter',
+          'Pelvic Ultrasound / MRI Pelvis documenting fibroids/pathology',
+          'Endometrial Biopsy / CBC & Pre-Op Labs',
+          'Certificate of Medical Necessity'
+        ],
+        prevTreatments: 'Tranexamic acid, hormonal therapy (progestins)',
+        treatDuration: '4 months',
+        treatOutcome: 'Persistent menorrhagia with microcytic hypochromic anemia (Hb 8.2)'
+      },
+      'CPT_52601': {
+        name: 'Transurethral Resection of Prostate (TURP)',
+        cpt: '52601',
+        icd10: 'N40.1',
+        diagDesc: 'Benign Prostatic Hyperplasia with LUTS and Urinary Retention',
+        cost: 180000,
+        timeline: 7,
+        requiredDocs: [
+          'Urologist Clinical Evaluation Note',
+          'USG KUB & Prostate Volume / Uroflowmetry & PSA',
+          'Trial of Medical Therapy (min 3 months)',
+          'Certificate of Medical Necessity'
+        ],
+        prevTreatments: 'Tamsulosin + Dutasteride combination therapy',
+        treatDuration: '3 months',
+        treatOutcome: 'High post-void residual volume (>180ml) and recurrent urinary retention'
+      }
+    };
+
+    function onProcedureSelect(procVal) {
+      if (!procVal || !PROCEDURE_CATALOG[procVal]) return;
+      const p = PROCEDURE_CATALOG[procVal];
+      const setIfEmpty = (id, val) => {
+        const el = document.getElementById(id);
+        if (el && (!el.value || el.value.trim() === '')) el.value = val;
+      };
+
+      setIfEmpty('f-diagnosis-desc', p.diagDesc);
+      setIfEmpty('f-icd', p.icd10);
+      setIfEmpty('f-cost', p.cost);
+      setIfEmpty('f-proc-cost-est', p.cost);
+      setIfEmpty('f-requested-amount', p.cost);
+      setIfEmpty('f-prev-treatments', p.prevTreatments);
+      setIfEmpty('f-treat-duration', p.treatDuration);
+      setIfEmpty('f-treat-outcome', p.treatOutcome);
+
+      console.log(`[Procedure Selected] ${p.name}. Policy required docs:`, p.requiredDocs);
+    }
+
+    function getProvidedEvidence() {
+      const getVal = (id) => (document.getElementById(id)?.value || '').trim();
+      const getFiles = (id) => {
+        const input = document.getElementById(id);
+        return (input && input.files && input.files.length > 0) ? Array.from(input.files).map(f => f.name) : [];
+      };
+
+      const imagingFiles = getFiles('f-doc-imaging');
+      const recoFiles = getFiles('f-doc-reco');
+      const historyFiles = getFiles('f-doc-history');
+      const labsFiles = getFiles('f-doc-labs');
+
+      const surgeonNote = getVal('f-note') || getVal('f-cert-notes');
+      const clinicalNote = getVal('f-diagnosis-notes');
+      const prevTreatments = getVal('f-prev-treatments') || getVal('f-conservative-duration');
+      const labFindings = getVal('f-lab-findings');
+      const mriDate = getVal('f-mri-date');
+      const usDate = getVal('f-ultrasound-date');
+      const labDate = getVal('f-lab-date') || getVal('f-lab-latest-date');
+      const docCert = getVal('f-cert-surgeon') || getVal('f-license');
+
+      return {
+        imagingFiles,
+        recoFiles,
+        historyFiles,
+        labsFiles,
+        hasImaging: imagingFiles.length > 0 || !!mriDate || !!usDate || (!!labFindings && /mri|x-?ray|ultrasound|ct|echo|angiogram|biometry|pns|scan/i.test(labFindings)),
+        hasSurgeonNote: recoFiles.length > 0 || (surgeonNote.length > 15),
+        hasClinicalNote: clinicalNote.length > 10,
+        hasConservativeHistory: historyFiles.length > 0 || (prevTreatments.length > 5),
+        hasLabs: labsFiles.length > 0 || !!labDate || (labFindings.length > 10),
+        hasCert: recoFiles.length > 0 || (docCert.length > 2 && surgeonNote.length > 10)
+      };
+    }
+
+    // ============================================================
+    //  AGENT LOADER & MANUAL CLAIM PROCESSOR
     // ============================================================
     async function runAgent() {
       const get = (id) => (document.getElementById(id)?.value || '').trim();
-      const pid = get('f-pid');
+      const pid = get('f-pid') || ('PAT_' + Math.floor(1000 + Math.random() * 9000));
       const proc = get('f-proc');       // CPT_XXXXX
-      const insurer = get('f-insurer'); // INS_X
+      const insurer = get('f-insurer') || 'INS_A'; // INS_X
       const surgeonNoteText = get('f-note');
 
-      if (!pid || !proc) { showNotif('⚠️ Please fill Patient ID and Procedure', 'error'); return; }
+      if (!proc) { showNotif('⚠️ Please select a Procedure', 'error'); return; }
 
       const loader = document.getElementById('loader');
       loader.classList.add('show');
@@ -6032,80 +6405,172 @@
         }
       }, 680);
 
+      // Inspect what was actually uploaded and typed in the form
+      const providedEvidence = getProvidedEvidence();
+      const procKey = proc.startsWith('CPT_') ? proc : `CPT_${proc}`;
+      const catalogEntry = PROCEDURE_CATALOG[procKey] || {
+        name: get('f-proc') || 'Surgical Procedure',
+        cpt: proc.replace('CPT_', ''),
+        icd10: get('f-icd') || 'M51.1',
+        diagDesc: get('f-diagnosis-desc') || 'Primary Diagnosis',
+        cost: Number(get('f-cost')) || 250000,
+        timeline: 7,
+        requiredDocs: [
+          'Surgeon Recommendation Letter',
+          'Diagnostic Imaging / Lab Report',
+          'Proof of Conservative Treatment',
+          'Certificate of Medical Necessity'
+        ]
+      };
+
+      const requiredDocs = [...catalogEntry.requiredDocs];
+      const foundDocs = [];
+      const missingDocs = [];
+
+      requiredDocs.forEach(doc => {
+        const dLower = doc.toLowerCase();
+        let isFound = false;
+
+        if (dLower.includes('surgeon') || dLower.includes('recommendation') || dLower.includes('intake') || dLower.includes('evaluation') || dLower.includes('clinical note') || dLower.includes('referral')) {
+          isFound = providedEvidence.hasSurgeonNote || providedEvidence.hasClinicalNote;
+        } else if (dLower.includes('certificate') || dLower.includes('medical necessity') || dLower.includes('clearance') || dLower.includes('consent') || dLower.includes('admission')) {
+          isFound = providedEvidence.hasCert || providedEvidence.hasSurgeonNote;
+        } else if (dLower.includes('conservative') || dLower.includes('therapy') || dLower.includes('physio') || dLower.includes('rehab')) {
+          isFound = providedEvidence.hasConservativeHistory;
+        } else if (['mri', 'x-ray', 'xray', 'ultrasound', 'usg', 'ct', 'angiogram', 'echo', 'biometry', 'pns'].some(term => dLower.includes(term))) {
+          isFound = providedEvidence.hasImaging;
+        } else if (['cbc', 'lft', 'blood', 'lab', 'pylori', 'biopsy', 'psa', 'fobt', 'pre-op'].some(term => dLower.includes(term))) {
+          isFound = providedEvidence.hasLabs;
+        } else {
+          isFound = providedEvidence.hasClinicalNote || providedEvidence.hasLabs || providedEvidence.hasImaging;
+        }
+
+        if (isFound) foundDocs.push(doc);
+        else missingDocs.push(doc);
+      });
+
+      let calculatedRiskLevel = 'LOW';
+      let calculatedRiskScore = 15;
+      let calculatedDrivers = ['All policy prerequisite documents verified in EHR submission.'];
+      let calculatedStatus = 'Approved';
+
+      if (missingDocs.length === 1) {
+        calculatedRiskLevel = 'MEDIUM';
+        calculatedRiskScore = 45;
+        calculatedDrivers = [
+          `Missing required policy document: ${missingDocs[0]}`,
+          'Action required: Submit supplemental clinical records to satisfy payer underwriting rules'
+        ];
+        calculatedStatus = 'Pending';
+      } else if (missingDocs.length >= 2) {
+        calculatedRiskLevel = 'HIGH';
+        calculatedRiskScore = Math.min(65 + missingDocs.length * 10, 95);
+        calculatedDrivers = [
+          `Multiple critical policy documents missing: ${missingDocs.join(', ')}`,
+          'Payer underwriting guidelines require full clinical documentation prior to sanction'
+        ];
+        calculatedStatus = 'Rejected';
+      }
+
       try {
-        const res = await apiFetch('/analyze', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            patientId: pid,
-            insurerId: insurer,
-            procedureId: proc,
-            surgeonNoteText: surgeonNoteText,
-            patientName: get('f-pname'),
-            dob: get('f-dob'),
-            age: get('f-age'),
-            gender: get('f-gender'),
-            policyNumber: get('f-policy'),
-            doctorId: get('f-doc'),
-            hospital: get('f-hospital'),
-            diagnosisDesc: get('f-diagnosis-desc'),
-            icd10: get('f-icd'),
-            diagnosisDate: get('f-diagnosis-date'),
-            diagnosisNotes: get('f-diagnosis-notes'),
-            surgeryDate: get('f-sdate'),
-            costEstimate: get('f-cost') || get('f-proc-cost-est'),
-            prevTreatments: get('f-prev-treatments'),
-            treatDuration: get('f-treat-duration') || get('f-conservative-duration'),
-            treatOutcome: get('f-treat-outcome'),
-            labType: get('f-lab-type'),
-            labDate: get('f-lab-date') || get('f-lab-latest-date'),
-            labFindings: get('f-lab-findings'),
-            mriDate: get('f-mri-date'),
-            ultrasoundDate: get('f-ultrasound-date'),
-            certSurgeon: get('f-cert-surgeon'),
-            medicalLicense: get('f-license'),
-            claimId: get('f-claim-id'),
-            submissionDate: get('f-claim-date'),
-            bmi: get('f-bmi')
-          })
-        });
+        let backendData = null;
+        try {
+          const res = await apiFetch('/analyze', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              patientId: pid,
+              insurerId: insurer,
+              procedureId: proc,
+              surgeonNoteText: surgeonNoteText || get('f-cert-notes'),
+              patientName: get('f-pname'),
+              dob: get('f-dob'),
+              age: get('f-age'),
+              gender: get('f-gender'),
+              policyNumber: get('f-policy'),
+              doctorId: get('f-doc'),
+              hospital: get('f-hospital'),
+              diagnosisDesc: get('f-diagnosis-desc') || catalogEntry.diagDesc,
+              icd10: get('f-icd') || catalogEntry.icd10,
+              diagnosisDate: get('f-diagnosis-date'),
+              diagnosisNotes: get('f-diagnosis-notes'),
+              surgeryDate: get('f-sdate'),
+              costEstimate: get('f-cost') || get('f-proc-cost-est') || catalogEntry.cost,
+              prevTreatments: get('f-prev-treatments'),
+              treatDuration: get('f-treat-duration') || get('f-conservative-duration'),
+              treatOutcome: get('f-treat-outcome'),
+              labType: get('f-lab-type'),
+              labDate: get('f-lab-date') || get('f-lab-latest-date'),
+              labFindings: get('f-lab-findings'),
+              mriDate: get('f-mri-date'),
+              ultrasoundDate: get('f-ultrasound-date'),
+              certSurgeon: get('f-cert-surgeon'),
+              medicalLicense: get('f-license'),
+              claimId: get('f-claim-id'),
+              submissionDate: get('f-claim-date'),
+              bmi: get('f-bmi'),
+              providedEvidence
+            })
+          });
+          if (res.ok) {
+            backendData = await res.json();
+          }
+        } catch (apiErr) {
+          console.warn('[analyze] Backend warning:', apiErr.message);
+        }
 
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Failed to analyze claim');
+        const newClaimId = get('f-claim-id') || backendData?.request?.claimId || `CLM_${Date.now().toString().slice(-4)}`;
+        const patientName = get('f-pname') || backendData?.ehrEvidence?.patient_name || 'Patient';
+        const costEst = Number(get('f-cost') || get('f-proc-cost-est') || catalogEntry.cost);
 
-        window.__lastAnalysis = data;
-        const newClaimId = data.request?.claimId || `CLM_${Date.now()}`;
+        const finalClaim = {
+          claimId: newClaimId,
+          patientId: pid,
+          patientName: patientName,
+          age: Number(get('f-age')) || 45,
+          gender: get('f-gender') || 'Unknown',
+          procedure: catalogEntry.name,
+          cpt_code: catalogEntry.cpt,
+          icd10_code: get('f-icd') || catalogEntry.icd10,
+          icd10_desc: get('f-diagnosis-desc') || catalogEntry.diagDesc,
+          insurerId: insurer,
+          policyNumber: get('f-policy') || `POL-${insurer}-2026`,
+          costEstimate: costEst,
+          maxApproved: catalogEntry.cost,
+          preauthDays: catalogEntry.timeline,
+          status: calculatedStatus,
+          risk: {
+            level: calculatedRiskLevel,
+            score: calculatedRiskScore,
+            topDrivers: calculatedDrivers
+          },
+          requiredDocs: requiredDocs,
+          missingDocs: missingDocs,
+          foundDocs: foundDocs,
+          ehrEvidence: {
+            patient_name: patientName,
+            policy_number: get('f-policy') || `POL-${insurer}-2026`,
+            missing_documents: missingDocs,
+            found_documents: foundDocs,
+            matched_diagnoses: [{ condition: get('f-diagnosis-desc') || catalogEntry.diagDesc, description: get('f-icd') || catalogEntry.icd10, date: 'Recent' }],
+            relevant_labs: providedEvidence.hasImaging ? [{ type: 'Diagnostic Imaging', findings: get('f-lab-findings') || 'Imaging attached', date: 'Recent' }] : [],
+            prior_treatments: providedEvidence.hasConservativeHistory ? [{ type: get('f-prev-treatments') || 'Conservative Therapy', duration: get('f-treat-duration') || 'Completed' }] : []
+          },
+          appeal: null
+        };
+
         if (window.CLAIMS_REGISTRY) {
-          window.CLAIMS_REGISTRY[newClaimId] = {
-            claimId: newClaimId,
-            patientId: data.request?.patientId || 'PAT_DYN',
-            patientName: data.ehrEvidence?.patient_name || data.request?.patientName || 'New Patient',
-            age: data.request?.age || 45,
-            gender: data.request?.gender || 'Unknown',
-            procedure: data.parsedNote?.procedure || 'Procedure',
-            cpt_code: data.parsedNote?.cpt_code || 'N/A',
-            icd10_code: data.parsedNote?.icd10_code || 'N/A',
-            icd10_desc: data.parsedNote?.icd10_desc || 'Primary Diagnosis',
-            insurerId: data.request?.insurerId || 'Insurer',
-            policyNumber: data.ehrEvidence?.policy_number || 'POL-NEW',
-            costEstimate: data.request?.costEstimate || 150000,
-            maxApproved: data.policy_used?.max_approved || 200000,
-            preauthDays: data.policy_used?.preauth_days || 3,
-            status: data.risk?.level === 'HIGH' ? 'Rejected' : (data.risk?.level === 'LOW' ? 'Approved' : 'Pending'),
-            risk: data.risk,
-            requiredDocs: data.policy_used?.required_documents || [],
-            missingDocs: data.ehrEvidence?.missing_documents || [],
-            foundDocs: data.ehrEvidence?.found_documents || [],
-            ehrEvidence: data.ehrEvidence,
-            appeal: null
-          };
+          window.CLAIMS_REGISTRY[newClaimId] = finalClaim;
           window.__currentClaimId = newClaimId;
           if (typeof populateClaimDropdowns === 'function') populateClaimDropdowns();
           if (typeof syncDashboardWithClaims === 'function') syncDashboardWithClaims();
           if (typeof renderAllClaimsTable === 'function') renderAllClaimsTable();
         }
-        populateAnalysisData(data);
-        appendClaimToHistory(data);
+
+        const analysisPayload = convertRegistryToAnalysisFormat(finalClaim);
+        window.__lastAnalysis = analysisPayload;
+        populateAnalysisData(analysisPayload);
+        appendClaimToHistory(analysisPayload);
 
         clearInterval(stepInterval);
         setTimeout(() => {
@@ -6114,10 +6579,12 @@
           navigate('analysis');
           switchAnalysisClaim(newClaimId);
 
-          if (data.risk && data.risk.level === 'HIGH') {
-            showNotif('✅ Analysis complete! Risk: HIGH', 'error');
+          if (calculatedRiskLevel === 'HIGH') {
+            showNotif(`⚠️ Claim processed! Risk: HIGH (${missingDocs.length} required documents missing)`, 'error');
+          } else if (calculatedRiskLevel === 'MEDIUM') {
+            showNotif(`⏳ Claim processed! Risk: MEDIUM (1 document pending)`, 'info');
           } else {
-            showNotif('✅ Analysis complete!', 'success');
+            showNotif('✅ Claim verified & approved! First-pass pre-auth granted', 'success');
           }
         }, 400);
 
@@ -8578,10 +9045,25 @@ Admission authorization token has been dispatched to the hospital desk.
           sendBtn.style.cursor = 'default';
         }
 
-        setText('appeal-reason', 'Under active payer adjudication (No rejection issued)');
-        setText('appeal-action', `Awaiting formal decision from ${claim.insurerId}`);
-        setText('appeal-doc-status', `⏳ ${claim.foundDocs?.length || 3} of ${(claim.requiredDocs?.length || 4)} documents verified & in review`);
+        const foundCount = Array.isArray(claim.foundDocs) ? claim.foundDocs.length : (claim.missingDocs?.length === 0 ? (claim.requiredDocs?.length || 4) : 0);
+        const reqCount = Array.isArray(claim.requiredDocs) && claim.requiredDocs.length > 0 ? claim.requiredDocs.length : Math.max(foundCount + (claim.missingDocs?.length || 0), 4);
+        const missingCount = Array.isArray(claim.missingDocs) ? claim.missingDocs.length : Math.max(reqCount - foundCount, 0);
+
+        const statusDocText = missingCount > 0 
+          ? `⏳ ${foundCount} of ${reqCount} documents verified & in review (${missingCount} missing)`
+          : `✅ ${foundCount} of ${reqCount} documents verified & in review`;
+
+        setText('appeal-reason', missingCount > 0 ? `Policy Documentation Gap (${claim.missingDocs[0]})` : 'Under active payer adjudication (No rejection issued)');
+        setText('appeal-action', missingCount > 0 ? `Attach required document: ${claim.missingDocs.join(', ')}` : `Awaiting formal decision from ${claim.insurerId}`);
+        setText('appeal-doc-status', statusDocText);
         setText('appeal-deadline', `Decision expected within ${claim.preauthDays || 3} business days`);
+
+        const verifiedEvidenceStr = (claim.foundDocs && claim.foundDocs.length > 0)
+          ? claim.foundDocs.join(', ')
+          : (foundCount > 0 ? `${foundCount} supporting documents attached` : 'None verified — pending document upload');
+        const awaitingDocsStr = (claim.missingDocs && claim.missingDocs.length > 0)
+          ? claim.missingDocs.join(', ')
+          : 'All prerequisite files attached';
 
         if (letterDiv) {
           letterDiv.innerHTML = `
@@ -8603,8 +9085,8 @@ Estimated Amount:      ₹${Number(claim.costEstimate).toLocaleString('en-IN')}
 Status:                PENDING MEDICAL BOARD EVALUATION
 
 Clinical Package Notes:
-• Verified Evidence: ${(claim.foundDocs || []).join(', ') || 'Diagnostic Labs & Notes'}
-${claim.missingDocs && claim.missingDocs.length ? `• Awaiting: ${claim.missingDocs.join(', ')}` : '• All prerequisite files attached'}
+• Verified Evidence: ${verifiedEvidenceStr}
+• Awaiting: ${awaitingDocsStr}
 
 AI Agent Readiness:
 Our dispute model has mapped this claim against ${claim.insurerId} policy rules. If an adverse determination is received, an immediate dispute appeal with supplemental evidence can be drafted and dispatched in seconds.
@@ -8651,9 +9133,13 @@ Our dispute model has mapped this claim against ${claim.insurerId} policy rules.
           sendBtn.style.cursor = 'pointer';
         }
 
+        const rejMissingCount = (claim.missingDocs && claim.missingDocs.length) ? claim.missingDocs.length : 1;
+        const rejFoundCount = (claim.foundDocs && claim.foundDocs.length) ? claim.foundDocs.length : 0;
+        const rejReqCount = (claim.requiredDocs && claim.requiredDocs.length) ? claim.requiredDocs.length : (rejFoundCount + rejMissingCount);
+
         setText('appeal-reason', appeal.rejectionReason);
         setText('appeal-action', appeal.actionPlan);
-        setText('appeal-doc-status', appeal.docStatus || '✅ Obtained');
+        setText('appeal-doc-status', `⚠️ ${rejMissingCount} of ${rejReqCount} documents missing (${rejFoundCount} verified)`);
         setText('appeal-deadline', appeal.deadline || 'Within 14 days');
 
         if (letterDiv) {

@@ -1,25 +1,18 @@
 {
   "INS_A": {
-    "name": "Star Health Insurance (INS_A)",
+    "name": "Star Health and Allied Insurance (INS_A)",
     "insurer_id": "INS_A",
-    "policy_id": "POL_A",
-    "max_claim": 50000,
-    "coverage": ["hospitalization", "diagnostics", "orthopedic_surgery"],
+    "policy_id": "POL_STAR_2026",
+    "max_claim": 1000000,
+    "coverage": [
+      "hospitalization",
+      "diagnostics",
+      "orthopedic_surgery",
+      "cardiology",
+      "general_surgery",
+      "daycare"
+    ],
     "procedures": {
-      "CPT_27447": {
-        "procedure": "Total Knee Arthroplasty",
-        "cpt": "CPT_27447",
-        "required_documents": [
-          "Surgeon Recommendation Letter",
-          "X-Ray or MRI showing Grade 3/4 osteoarthritis",
-          "Proof of failed conservative treatment (min 3 months)",
-          "Certificate of Medical Necessity"
-        ],
-        "qualifying_icd10": ["M17.11", "M17.12", "M17.31", "M17.9"],
-        "preauth_timeline_days": 10,
-        "max_approved_amount": 25000,
-        "notes": "Conservative treatment must be documented for at least 3 months prior."
-      },
       "CPT_63030": {
         "procedure": "Lumbar Discectomy",
         "cpt": "CPT_63030",
@@ -29,41 +22,610 @@
           "Proof of failed conservative treatment (min 6 weeks)",
           "Certificate of Medical Necessity"
         ],
-        "qualifying_icd10": ["M51.1", "M51.16", "M51.17"],
+        "qualifying_icd10": [
+          "M51.1",
+          "M51.16",
+          "M51.17",
+          "M51.26"
+        ],
         "preauth_timeline_days": 14,
-        "max_approved_amount": 20000
-      }
-    }
-  },
-  "INS_B": {
-    "name": "HDFC ERGO Health (INS_B)",
-    "insurer_id": "INS_B",
-    "policy_id": "POL_B",
-    "max_claim": 40000,
-    "coverage": ["hospitalization", "diagnostics", "endoscopy"],
-    "procedures": {
+        "max_approved_amount": 220000,
+        "notes": "MRI study must be within 6 months of surgery date."
+      },
+      "CPT_27447": {
+        "procedure": "Total Knee Arthroplasty (Knee Replacement)",
+        "cpt": "CPT_27447",
+        "required_documents": [
+          "Surgeon Recommendation Letter",
+          "Weight-Bearing Knee X-Ray / MRI showing Grade 3/4 osteoarthritis",
+          "Proof of failed conservative treatment (min 8 weeks)",
+          "Certificate of Medical Necessity"
+        ],
+        "qualifying_icd10": [
+          "M17.11",
+          "M17.12",
+          "M17.31",
+          "M17.9"
+        ],
+        "preauth_timeline_days": 10,
+        "max_approved_amount": 450000,
+        "notes": "Conservative therapy and physical therapy logs required."
+      },
+      "CPT_27130": {
+        "procedure": "Total Hip Replacement (Hip Arthroplasty)",
+        "cpt": "CPT_27130",
+        "required_documents": [
+          "Orthopedic Surgeon Recommendation Letter",
+          "Pelvis & Hip AP X-Ray / CT Scans",
+          "Proof of failed conservative treatment (min 8 weeks)",
+          "Certificate of Medical Necessity"
+        ],
+        "qualifying_icd10": [
+          "M16.11",
+          "M16.12",
+          "M16.9"
+        ],
+        "preauth_timeline_days": 12,
+        "max_approved_amount": 420000,
+        "notes": "Severe joint collapse or Grade 4 osteoarthritic changes required."
+      },
+      "CPT_29888": {
+        "procedure": "ACL Reconstruction (Knee Ligament Repair)",
+        "cpt": "CPT_29888",
+        "required_documents": [
+          "Orthopedic Sports Medicine Clinical Notes",
+          "MRI Knee confirming complete ACL tear",
+          "Pre-Operative Rehabilitation Plan",
+          "Surgical Clearance Certificate"
+        ],
+        "qualifying_icd10": [
+          "S83.511A",
+          "S83.512A",
+          "M23.20"
+        ],
+        "preauth_timeline_days": 7,
+        "max_approved_amount": 240000
+      },
+      "CPT_29827": {
+        "procedure": "Rotator Cuff Repair / Shoulder Arthroscopy",
+        "cpt": "CPT_29827",
+        "required_documents": [
+          "Shoulder Surgeon Recommendation Letter",
+          "MRI Shoulder confirming full-thickness tendon tear",
+          "Physiotherapy Trial Log (min 6 weeks)",
+          "Certificate of Medical Necessity"
+        ],
+        "qualifying_icd10": [
+          "M75.121",
+          "M75.122",
+          "M75.10"
+        ],
+        "preauth_timeline_days": 10,
+        "max_approved_amount": 220000
+      },
+      "CPT_22551": {
+        "procedure": "Anterior Cervical Discectomy & Fusion (ACDF)",
+        "cpt": "CPT_22551",
+        "required_documents": [
+          "Spine Surgeon Clinical Justification Note",
+          "MRI Cervical Spine Study",
+          "EMG / Nerve Conduction Study",
+          "Certificate of Medical Necessity"
+        ],
+        "qualifying_icd10": [
+          "M50.20",
+          "M50.10"
+        ],
+        "preauth_timeline_days": 14,
+        "max_approved_amount": 350000
+      },
+      "CPT_47562": {
+        "procedure": "Laparoscopic Cholecystectomy",
+        "cpt": "CPT_47562",
+        "required_documents": [
+          "Surgeon Recommendation Note",
+          "Ultrasound Abdomen showing gallstones / wall thickening",
+          "Liver Function Tests (LFT) & CBC",
+          "Surgical Clearance Certificate"
+        ],
+        "qualifying_icd10": [
+          "K80.20",
+          "K80.00",
+          "K81.0"
+        ],
+        "preauth_timeline_days": 5,
+        "max_approved_amount": 210000
+      },
+      "CPT_44950": {
+        "procedure": "Laparoscopic Appendectomy",
+        "cpt": "CPT_44950",
+        "required_documents": [
+          "Emergency / Surgeon Clinical Notes",
+          "Ultrasound Abdomen or CT Abdomen",
+          "CBC & Blood Work (WBC Leukocytosis)",
+          "Emergency Admission & Consent Form"
+        ],
+        "qualifying_icd10": [
+          "K37",
+          "K35.80",
+          "K35.30"
+        ],
+        "preauth_timeline_days": 3,
+        "max_approved_amount": 180000
+      },
+      "CPT_49505": {
+        "procedure": "Inguinal Hernia Repair",
+        "cpt": "CPT_49505",
+        "required_documents": [
+          "General Surgeon Evaluation Note",
+          "Groin Ultrasound / Clinical Examination Record",
+          "Routine Pre-Op Blood Profile & ECG",
+          "Certificate of Medical Necessity"
+        ],
+        "qualifying_icd10": [
+          "K40.90",
+          "K40.20"
+        ],
+        "preauth_timeline_days": 7,
+        "max_approved_amount": 150000
+      },
+      "CPT_92928": {
+        "procedure": "Percutaneous Coronary Intervention (PCI) with Stenting",
+        "cpt": "CPT_92928",
+        "required_documents": [
+          "Cardiologist Clinical Evaluation Note",
+          "Coronary Angiogram documenting significant stenosis",
+          "12-Lead ECG & 2D Echocardiogram",
+          "Interventional Pre-Auth Clearance Certificate"
+        ],
+        "qualifying_icd10": [
+          "I25.10",
+          "I20.0",
+          "I25.110"
+        ],
+        "preauth_timeline_days": 7,
+        "max_approved_amount": 320000
+      },
+      "CPT_33533": {
+        "procedure": "Coronary Artery Bypass Graft (CABG)",
+        "cpt": "CPT_33533",
+        "required_documents": [
+          "Cardiothoracic Surgeon Operative Plan Note",
+          "Coronary Angiography (Multi-Vessel Disease)",
+          "2D Echocardiogram & Left Ventricular Function",
+          "Pre-Anesthesia Medical Clearance"
+        ],
+        "qualifying_icd10": [
+          "I25.10",
+          "I25.110",
+          "I25.700"
+        ],
+        "preauth_timeline_days": 10,
+        "max_approved_amount": 550000
+      },
       "CPT_43239": {
         "procedure": "Upper GI Endoscopy with Biopsy",
         "cpt": "CPT_43239",
         "required_documents": [
           "Referring Physician Note",
-          "Prior endoscopy report (if repeat procedure)",
-          "H. pylori test result",
+          "Prior Trial of Medical Therapy (min 4 weeks)",
+          "H. Pylori / Lab Findings",
           "Certificate of Medical Necessity"
         ],
-        "qualifying_icd10": ["K25.9", "K27.9", "K29.70", "K21.0"],
+        "qualifying_icd10": [
+          "K29.70",
+          "K25.9",
+          "K21.0"
+        ],
         "preauth_timeline_days": 5,
-        "max_approved_amount": 4500,
-        "notes": "Prior endoscopy required if repeat procedure within 12 months."
+        "max_approved_amount": 45000
+      },
+      "CPT_45378": {
+        "procedure": "Diagnostic & Therapeutic Colonoscopy",
+        "cpt": "CPT_45378",
+        "required_documents": [
+          "Gastroenterologist Referral & Indications Note",
+          "Fecal Occult Blood Test (FOBT) / CBC Report",
+          "Previous Colonoscopy or Screening History",
+          "Certificate of Medical Necessity"
+        ],
+        "qualifying_icd10": [
+          "K63.5",
+          "K52.9",
+          "K50.90"
+        ],
+        "preauth_timeline_days": 5,
+        "max_approved_amount": 55000
+      },
+      "CPT_66984": {
+        "procedure": "Cataract Surgery with Phacoemulsification & IOL",
+        "cpt": "CPT_66984",
+        "required_documents": [
+          "Ophthalmologist Evaluation Letter",
+          "Optical Biometry & IOL Calculation",
+          "Slit Lamp Examination & Visual Acuity Report",
+          "Certificate of Medical Necessity"
+        ],
+        "qualifying_icd10": [
+          "H25.11",
+          "H25.12",
+          "H25.811"
+        ],
+        "preauth_timeline_days": 5,
+        "max_approved_amount": 95000
+      },
+      "CPT_31255": {
+        "procedure": "Functional Endoscopic Sinus Surgery (FESS)",
+        "cpt": "CPT_31255",
+        "required_documents": [
+          "ENT Specialist Clinical Note",
+          "CT Paranasal Sinuses (PNS Study)",
+          "Proof of Medical Therapy Trial (min 4 weeks)",
+          "Certificate of Medical Necessity"
+        ],
+        "qualifying_icd10": [
+          "J32.9",
+          "J32.0",
+          "J33.0"
+        ],
+        "preauth_timeline_days": 7,
+        "max_approved_amount": 160000
+      },
+      "CPT_58571": {
+        "procedure": "Total Laparoscopic Hysterectomy",
+        "cpt": "CPT_58571",
+        "required_documents": [
+          "Gynecologist Evaluation & Recommendation Letter",
+          "Pelvic Ultrasound / MRI Pelvis documenting fibroids/pathology",
+          "Endometrial Biopsy / CBC & Pre-Op Labs",
+          "Certificate of Medical Necessity"
+        ],
+        "qualifying_icd10": [
+          "D25.9",
+          "N80.0",
+          "N85.00"
+        ],
+        "preauth_timeline_days": 10,
+        "max_approved_amount": 240000
+      },
+      "CPT_52601": {
+        "procedure": "Transurethral Resection of Prostate (TURP)",
+        "cpt": "CPT_52601",
+        "required_documents": [
+          "Urologist Clinical Evaluation Note",
+          "USG KUB & Prostate Volume / Uroflowmetry & PSA",
+          "Trial of Medical Therapy (min 3 months)",
+          "Certificate of Medical Necessity"
+        ],
+        "qualifying_icd10": [
+          "N40.1",
+          "N40.0"
+        ],
+        "preauth_timeline_days": 7,
+        "max_approved_amount": 180000
+      }
+    }
+  },
+  "INS_B": {
+    "name": "HDFC ERGO Health Insurance (INS_B)",
+    "insurer_id": "INS_B",
+    "policy_id": "POL_HDFC_2026",
+    "max_claim": 1000000,
+    "coverage": [
+      "hospitalization",
+      "diagnostics",
+      "endoscopy",
+      "cardiology",
+      "general_surgery",
+      "orthopedics"
+    ],
+    "procedures": {
+      "CPT_63030": {
+        "procedure": "Lumbar Discectomy",
+        "cpt": "CPT_63030",
+        "required_documents": [
+          "Surgeon Recommendation Letter",
+          "MRI report confirming disc herniation",
+          "Proof of failed conservative treatment (min 6 weeks)",
+          "Certificate of Medical Necessity"
+        ],
+        "qualifying_icd10": [
+          "M51.1",
+          "M51.16",
+          "M51.17",
+          "M51.26"
+        ],
+        "preauth_timeline_days": 14,
+        "max_approved_amount": 220000,
+        "notes": "MRI study must be within 6 months of surgery date."
+      },
+      "CPT_27447": {
+        "procedure": "Total Knee Arthroplasty (Knee Replacement)",
+        "cpt": "CPT_27447",
+        "required_documents": [
+          "Surgeon Recommendation Letter",
+          "Weight-Bearing Knee X-Ray / MRI showing Grade 3/4 osteoarthritis",
+          "Proof of failed conservative treatment (min 8 weeks)",
+          "Certificate of Medical Necessity"
+        ],
+        "qualifying_icd10": [
+          "M17.11",
+          "M17.12",
+          "M17.31",
+          "M17.9"
+        ],
+        "preauth_timeline_days": 10,
+        "max_approved_amount": 450000,
+        "notes": "Conservative therapy and physical therapy logs required."
+      },
+      "CPT_27130": {
+        "procedure": "Total Hip Replacement (Hip Arthroplasty)",
+        "cpt": "CPT_27130",
+        "required_documents": [
+          "Orthopedic Surgeon Recommendation Letter",
+          "Pelvis & Hip AP X-Ray / CT Scans",
+          "Proof of failed conservative treatment (min 8 weeks)",
+          "Certificate of Medical Necessity"
+        ],
+        "qualifying_icd10": [
+          "M16.11",
+          "M16.12",
+          "M16.9"
+        ],
+        "preauth_timeline_days": 12,
+        "max_approved_amount": 420000,
+        "notes": "Severe joint collapse or Grade 4 osteoarthritic changes required."
+      },
+      "CPT_29888": {
+        "procedure": "ACL Reconstruction (Knee Ligament Repair)",
+        "cpt": "CPT_29888",
+        "required_documents": [
+          "Orthopedic Sports Medicine Clinical Notes",
+          "MRI Knee confirming complete ACL tear",
+          "Pre-Operative Rehabilitation Plan",
+          "Surgical Clearance Certificate"
+        ],
+        "qualifying_icd10": [
+          "S83.511A",
+          "S83.512A",
+          "M23.20"
+        ],
+        "preauth_timeline_days": 7,
+        "max_approved_amount": 240000
+      },
+      "CPT_29827": {
+        "procedure": "Rotator Cuff Repair / Shoulder Arthroscopy",
+        "cpt": "CPT_29827",
+        "required_documents": [
+          "Shoulder Surgeon Recommendation Letter",
+          "MRI Shoulder confirming full-thickness tendon tear",
+          "Physiotherapy Trial Log (min 6 weeks)",
+          "Certificate of Medical Necessity"
+        ],
+        "qualifying_icd10": [
+          "M75.121",
+          "M75.122",
+          "M75.10"
+        ],
+        "preauth_timeline_days": 10,
+        "max_approved_amount": 220000
+      },
+      "CPT_22551": {
+        "procedure": "Anterior Cervical Discectomy & Fusion (ACDF)",
+        "cpt": "CPT_22551",
+        "required_documents": [
+          "Spine Surgeon Clinical Justification Note",
+          "MRI Cervical Spine Study",
+          "EMG / Nerve Conduction Study",
+          "Certificate of Medical Necessity"
+        ],
+        "qualifying_icd10": [
+          "M50.20",
+          "M50.10"
+        ],
+        "preauth_timeline_days": 14,
+        "max_approved_amount": 350000
+      },
+      "CPT_47562": {
+        "procedure": "Laparoscopic Cholecystectomy",
+        "cpt": "CPT_47562",
+        "required_documents": [
+          "Surgeon Recommendation Note",
+          "Ultrasound Abdomen showing gallstones / wall thickening",
+          "Liver Function Tests (LFT) & CBC",
+          "Surgical Clearance Certificate"
+        ],
+        "qualifying_icd10": [
+          "K80.20",
+          "K80.00",
+          "K81.0"
+        ],
+        "preauth_timeline_days": 5,
+        "max_approved_amount": 210000
+      },
+      "CPT_44950": {
+        "procedure": "Laparoscopic Appendectomy",
+        "cpt": "CPT_44950",
+        "required_documents": [
+          "Emergency / Surgeon Clinical Notes",
+          "Ultrasound Abdomen or CT Abdomen",
+          "CBC & Blood Work (WBC Leukocytosis)",
+          "Emergency Admission & Consent Form"
+        ],
+        "qualifying_icd10": [
+          "K37",
+          "K35.80",
+          "K35.30"
+        ],
+        "preauth_timeline_days": 3,
+        "max_approved_amount": 180000
+      },
+      "CPT_49505": {
+        "procedure": "Inguinal Hernia Repair",
+        "cpt": "CPT_49505",
+        "required_documents": [
+          "General Surgeon Evaluation Note",
+          "Groin Ultrasound / Clinical Examination Record",
+          "Routine Pre-Op Blood Profile & ECG",
+          "Certificate of Medical Necessity"
+        ],
+        "qualifying_icd10": [
+          "K40.90",
+          "K40.20"
+        ],
+        "preauth_timeline_days": 7,
+        "max_approved_amount": 150000
+      },
+      "CPT_92928": {
+        "procedure": "Percutaneous Coronary Intervention (PCI) with Stenting",
+        "cpt": "CPT_92928",
+        "required_documents": [
+          "Cardiologist Clinical Evaluation Note",
+          "Coronary Angiogram documenting significant stenosis",
+          "12-Lead ECG & 2D Echocardiogram",
+          "Interventional Pre-Auth Clearance Certificate"
+        ],
+        "qualifying_icd10": [
+          "I25.10",
+          "I20.0",
+          "I25.110"
+        ],
+        "preauth_timeline_days": 7,
+        "max_approved_amount": 320000
+      },
+      "CPT_33533": {
+        "procedure": "Coronary Artery Bypass Graft (CABG)",
+        "cpt": "CPT_33533",
+        "required_documents": [
+          "Cardiothoracic Surgeon Operative Plan Note",
+          "Coronary Angiography (Multi-Vessel Disease)",
+          "2D Echocardiogram & Left Ventricular Function",
+          "Pre-Anesthesia Medical Clearance"
+        ],
+        "qualifying_icd10": [
+          "I25.10",
+          "I25.110",
+          "I25.700"
+        ],
+        "preauth_timeline_days": 10,
+        "max_approved_amount": 550000
+      },
+      "CPT_43239": {
+        "procedure": "Upper GI Endoscopy with Biopsy",
+        "cpt": "CPT_43239",
+        "required_documents": [
+          "Referring Physician Note",
+          "Prior Trial of Medical Therapy (min 4 weeks)",
+          "H. Pylori / Lab Findings",
+          "Certificate of Medical Necessity"
+        ],
+        "qualifying_icd10": [
+          "K29.70",
+          "K25.9",
+          "K21.0"
+        ],
+        "preauth_timeline_days": 5,
+        "max_approved_amount": 45000
+      },
+      "CPT_45378": {
+        "procedure": "Diagnostic & Therapeutic Colonoscopy",
+        "cpt": "CPT_45378",
+        "required_documents": [
+          "Gastroenterologist Referral & Indications Note",
+          "Fecal Occult Blood Test (FOBT) / CBC Report",
+          "Previous Colonoscopy or Screening History",
+          "Certificate of Medical Necessity"
+        ],
+        "qualifying_icd10": [
+          "K63.5",
+          "K52.9",
+          "K50.90"
+        ],
+        "preauth_timeline_days": 5,
+        "max_approved_amount": 55000
+      },
+      "CPT_66984": {
+        "procedure": "Cataract Surgery with Phacoemulsification & IOL",
+        "cpt": "CPT_66984",
+        "required_documents": [
+          "Ophthalmologist Evaluation Letter",
+          "Optical Biometry & IOL Calculation",
+          "Slit Lamp Examination & Visual Acuity Report",
+          "Certificate of Medical Necessity"
+        ],
+        "qualifying_icd10": [
+          "H25.11",
+          "H25.12",
+          "H25.811"
+        ],
+        "preauth_timeline_days": 5,
+        "max_approved_amount": 95000
+      },
+      "CPT_31255": {
+        "procedure": "Functional Endoscopic Sinus Surgery (FESS)",
+        "cpt": "CPT_31255",
+        "required_documents": [
+          "ENT Specialist Clinical Note",
+          "CT Paranasal Sinuses (PNS Study)",
+          "Proof of Medical Therapy Trial (min 4 weeks)",
+          "Certificate of Medical Necessity"
+        ],
+        "qualifying_icd10": [
+          "J32.9",
+          "J32.0",
+          "J33.0"
+        ],
+        "preauth_timeline_days": 7,
+        "max_approved_amount": 160000
+      },
+      "CPT_58571": {
+        "procedure": "Total Laparoscopic Hysterectomy",
+        "cpt": "CPT_58571",
+        "required_documents": [
+          "Gynecologist Evaluation & Recommendation Letter",
+          "Pelvic Ultrasound / MRI Pelvis documenting fibroids/pathology",
+          "Endometrial Biopsy / CBC & Pre-Op Labs",
+          "Certificate of Medical Necessity"
+        ],
+        "qualifying_icd10": [
+          "D25.9",
+          "N80.0",
+          "N85.00"
+        ],
+        "preauth_timeline_days": 10,
+        "max_approved_amount": 240000
+      },
+      "CPT_52601": {
+        "procedure": "Transurethral Resection of Prostate (TURP)",
+        "cpt": "CPT_52601",
+        "required_documents": [
+          "Urologist Clinical Evaluation Note",
+          "USG KUB & Prostate Volume / Uroflowmetry & PSA",
+          "Trial of Medical Therapy (min 3 months)",
+          "Certificate of Medical Necessity"
+        ],
+        "qualifying_icd10": [
+          "N40.1",
+          "N40.0"
+        ],
+        "preauth_timeline_days": 7,
+        "max_approved_amount": 180000
       }
     }
   },
   "INS_C": {
     "name": "Care Health Insurance (INS_C)",
     "insurer_id": "INS_C",
-    "policy_id": "POL_C",
-    "max_claim": 60000,
-    "coverage": ["hospitalization", "diagnostics", "neurosurgery", "spine_surgery"],
+    "policy_id": "POL_CARE_2026",
+    "max_claim": 1000000,
+    "coverage": [
+      "hospitalization",
+      "diagnostics",
+      "neurosurgery",
+      "spine_surgery",
+      "general_surgery",
+      "cardiology"
+    ],
     "procedures": {
       "CPT_63030": {
         "procedure": "Lumbar Discectomy",
@@ -71,46 +633,594 @@
         "required_documents": [
           "Surgeon Recommendation Letter",
           "MRI report confirming disc herniation",
-          "Nerve Conduction Study or EMG",
           "Proof of failed conservative treatment (min 6 weeks)",
           "Certificate of Medical Necessity"
         ],
-        "qualifying_icd10": ["M51.1", "M51.16", "M51.17"],
+        "qualifying_icd10": [
+          "M51.1",
+          "M51.16",
+          "M51.17",
+          "M51.26"
+        ],
         "preauth_timeline_days": 14,
-        "max_approved_amount": 18000,
-        "notes": "MRI must be within 6 months of surgery date. Conservative treatment must include PT."
+        "max_approved_amount": 220000,
+        "notes": "MRI study must be within 6 months of surgery date."
       },
       "CPT_27447": {
-        "procedure": "Total Knee Arthroplasty",
+        "procedure": "Total Knee Arthroplasty (Knee Replacement)",
         "cpt": "CPT_27447",
         "required_documents": [
           "Surgeon Recommendation Letter",
-          "X-Ray or MRI showing Grade 3/4 osteoarthritis",
+          "Weight-Bearing Knee X-Ray / MRI showing Grade 3/4 osteoarthritis",
+          "Proof of failed conservative treatment (min 8 weeks)",
           "Certificate of Medical Necessity"
         ],
-        "qualifying_icd10": ["M17.11", "M17.12", "M17.31", "M17.9"],
+        "qualifying_icd10": [
+          "M17.11",
+          "M17.12",
+          "M17.31",
+          "M17.9"
+        ],
         "preauth_timeline_days": 10,
-        "max_approved_amount": 22000
+        "max_approved_amount": 450000,
+        "notes": "Conservative therapy and physical therapy logs required."
+      },
+      "CPT_27130": {
+        "procedure": "Total Hip Replacement (Hip Arthroplasty)",
+        "cpt": "CPT_27130",
+        "required_documents": [
+          "Orthopedic Surgeon Recommendation Letter",
+          "Pelvis & Hip AP X-Ray / CT Scans",
+          "Proof of failed conservative treatment (min 8 weeks)",
+          "Certificate of Medical Necessity"
+        ],
+        "qualifying_icd10": [
+          "M16.11",
+          "M16.12",
+          "M16.9"
+        ],
+        "preauth_timeline_days": 12,
+        "max_approved_amount": 420000,
+        "notes": "Severe joint collapse or Grade 4 osteoarthritic changes required."
+      },
+      "CPT_29888": {
+        "procedure": "ACL Reconstruction (Knee Ligament Repair)",
+        "cpt": "CPT_29888",
+        "required_documents": [
+          "Orthopedic Sports Medicine Clinical Notes",
+          "MRI Knee confirming complete ACL tear",
+          "Pre-Operative Rehabilitation Plan",
+          "Surgical Clearance Certificate"
+        ],
+        "qualifying_icd10": [
+          "S83.511A",
+          "S83.512A",
+          "M23.20"
+        ],
+        "preauth_timeline_days": 7,
+        "max_approved_amount": 240000
+      },
+      "CPT_29827": {
+        "procedure": "Rotator Cuff Repair / Shoulder Arthroscopy",
+        "cpt": "CPT_29827",
+        "required_documents": [
+          "Shoulder Surgeon Recommendation Letter",
+          "MRI Shoulder confirming full-thickness tendon tear",
+          "Physiotherapy Trial Log (min 6 weeks)",
+          "Certificate of Medical Necessity"
+        ],
+        "qualifying_icd10": [
+          "M75.121",
+          "M75.122",
+          "M75.10"
+        ],
+        "preauth_timeline_days": 10,
+        "max_approved_amount": 220000
+      },
+      "CPT_22551": {
+        "procedure": "Anterior Cervical Discectomy & Fusion (ACDF)",
+        "cpt": "CPT_22551",
+        "required_documents": [
+          "Spine Surgeon Clinical Justification Note",
+          "MRI Cervical Spine Study",
+          "EMG / Nerve Conduction Study",
+          "Certificate of Medical Necessity"
+        ],
+        "qualifying_icd10": [
+          "M50.20",
+          "M50.10"
+        ],
+        "preauth_timeline_days": 14,
+        "max_approved_amount": 350000
+      },
+      "CPT_47562": {
+        "procedure": "Laparoscopic Cholecystectomy",
+        "cpt": "CPT_47562",
+        "required_documents": [
+          "Surgeon Recommendation Note",
+          "Ultrasound Abdomen showing gallstones / wall thickening",
+          "Liver Function Tests (LFT) & CBC",
+          "Surgical Clearance Certificate"
+        ],
+        "qualifying_icd10": [
+          "K80.20",
+          "K80.00",
+          "K81.0"
+        ],
+        "preauth_timeline_days": 5,
+        "max_approved_amount": 210000
+      },
+      "CPT_44950": {
+        "procedure": "Laparoscopic Appendectomy",
+        "cpt": "CPT_44950",
+        "required_documents": [
+          "Emergency / Surgeon Clinical Notes",
+          "Ultrasound Abdomen or CT Abdomen",
+          "CBC & Blood Work (WBC Leukocytosis)",
+          "Emergency Admission & Consent Form"
+        ],
+        "qualifying_icd10": [
+          "K37",
+          "K35.80",
+          "K35.30"
+        ],
+        "preauth_timeline_days": 3,
+        "max_approved_amount": 180000
+      },
+      "CPT_49505": {
+        "procedure": "Inguinal Hernia Repair",
+        "cpt": "CPT_49505",
+        "required_documents": [
+          "General Surgeon Evaluation Note",
+          "Groin Ultrasound / Clinical Examination Record",
+          "Routine Pre-Op Blood Profile & ECG",
+          "Certificate of Medical Necessity"
+        ],
+        "qualifying_icd10": [
+          "K40.90",
+          "K40.20"
+        ],
+        "preauth_timeline_days": 7,
+        "max_approved_amount": 150000
+      },
+      "CPT_92928": {
+        "procedure": "Percutaneous Coronary Intervention (PCI) with Stenting",
+        "cpt": "CPT_92928",
+        "required_documents": [
+          "Cardiologist Clinical Evaluation Note",
+          "Coronary Angiogram documenting significant stenosis",
+          "12-Lead ECG & 2D Echocardiogram",
+          "Interventional Pre-Auth Clearance Certificate"
+        ],
+        "qualifying_icd10": [
+          "I25.10",
+          "I20.0",
+          "I25.110"
+        ],
+        "preauth_timeline_days": 7,
+        "max_approved_amount": 320000
+      },
+      "CPT_33533": {
+        "procedure": "Coronary Artery Bypass Graft (CABG)",
+        "cpt": "CPT_33533",
+        "required_documents": [
+          "Cardiothoracic Surgeon Operative Plan Note",
+          "Coronary Angiography (Multi-Vessel Disease)",
+          "2D Echocardiogram & Left Ventricular Function",
+          "Pre-Anesthesia Medical Clearance"
+        ],
+        "qualifying_icd10": [
+          "I25.10",
+          "I25.110",
+          "I25.700"
+        ],
+        "preauth_timeline_days": 10,
+        "max_approved_amount": 550000
+      },
+      "CPT_43239": {
+        "procedure": "Upper GI Endoscopy with Biopsy",
+        "cpt": "CPT_43239",
+        "required_documents": [
+          "Referring Physician Note",
+          "Prior Trial of Medical Therapy (min 4 weeks)",
+          "H. Pylori / Lab Findings",
+          "Certificate of Medical Necessity"
+        ],
+        "qualifying_icd10": [
+          "K29.70",
+          "K25.9",
+          "K21.0"
+        ],
+        "preauth_timeline_days": 5,
+        "max_approved_amount": 45000
+      },
+      "CPT_45378": {
+        "procedure": "Diagnostic & Therapeutic Colonoscopy",
+        "cpt": "CPT_45378",
+        "required_documents": [
+          "Gastroenterologist Referral & Indications Note",
+          "Fecal Occult Blood Test (FOBT) / CBC Report",
+          "Previous Colonoscopy or Screening History",
+          "Certificate of Medical Necessity"
+        ],
+        "qualifying_icd10": [
+          "K63.5",
+          "K52.9",
+          "K50.90"
+        ],
+        "preauth_timeline_days": 5,
+        "max_approved_amount": 55000
+      },
+      "CPT_66984": {
+        "procedure": "Cataract Surgery with Phacoemulsification & IOL",
+        "cpt": "CPT_66984",
+        "required_documents": [
+          "Ophthalmologist Evaluation Letter",
+          "Optical Biometry & IOL Calculation",
+          "Slit Lamp Examination & Visual Acuity Report",
+          "Certificate of Medical Necessity"
+        ],
+        "qualifying_icd10": [
+          "H25.11",
+          "H25.12",
+          "H25.811"
+        ],
+        "preauth_timeline_days": 5,
+        "max_approved_amount": 95000
+      },
+      "CPT_31255": {
+        "procedure": "Functional Endoscopic Sinus Surgery (FESS)",
+        "cpt": "CPT_31255",
+        "required_documents": [
+          "ENT Specialist Clinical Note",
+          "CT Paranasal Sinuses (PNS Study)",
+          "Proof of Medical Therapy Trial (min 4 weeks)",
+          "Certificate of Medical Necessity"
+        ],
+        "qualifying_icd10": [
+          "J32.9",
+          "J32.0",
+          "J33.0"
+        ],
+        "preauth_timeline_days": 7,
+        "max_approved_amount": 160000
+      },
+      "CPT_58571": {
+        "procedure": "Total Laparoscopic Hysterectomy",
+        "cpt": "CPT_58571",
+        "required_documents": [
+          "Gynecologist Evaluation & Recommendation Letter",
+          "Pelvic Ultrasound / MRI Pelvis documenting fibroids/pathology",
+          "Endometrial Biopsy / CBC & Pre-Op Labs",
+          "Certificate of Medical Necessity"
+        ],
+        "qualifying_icd10": [
+          "D25.9",
+          "N80.0",
+          "N85.00"
+        ],
+        "preauth_timeline_days": 10,
+        "max_approved_amount": 240000
+      },
+      "CPT_52601": {
+        "procedure": "Transurethral Resection of Prostate (TURP)",
+        "cpt": "CPT_52601",
+        "required_documents": [
+          "Urologist Clinical Evaluation Note",
+          "USG KUB & Prostate Volume / Uroflowmetry & PSA",
+          "Trial of Medical Therapy (min 3 months)",
+          "Certificate of Medical Necessity"
+        ],
+        "qualifying_icd10": [
+          "N40.1",
+          "N40.0"
+        ],
+        "preauth_timeline_days": 7,
+        "max_approved_amount": 180000
       }
     }
   },
   "POL001": {
-    "name": "Standard Plan POL001",
+    "name": "Standard Comprehensive Plan POL001",
     "insurer_id": "POL001",
     "policy_id": "POL001",
-    "max_claim": 50000,
-    "coverage": ["hospitalization", "diagnostics"],
+    "max_claim": 750000,
+    "coverage": [
+      "hospitalization",
+      "diagnostics",
+      "surgery"
+    ],
     "procedures": {
       "CPT_63030": {
         "procedure": "Lumbar Discectomy",
         "cpt": "CPT_63030",
         "required_documents": [
           "Surgeon Recommendation Letter",
-          "MRI report confirming disc herniation"
+          "MRI report confirming disc herniation",
+          "Proof of failed conservative treatment (min 6 weeks)",
+          "Certificate of Medical Necessity"
         ],
-        "qualifying_icd10": ["M51.1"],
+        "qualifying_icd10": [
+          "M51.1",
+          "M51.16",
+          "M51.17",
+          "M51.26"
+        ],
         "preauth_timeline_days": 14,
-        "max_approved_amount": 18000
+        "max_approved_amount": 220000,
+        "notes": "MRI study must be within 6 months of surgery date."
+      },
+      "CPT_27447": {
+        "procedure": "Total Knee Arthroplasty (Knee Replacement)",
+        "cpt": "CPT_27447",
+        "required_documents": [
+          "Surgeon Recommendation Letter",
+          "Weight-Bearing Knee X-Ray / MRI showing Grade 3/4 osteoarthritis",
+          "Proof of failed conservative treatment (min 8 weeks)",
+          "Certificate of Medical Necessity"
+        ],
+        "qualifying_icd10": [
+          "M17.11",
+          "M17.12",
+          "M17.31",
+          "M17.9"
+        ],
+        "preauth_timeline_days": 10,
+        "max_approved_amount": 450000,
+        "notes": "Conservative therapy and physical therapy logs required."
+      },
+      "CPT_27130": {
+        "procedure": "Total Hip Replacement (Hip Arthroplasty)",
+        "cpt": "CPT_27130",
+        "required_documents": [
+          "Orthopedic Surgeon Recommendation Letter",
+          "Pelvis & Hip AP X-Ray / CT Scans",
+          "Proof of failed conservative treatment (min 8 weeks)",
+          "Certificate of Medical Necessity"
+        ],
+        "qualifying_icd10": [
+          "M16.11",
+          "M16.12",
+          "M16.9"
+        ],
+        "preauth_timeline_days": 12,
+        "max_approved_amount": 420000,
+        "notes": "Severe joint collapse or Grade 4 osteoarthritic changes required."
+      },
+      "CPT_29888": {
+        "procedure": "ACL Reconstruction (Knee Ligament Repair)",
+        "cpt": "CPT_29888",
+        "required_documents": [
+          "Orthopedic Sports Medicine Clinical Notes",
+          "MRI Knee confirming complete ACL tear",
+          "Pre-Operative Rehabilitation Plan",
+          "Surgical Clearance Certificate"
+        ],
+        "qualifying_icd10": [
+          "S83.511A",
+          "S83.512A",
+          "M23.20"
+        ],
+        "preauth_timeline_days": 7,
+        "max_approved_amount": 240000
+      },
+      "CPT_29827": {
+        "procedure": "Rotator Cuff Repair / Shoulder Arthroscopy",
+        "cpt": "CPT_29827",
+        "required_documents": [
+          "Shoulder Surgeon Recommendation Letter",
+          "MRI Shoulder confirming full-thickness tendon tear",
+          "Physiotherapy Trial Log (min 6 weeks)",
+          "Certificate of Medical Necessity"
+        ],
+        "qualifying_icd10": [
+          "M75.121",
+          "M75.122",
+          "M75.10"
+        ],
+        "preauth_timeline_days": 10,
+        "max_approved_amount": 220000
+      },
+      "CPT_22551": {
+        "procedure": "Anterior Cervical Discectomy & Fusion (ACDF)",
+        "cpt": "CPT_22551",
+        "required_documents": [
+          "Spine Surgeon Clinical Justification Note",
+          "MRI Cervical Spine Study",
+          "EMG / Nerve Conduction Study",
+          "Certificate of Medical Necessity"
+        ],
+        "qualifying_icd10": [
+          "M50.20",
+          "M50.10"
+        ],
+        "preauth_timeline_days": 14,
+        "max_approved_amount": 350000
+      },
+      "CPT_47562": {
+        "procedure": "Laparoscopic Cholecystectomy",
+        "cpt": "CPT_47562",
+        "required_documents": [
+          "Surgeon Recommendation Note",
+          "Ultrasound Abdomen showing gallstones / wall thickening",
+          "Liver Function Tests (LFT) & CBC",
+          "Surgical Clearance Certificate"
+        ],
+        "qualifying_icd10": [
+          "K80.20",
+          "K80.00",
+          "K81.0"
+        ],
+        "preauth_timeline_days": 5,
+        "max_approved_amount": 210000
+      },
+      "CPT_44950": {
+        "procedure": "Laparoscopic Appendectomy",
+        "cpt": "CPT_44950",
+        "required_documents": [
+          "Emergency / Surgeon Clinical Notes",
+          "Ultrasound Abdomen or CT Abdomen",
+          "CBC & Blood Work (WBC Leukocytosis)",
+          "Emergency Admission & Consent Form"
+        ],
+        "qualifying_icd10": [
+          "K37",
+          "K35.80",
+          "K35.30"
+        ],
+        "preauth_timeline_days": 3,
+        "max_approved_amount": 180000
+      },
+      "CPT_49505": {
+        "procedure": "Inguinal Hernia Repair",
+        "cpt": "CPT_49505",
+        "required_documents": [
+          "General Surgeon Evaluation Note",
+          "Groin Ultrasound / Clinical Examination Record",
+          "Routine Pre-Op Blood Profile & ECG",
+          "Certificate of Medical Necessity"
+        ],
+        "qualifying_icd10": [
+          "K40.90",
+          "K40.20"
+        ],
+        "preauth_timeline_days": 7,
+        "max_approved_amount": 150000
+      },
+      "CPT_92928": {
+        "procedure": "Percutaneous Coronary Intervention (PCI) with Stenting",
+        "cpt": "CPT_92928",
+        "required_documents": [
+          "Cardiologist Clinical Evaluation Note",
+          "Coronary Angiogram documenting significant stenosis",
+          "12-Lead ECG & 2D Echocardiogram",
+          "Interventional Pre-Auth Clearance Certificate"
+        ],
+        "qualifying_icd10": [
+          "I25.10",
+          "I20.0",
+          "I25.110"
+        ],
+        "preauth_timeline_days": 7,
+        "max_approved_amount": 320000
+      },
+      "CPT_33533": {
+        "procedure": "Coronary Artery Bypass Graft (CABG)",
+        "cpt": "CPT_33533",
+        "required_documents": [
+          "Cardiothoracic Surgeon Operative Plan Note",
+          "Coronary Angiography (Multi-Vessel Disease)",
+          "2D Echocardiogram & Left Ventricular Function",
+          "Pre-Anesthesia Medical Clearance"
+        ],
+        "qualifying_icd10": [
+          "I25.10",
+          "I25.110",
+          "I25.700"
+        ],
+        "preauth_timeline_days": 10,
+        "max_approved_amount": 550000
+      },
+      "CPT_43239": {
+        "procedure": "Upper GI Endoscopy with Biopsy",
+        "cpt": "CPT_43239",
+        "required_documents": [
+          "Referring Physician Note",
+          "Prior Trial of Medical Therapy (min 4 weeks)",
+          "H. Pylori / Lab Findings",
+          "Certificate of Medical Necessity"
+        ],
+        "qualifying_icd10": [
+          "K29.70",
+          "K25.9",
+          "K21.0"
+        ],
+        "preauth_timeline_days": 5,
+        "max_approved_amount": 45000
+      },
+      "CPT_45378": {
+        "procedure": "Diagnostic & Therapeutic Colonoscopy",
+        "cpt": "CPT_45378",
+        "required_documents": [
+          "Gastroenterologist Referral & Indications Note",
+          "Fecal Occult Blood Test (FOBT) / CBC Report",
+          "Previous Colonoscopy or Screening History",
+          "Certificate of Medical Necessity"
+        ],
+        "qualifying_icd10": [
+          "K63.5",
+          "K52.9",
+          "K50.90"
+        ],
+        "preauth_timeline_days": 5,
+        "max_approved_amount": 55000
+      },
+      "CPT_66984": {
+        "procedure": "Cataract Surgery with Phacoemulsification & IOL",
+        "cpt": "CPT_66984",
+        "required_documents": [
+          "Ophthalmologist Evaluation Letter",
+          "Optical Biometry & IOL Calculation",
+          "Slit Lamp Examination & Visual Acuity Report",
+          "Certificate of Medical Necessity"
+        ],
+        "qualifying_icd10": [
+          "H25.11",
+          "H25.12",
+          "H25.811"
+        ],
+        "preauth_timeline_days": 5,
+        "max_approved_amount": 95000
+      },
+      "CPT_31255": {
+        "procedure": "Functional Endoscopic Sinus Surgery (FESS)",
+        "cpt": "CPT_31255",
+        "required_documents": [
+          "ENT Specialist Clinical Note",
+          "CT Paranasal Sinuses (PNS Study)",
+          "Proof of Medical Therapy Trial (min 4 weeks)",
+          "Certificate of Medical Necessity"
+        ],
+        "qualifying_icd10": [
+          "J32.9",
+          "J32.0",
+          "J33.0"
+        ],
+        "preauth_timeline_days": 7,
+        "max_approved_amount": 160000
+      },
+      "CPT_58571": {
+        "procedure": "Total Laparoscopic Hysterectomy",
+        "cpt": "CPT_58571",
+        "required_documents": [
+          "Gynecologist Evaluation & Recommendation Letter",
+          "Pelvic Ultrasound / MRI Pelvis documenting fibroids/pathology",
+          "Endometrial Biopsy / CBC & Pre-Op Labs",
+          "Certificate of Medical Necessity"
+        ],
+        "qualifying_icd10": [
+          "D25.9",
+          "N80.0",
+          "N85.00"
+        ],
+        "preauth_timeline_days": 10,
+        "max_approved_amount": 240000
+      },
+      "CPT_52601": {
+        "procedure": "Transurethral Resection of Prostate (TURP)",
+        "cpt": "CPT_52601",
+        "required_documents": [
+          "Urologist Clinical Evaluation Note",
+          "USG KUB & Prostate Volume / Uroflowmetry & PSA",
+          "Trial of Medical Therapy (min 3 months)",
+          "Certificate of Medical Necessity"
+        ],
+        "qualifying_icd10": [
+          "N40.1",
+          "N40.0"
+        ],
+        "preauth_timeline_days": 7,
+        "max_approved_amount": 180000
       }
     }
   }
