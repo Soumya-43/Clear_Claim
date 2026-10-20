@@ -5662,6 +5662,12 @@
       try { await sb.auth.signOut(); } catch (e) { }
       localStorage.removeItem('clearclaim_local_session');
       currentUser = null; currentProfile = null;
+      if (window.__INITIAL_SAMPLE_CLAIMS) {
+        window.CLAIMS_REGISTRY = JSON.parse(JSON.stringify(window.__INITIAL_SAMPLE_CLAIMS));
+      }
+      window.__currentClaimId = null;
+      window.__currentAppealClaimId = null;
+      window.__lastAnalysis = null;
       document.getElementById('login-email').value = '';
       document.getElementById('login-password').value = '';
       document.getElementById('login-alert').className = 'auth-alert';
@@ -8199,19 +8205,45 @@
     window.__INITIAL_SAMPLE_CLAIMS = JSON.parse(JSON.stringify(window.CLAIMS_REGISTRY));
 
     // ============================================================
-    //  PERSISTENCE STORAGE HELPERS (Preserve Manual Claims & Updates)
+    //  PERSISTENCE STORAGE HELPERS (User-Specific Claims & Updates)
     // ============================================================
     const CLAIMS_STORAGE_KEY = 'clearclaim_registry_v3';
 
+    function getStorageUserKey() {
+      if (typeof currentUser !== 'undefined' && currentUser) {
+        if (currentUser.email) {
+          return currentUser.email.toLowerCase().trim().replace(/[^a-z0-9]/g, '_');
+        }
+        if (currentUser.id) {
+          return String(currentUser.id).replace(/[^a-zA-Z0-9_-]/g, '_');
+        }
+      }
+      try {
+        const localSession = localStorage.getItem('clearclaim_local_session');
+        if (localSession) {
+          const u = JSON.parse(localSession);
+          if (u?.email) return u.email.toLowerCase().trim().replace(/[^a-z0-9]/g, '_');
+          if (u?.id) return String(u.id).replace(/[^a-zA-Z0-9_-]/g, '_');
+        }
+      } catch (e) { }
+      return 'shared_session';
+    }
+
     function saveClaimsRegistryToStorage() {
       try {
+        const uKey = getStorageUserKey();
+        const userScopedKey = `${CLAIMS_STORAGE_KEY}_${uKey}`;
         if (window.CLAIMS_REGISTRY && typeof window.CLAIMS_REGISTRY === 'object') {
+          localStorage.setItem(userScopedKey, JSON.stringify(window.CLAIMS_REGISTRY));
+          // Backward-compat fallback
           localStorage.setItem(CLAIMS_STORAGE_KEY, JSON.stringify(window.CLAIMS_REGISTRY));
         }
         if (window.__currentClaimId) {
+          localStorage.setItem(`clearclaim_current_claim_id_${uKey}`, window.__currentClaimId);
           localStorage.setItem('clearclaim_current_claim_id', window.__currentClaimId);
         }
         if (window.__currentAppealClaimId) {
+          localStorage.setItem(`clearclaim_current_appeal_id_${uKey}`, window.__currentAppealClaimId);
           localStorage.setItem('clearclaim_current_appeal_id', window.__currentAppealClaimId);
         }
       } catch (e) {
@@ -8221,24 +8253,39 @@
 
     function loadClaimsRegistryFromStorage() {
       try {
-        const saved = localStorage.getItem(CLAIMS_STORAGE_KEY) || localStorage.getItem('clearclaim_registry_v2');
+        const uKey = getStorageUserKey();
+        const userScopedKey = `${CLAIMS_STORAGE_KEY}_${uKey}`;
+        let saved = localStorage.getItem(userScopedKey);
+
+        // Fallback: If no user-scoped key found yet, check global key (migrating previous entries seamlessly)
+        if (!saved) {
+          const legacy = localStorage.getItem(CLAIMS_STORAGE_KEY) || localStorage.getItem('clearclaim_registry_v2');
+          if (legacy) {
+            saved = legacy;
+            localStorage.setItem(userScopedKey, legacy);
+          }
+        }
+
         if (saved !== null) {
           const parsed = JSON.parse(saved);
           if (parsed && typeof parsed === 'object') {
             window.CLAIMS_REGISTRY = parsed;
           }
         } else {
-          // First visit: save initial sample claims so manual adds merge seamlessly
+          // Fresh user with no stored claims: seed with initial sample claims and save for this user
+          if (window.__INITIAL_SAMPLE_CLAIMS) {
+            window.CLAIMS_REGISTRY = JSON.parse(JSON.stringify(window.__INITIAL_SAMPLE_CLAIMS));
+          }
           if (window.CLAIMS_REGISTRY && Object.keys(window.CLAIMS_REGISTRY).length > 0) {
             saveClaimsRegistryToStorage();
           }
         }
 
-        const savedClaimId = localStorage.getItem('clearclaim_current_claim_id');
+        const savedClaimId = localStorage.getItem(`clearclaim_current_claim_id_${uKey}`) || localStorage.getItem('clearclaim_current_claim_id');
         if (savedClaimId && window.CLAIMS_REGISTRY && window.CLAIMS_REGISTRY[savedClaimId]) {
           window.__currentClaimId = savedClaimId;
         }
-        const savedAppealId = localStorage.getItem('clearclaim_current_appeal_id');
+        const savedAppealId = localStorage.getItem(`clearclaim_current_appeal_id_${uKey}`) || localStorage.getItem('clearclaim_current_appeal_id');
         if (savedAppealId && window.CLAIMS_REGISTRY && window.CLAIMS_REGISTRY[savedAppealId]) {
           window.__currentAppealClaimId = savedAppealId;
         }
@@ -8689,7 +8736,11 @@
     function switchAnalysisClaim(claimId) {
       if (!claimId || !window.CLAIMS_REGISTRY || !window.CLAIMS_REGISTRY[claimId]) return;
       window.__currentClaimId = claimId;
-      try { localStorage.setItem('clearclaim_current_claim_id', claimId); } catch (e) {}
+      try {
+        const uKey = getStorageUserKey();
+        localStorage.setItem(`clearclaim_current_claim_id_${uKey}`, claimId);
+        localStorage.setItem('clearclaim_current_claim_id', claimId);
+      } catch (e) {}
 
       const claim = window.CLAIMS_REGISTRY[claimId];
       const analysisData = convertRegistryToAnalysisFormat(claim);
@@ -8722,7 +8773,11 @@
     function switchPreauthClaim(claimId) {
       if (!claimId || !window.CLAIMS_REGISTRY || !window.CLAIMS_REGISTRY[claimId]) return;
       window.__currentClaimId = claimId;
-      try { localStorage.setItem('clearclaim_current_claim_id', claimId); } catch (e) {}
+      try {
+        const uKey = getStorageUserKey();
+        localStorage.setItem(`clearclaim_current_claim_id_${uKey}`, claimId);
+        localStorage.setItem('clearclaim_current_claim_id', claimId);
+      } catch (e) {}
 
       const claim = window.CLAIMS_REGISTRY[claimId];
 
@@ -9034,7 +9089,11 @@
     function switchAppealClaim(claimId) {
       if (!claimId || !window.CLAIMS_REGISTRY || !window.CLAIMS_REGISTRY[claimId]) return;
       window.__currentAppealClaimId = claimId;
-      try { localStorage.setItem('clearclaim_current_appeal_id', claimId); } catch (e) {}
+      try {
+        const uKey = getStorageUserKey();
+        localStorage.setItem(`clearclaim_current_appeal_id_${uKey}`, claimId);
+        localStorage.setItem('clearclaim_current_appeal_id', claimId);
+      } catch (e) {}
 
       const claim = window.CLAIMS_REGISTRY[claimId];
       const sel = document.getElementById('appeal-claim-selector');
