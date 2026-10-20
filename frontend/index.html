@@ -5,7 +5,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Clear Claim — Pre-authorization Optimization Agent</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
   <link
     href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap"
     rel="stylesheet" />
@@ -242,6 +243,7 @@
       from {
         opacity: 0;
       }
+
       to {
         opacity: 1;
       }
@@ -3098,9 +3100,17 @@
     }
 
     @keyframes pulseDot {
-      0% { box-shadow: 0 0 0 2px var(--border), 0 0 0 0 rgba(245, 158, 11, 0.7); }
-      70% { box-shadow: 0 0 0 2px var(--border), 0 0 0 8px rgba(245, 158, 11, 0); }
-      100% { box-shadow: 0 0 0 2px var(--border), 0 0 0 0 rgba(245, 158, 11, 0); }
+      0% {
+        box-shadow: 0 0 0 2px var(--border), 0 0 0 0 rgba(245, 158, 11, 0.7);
+      }
+
+      70% {
+        box-shadow: 0 0 0 2px var(--border), 0 0 0 8px rgba(245, 158, 11, 0);
+      }
+
+      100% {
+        box-shadow: 0 0 0 2px var(--border), 0 0 0 0 rgba(245, 158, 11, 0);
+      }
     }
 
     .tl-dot.glow-green {
@@ -3140,11 +3150,13 @@
       background: #ffffff !important;
       color: #0f172a !important;
     }
+
     #doc-report-paper table {
       width: 100% !important;
       border-collapse: collapse !important;
       margin: 14px 0 !important;
     }
+
     #doc-report-paper table th,
     #doc-report-paper th {
       background: #0f172a !important;
@@ -3157,6 +3169,7 @@
       letter-spacing: 0.5px !important;
       text-align: left !important;
     }
+
     #doc-report-paper table td,
     #doc-report-paper td {
       color: #1e293b !important;
@@ -3167,32 +3180,38 @@
       font-weight: 500 !important;
       line-height: 1.5 !important;
     }
+
     #doc-report-paper table tr:hover td {
       background: #f8fafc !important;
     }
+
     #doc-report-paper td[style*="16a34a"],
     #doc-report-paper td[style*="green"],
     #doc-report-paper span[style*="16a34a"] {
       color: #16a34a !important;
       font-weight: 700 !important;
     }
+
     #doc-report-paper td[style*="dc2626"],
     #doc-report-paper td[style*="red"],
     #doc-report-paper span[style*="dc2626"] {
       color: #dc2626 !important;
       font-weight: 700 !important;
     }
+
     #doc-report-paper td[style*="d97706"],
     #doc-report-paper td[style*="amber"],
     #doc-report-paper span[style*="d97706"] {
       color: #d97706 !important;
       font-weight: 700 !important;
     }
+
     #doc-report-paper div,
     #doc-report-paper p,
     #doc-report-paper span {
       color: #1e293b;
     }
+
     #doc-report-paper strong,
     #doc-report-paper b {
       color: #0f172a !important;
@@ -3570,18 +3589,22 @@
         grid-template-columns: 1fr;
         gap: 16px;
       }
+
       .ag3 {
         grid-template-columns: 1fr;
         gap: 16px;
       }
+
       .fgrid {
         grid-template-columns: 1fr;
         gap: 16px;
       }
+
       .dash-hero {
         flex-direction: column;
         align-items: stretch;
       }
+
       .dh-right {
         margin-top: 20px;
         padding-right: 0;
@@ -3628,7 +3651,7 @@
         padding-bottom: 14px;
       }
 
-      .topbar > div:first-child {
+      .topbar>div:first-child {
         width: 100%;
       }
 
@@ -3878,7 +3901,9 @@
           </svg>
           Sign in with Google
         </button>
-        <button class="btn-secondary-auth" style="margin-top:10px;border-color:var(--green);color:var(--green);font-weight:600" onclick="handleDemoLogin()">
+        <button class="btn-secondary-auth"
+          style="margin-top:10px;border-color:var(--green);color:var(--green);font-weight:600"
+          onclick="handleDemoLogin()">
           ⚡ Quick Demo Access (Explore without login)
         </button>
       </div>
@@ -3971,7 +3996,9 @@
           </svg>
           Continue with Google
         </button>
-        <button class="btn-secondary-auth" style="margin-top:10px;border-color:var(--green);color:var(--green);font-weight:600" onclick="handleDemoLogin()">
+        <button class="btn-secondary-auth"
+          style="margin-top:10px;border-color:var(--green);color:var(--green);font-weight:600"
+          onclick="handleDemoLogin()">
           ⚡ Quick Demo Access (Explore without signup)
         </button>
       </div>
@@ -4008,10 +4035,13 @@
         </div>
         <div class="fg"><label>Primary Insurer(s)</label><input type="text" id="su-insurers"
             placeholder="e.g. Star Health, HDFC ERGO" /></div>
-        <label class="terms-label chk-label" for="su-terms" onclick="toggleSuTerms(event)" style="cursor:pointer;user-select:none;-webkit-user-select:none;margin-top:8px;display:flex;align-items:center;gap:9px;">
+        <label class="terms-label chk-label" for="su-terms" onclick="toggleSuTerms(event)"
+          style="cursor:pointer;user-select:none;-webkit-user-select:none;margin-top:8px;display:flex;align-items:center;gap:9px;">
           <input type="checkbox" id="su-terms" checked />
           <span class="chk-box" id="su-terms-box" style="cursor:pointer;"></span>
-          <span style="cursor:pointer;">I agree to the <a href="javascript:void(0)" onclick="event.stopPropagation();">Terms of Service</a> and <a href="javascript:void(0)" onclick="event.stopPropagation();">Privacy Policy</a>.</span>
+          <span style="cursor:pointer;">I agree to the <a href="javascript:void(0)"
+              onclick="event.stopPropagation();">Terms of Service</a> and <a href="javascript:void(0)"
+              onclick="event.stopPropagation();">Privacy Policy</a>.</span>
         </label>
         <div class="btn-row">
           <button class="btn-back" onclick="suPrev(2)">← Back</button>
@@ -4026,7 +4056,8 @@
           <div style="font-family:'Fraunces',serif;font-size:22px;font-weight:700;margin-bottom:12px;color:var(--text)">
             Account Created Successfully!</div>
           <div style="font-size:13px;color:var(--muted);line-height:1.85;margin-bottom:26px">
-            Welcome to Clear Claim, <strong id="su-email-display" style="color:var(--text);font-weight:600"></strong><br>
+            Welcome to Clear Claim, <strong id="su-email-display"
+              style="color:var(--text);font-weight:600"></strong><br>
             <span style="font-size:12px">Your hospital profile is active and ready.</span>
           </div>
         </div>
@@ -4140,8 +4171,8 @@
       <div class="sidebar-footer">
         <div class="sidebar-theme" style="margin-bottom:10px">
           <button class="sidebar-theme-toggle" onclick="toggleTheme()">
-            <span style="display:flex;align-items:center;gap:8px"><span id="sidebar-theme-icon" class="nav-icon" aria-hidden="true"></span> <span
-                class="nav-text">Theme</span></span>
+            <span style="display:flex;align-items:center;gap:8px"><span id="sidebar-theme-icon" class="nav-icon"
+                aria-hidden="true"></span> <span class="nav-text">Theme</span></span>
             <span class="theme-pill" id="sidebar-theme-pill">LIGHT</span>
           </button>
         </div>
@@ -4579,33 +4610,44 @@
           <div>
             <div class="breadcrumb">Dashboard <span class="bc-arrow">›</span> Claim Analysis</div>
             <div class="page-title" id="analysis-page-title">Claim Analysis</div>
-            <div class="page-sub" id="analysis-page-sub">Select a patient claim to view AI verification and risk score</div>
+            <div class="page-sub" id="analysis-page-sub">Select a patient claim to view AI verification and risk score
+            </div>
           </div>
           <div style="display:flex;gap:10px">
             <button class="btn btn-w" onclick="navigate('preauth')">📋 View Package</button>
-            <button class="btn btn-g" onclick="showNotif('Package sent to billing team!','success')">📤 Send to Billing</button>
+            <button class="btn btn-g" onclick="showNotif('Package sent to billing team!','success')">📤 Send to
+              Billing</button>
           </div>
         </div>
 
         <!-- PATIENT CLAIM SELECTOR TOOLBAR -->
-        <div class="card" style="margin-bottom:18px; padding:14px 20px; background:var(--surface); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:14px; border-left:4px solid var(--green); border-radius:var(--radius-sm); box-shadow:var(--shadow-sm);">
+        <div class="card"
+          style="margin-bottom:18px; padding:14px 20px; background:var(--surface); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:14px; border-left:4px solid var(--green); border-radius:var(--radius-sm); box-shadow:var(--shadow-sm);">
           <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
             <div style="display:flex; align-items:center; gap:8px;">
               <span style="font-size:18px;">👤</span>
               <span style="font-weight:700; font-size:13px; color:var(--text);">Select Patient Claim:</span>
             </div>
-            <select id="analysis-claim-selector" class="fi" style="margin:0; width:auto; min-width:340px; padding:7px 12px; font-weight:600; border-color:var(--border2); cursor:pointer;" onchange="switchAnalysisClaim(this.value)">
+            <select id="analysis-claim-selector" class="fi"
+              style="margin:0; width:auto; min-width:340px; padding:7px 12px; font-weight:600; border-color:var(--border2); cursor:pointer;"
+              onchange="switchAnalysisClaim(this.value)">
               <!-- Populated dynamically via JS -->
             </select>
             <span class="badge" id="analysis-claim-status-pill" style="font-size:11px;">● Select Claim</span>
-            <input type="text" id="analysis-claim-search" placeholder="🔍 Search patient / claim..." class="fi" style="padding:6px 12px; font-size:12px; width:200px; margin:0;" oninput="searchAnalysisDropdown(this.value)" />
+            <input type="text" id="analysis-claim-search" placeholder="🔍 Search patient / claim..." class="fi"
+              style="padding:6px 12px; font-size:12px; width:200px; margin:0;"
+              oninput="searchAnalysisDropdown(this.value)" />
           </div>
           <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
             <span style="font-size:12px; color:var(--muted); margin-right:4px;">Filter List:</span>
-            <button class="btn btn-w btn-sm active" id="chip-all" onclick="filterAnalysisDropdown('ALL', this)">All</button>
-            <button class="btn btn-w btn-sm" id="chip-high" onclick="filterAnalysisDropdown('HIGH', this)">⚠️ High Risk / Rejected</button>
-            <button class="btn btn-w btn-sm" id="chip-pending" onclick="filterAnalysisDropdown('PENDING', this)">⏳ Pending</button>
-            <button class="btn btn-w btn-sm" id="chip-approved" onclick="filterAnalysisDropdown('APPROVED', this)">✅ Approved</button>
+            <button class="btn btn-w btn-sm active" id="chip-all"
+              onclick="filterAnalysisDropdown('ALL', this)">All</button>
+            <button class="btn btn-w btn-sm" id="chip-high" onclick="filterAnalysisDropdown('HIGH', this)">⚠️ High Risk
+              / Rejected</button>
+            <button class="btn btn-w btn-sm" id="chip-pending" onclick="filterAnalysisDropdown('PENDING', this)">⏳
+              Pending</button>
+            <button class="btn btn-w btn-sm" id="chip-approved" onclick="filterAnalysisDropdown('APPROVED', this)">✅
+              Approved</button>
           </div>
         </div>
 
@@ -4670,8 +4712,8 @@
             </div>
 
             <div class="risk-reason" id="analysis-risk-reason">Select a patient claim to view AI risk analysis.</div>
-            <div style="margin-top:18px"><button class="btn btn-r btn-sm" id="analysis-appeal-btn" style="width:100%;justify-content:center"
-                onclick="prepareAppeal()">⚡ Prepare Appeal</button></div>
+            <div style="margin-top:18px"><button class="btn btn-r btn-sm" id="analysis-appeal-btn"
+                style="width:100%;justify-content:center" onclick="prepareAppeal()">⚡ Prepare Appeal</button></div>
           </div>
         </div>
 
@@ -4751,30 +4793,40 @@
             <div class="page-sub" id="preauth-page-sub">Select a patient record to view pre-authorization package</div>
           </div>
           <div style="display:flex;gap:10px">
-            <button class="btn btn-w" id="preauth-download-pdf-btn" onclick="downloadPreauthPackagePDF()">⬇ Download PDF</button>
+            <button class="btn btn-w" id="preauth-download-pdf-btn" onclick="downloadPreauthPackagePDF()">⬇ Download
+              PDF</button>
             <button class="btn btn-g" id="preauth-submit-btn" onclick="submitPreauthPackage()">Submit Package</button>
           </div>
         </div>
 
         <!-- PATIENT CLAIM SELECTOR TOOLBAR FOR PRE-AUTH PACKAGE -->
-        <div class="card" style="margin-bottom:18px; padding:14px 20px; background:var(--surface); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:14px; border-left:4px solid var(--green); border-radius:var(--radius-sm); box-shadow:var(--shadow-sm);">
+        <div class="card"
+          style="margin-bottom:18px; padding:14px 20px; background:var(--surface); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:14px; border-left:4px solid var(--green); border-radius:var(--radius-sm); box-shadow:var(--shadow-sm);">
           <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
             <div style="display:flex; align-items:center; gap:8px;">
               <span style="font-size:18px;">👤</span>
               <span style="font-weight:700; font-size:13px; color:var(--text);">Select Patient Record:</span>
             </div>
-            <select id="preauth-claim-selector" class="fi" style="margin:0; width:auto; min-width:320px; padding:7px 12px; font-weight:600; border-color:var(--border2); cursor:pointer;" onchange="switchPreauthClaim(this.value)">
+            <select id="preauth-claim-selector" class="fi"
+              style="margin:0; width:auto; min-width:320px; padding:7px 12px; font-weight:600; border-color:var(--border2); cursor:pointer;"
+              onchange="switchPreauthClaim(this.value)">
               <!-- Populated dynamically via JS -->
             </select>
             <span class="badge" id="preauth-claim-status-pill" style="font-size:11px;">● Select Patient</span>
-            <input type="text" id="preauth-claim-search" placeholder="🔍 Search patient / claim..." class="fi" style="padding:6px 12px; font-size:12px; width:200px; margin:0;" oninput="searchPreauthDropdown(this.value)" />
+            <input type="text" id="preauth-claim-search" placeholder="🔍 Search patient / claim..." class="fi"
+              style="padding:6px 12px; font-size:12px; width:200px; margin:0;"
+              oninput="searchPreauthDropdown(this.value)" />
           </div>
           <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
             <span style="font-size:12px; color:var(--muted); margin-right:4px;">Filter List:</span>
-            <button class="btn btn-w btn-sm active" id="preauth-chip-all" onclick="filterPreauthDropdown('ALL', this)">All</button>
-            <button class="btn btn-w btn-sm" id="preauth-chip-high" onclick="filterPreauthDropdown('HIGH', this)">⚠️ High Risk / Rejected</button>
-            <button class="btn btn-w btn-sm" id="preauth-chip-pending" onclick="filterPreauthDropdown('PENDING', this)">⏳ Pending</button>
-            <button class="btn btn-w btn-sm" id="preauth-chip-approved" onclick="filterPreauthDropdown('APPROVED', this)">✅ Approved</button>
+            <button class="btn btn-w btn-sm active" id="preauth-chip-all"
+              onclick="filterPreauthDropdown('ALL', this)">All</button>
+            <button class="btn btn-w btn-sm" id="preauth-chip-high" onclick="filterPreauthDropdown('HIGH', this)">⚠️
+              High Risk / Rejected</button>
+            <button class="btn btn-w btn-sm" id="preauth-chip-pending"
+              onclick="filterPreauthDropdown('PENDING', this)">⏳ Pending</button>
+            <button class="btn btn-w btn-sm" id="preauth-chip-approved"
+              onclick="filterPreauthDropdown('APPROVED', this)">✅ Approved</button>
           </div>
         </div>
 
@@ -4810,7 +4862,8 @@
                 </div>
                 <div class="ffd">
                   <div class="ffd-lbl">Medical Necessity Justification</div>
-                  <div class="ffd-val" id="preauth-justification">Medical necessity justification will appear here.</div>
+                  <div class="ffd-val" id="preauth-justification">Medical necessity justification will appear here.
+                  </div>
                   <div class="ffd-src" id="preauth-justification-src">📎 Cited evidence</div>
                 </div>
                 <div class="ffd">
@@ -4848,24 +4901,33 @@
               <div class="card-body" style="padding:20px 24px">
                 <!-- Top Score Indicator (Single prominent score below Composite Risk Index) -->
                 <div style="margin-bottom:14px;">
-                  <span style="font-size:11px; text-transform:uppercase; letter-spacing:1px; color:var(--muted); font-weight:700;">Composite Risk Index</span>
+                  <span
+                    style="font-size:11px; text-transform:uppercase; letter-spacing:1px; color:var(--muted); font-weight:700;">Composite
+                    Risk Index</span>
                   <div style="display:flex; align-items:baseline; gap:10px; margin-top:2px;">
-                    <span id="preauth-risk-score-display" style="font-family:'Outfit', sans-serif; font-size:34px; font-weight:900; color:var(--text); line-height:1;">—</span>
-                    <span id="preauth-risk-label" style="font-size:12.5px; font-weight:800; color:var(--amber); text-transform:uppercase; letter-spacing:0.8px;">ASSESSING...</span>
+                    <span id="preauth-risk-score-display"
+                      style="font-family:'Outfit', sans-serif; font-size:34px; font-weight:900; color:var(--text); line-height:1;">—</span>
+                    <span id="preauth-risk-label"
+                      style="font-size:12.5px; font-weight:800; color:var(--amber); text-transform:uppercase; letter-spacing:0.8px;">ASSESSING...</span>
                   </div>
                 </div>
 
                 <!-- Dynamic Risk Bar Meter -->
                 <div style="margin: 12px 0 16px 0;">
-                  <div style="display:flex; justify-content:space-between; font-size:11px; font-weight:700; margin-bottom:6px;">
+                  <div
+                    style="display:flex; justify-content:space-between; font-size:11px; font-weight:700; margin-bottom:6px;">
                     <span style="color:var(--muted);">Adjudication Feasibility Gauge</span>
                     <span id="preauth-risk-bar-pct" style="color:var(--text); font-weight:700;">— Risk Index</span>
                   </div>
-                  <div style="height: 12px; background: var(--surface3); border-radius: 999px; overflow: hidden; position: relative; border: 1px solid var(--border); box-shadow: inset 0 1px 3px rgba(0,0,0,0.12);">
-                    <div id="preauth-risk-bar-fill" style="height: 100%; width: 45%; border-radius: 999px; transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1), background 0.4s ease; background: linear-gradient(90deg, #f59e0b, #d97706); box-shadow: 0 0 10px rgba(217,119,6,0.45);"></div>
+                  <div
+                    style="height: 12px; background: var(--surface3); border-radius: 999px; overflow: hidden; position: relative; border: 1px solid var(--border); box-shadow: inset 0 1px 3px rgba(0,0,0,0.12);">
+                    <div id="preauth-risk-bar-fill"
+                      style="height: 100%; width: 45%; border-radius: 999px; transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1), background 0.4s ease; background: linear-gradient(90deg, #f59e0b, #d97706); box-shadow: 0 0 10px rgba(217,119,6,0.45);">
+                    </div>
                   </div>
                   <!-- Scale Thresholds -->
-                  <div style="display:flex; justify-content:space-between; font-size:10px; color:var(--muted); font-weight:700; margin-top:5px;">
+                  <div
+                    style="display:flex; justify-content:space-between; font-size:10px; color:var(--muted); font-weight:700; margin-top:5px;">
                     <span style="color:var(--green)">0% (Low Risk)</span>
                     <span style="color:var(--amber)">40% (Moderate)</span>
                     <span style="color:var(--red)">70%+ (High / Denial)</span>
@@ -4873,19 +4935,23 @@
                 </div>
 
                 <!-- Factor Risk Weightings Micro-Graph -->
-                <div style="background: var(--surface2); padding: 14px 16px; border-radius: var(--radius-sm); border: 1px solid var(--border); margin-bottom: 16px;">
-                  <div style="font-size: 11px; font-weight: 800; color: var(--text); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 12px; display:flex; align-items:center; justify-content:space-between;">
+                <div
+                  style="background: var(--surface2); padding: 14px 16px; border-radius: var(--radius-sm); border: 1px solid var(--border); margin-bottom: 16px;">
+                  <div
+                    style="font-size: 11px; font-weight: 800; color: var(--text); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 12px; display:flex; align-items:center; justify-content:space-between;">
                     <span>Factor Risk Breakdown</span>
                     <span style="font-size:10px; color:var(--muted); font-weight:600;">EHR &amp; Policy Weights</span>
                   </div>
-                  
+
                   <div style="margin-bottom: 10px;">
                     <div style="display:flex; justify-content:space-between; font-size:11.5px; margin-bottom:4px;">
                       <span style="color:var(--text2)">Documentation Completeness</span>
                       <span id="preauth-subbar-doc-val" style="font-weight:700; color:var(--green)">—</span>
                     </div>
                     <div style="height:6px; background:var(--surface3); border-radius:4px; overflow:hidden;">
-                      <div id="preauth-subbar-doc-fill" style="height:100%; width:0%; background:var(--green); border-radius:4px; transition:width 0.6s ease;"></div>
+                      <div id="preauth-subbar-doc-fill"
+                        style="height:100%; width:0%; background:var(--green); border-radius:4px; transition:width 0.6s ease;">
+                      </div>
                     </div>
                   </div>
 
@@ -4895,7 +4961,9 @@
                       <span id="preauth-subbar-criteria-val" style="font-weight:700; color:var(--green)">—</span>
                     </div>
                     <div style="height:6px; background:var(--surface3); border-radius:4px; overflow:hidden;">
-                      <div id="preauth-subbar-criteria-fill" style="height:100%; width:0%; background:var(--green); border-radius:4px; transition:width 0.6s ease;"></div>
+                      <div id="preauth-subbar-criteria-fill"
+                        style="height:100%; width:0%; background:var(--green); border-radius:4px; transition:width 0.6s ease;">
+                      </div>
                     </div>
                   </div>
 
@@ -4905,7 +4973,9 @@
                       <span id="preauth-subbar-hist-val" style="font-weight:700; color:var(--amber)">—</span>
                     </div>
                     <div style="height:6px; background:var(--surface3); border-radius:4px; overflow:hidden;">
-                      <div id="preauth-subbar-hist-fill" style="height:100%; width:0%; background:var(--amber); border-radius:4px; transition:width 0.6s ease;"></div>
+                      <div id="preauth-subbar-hist-fill"
+                        style="height:100%; width:0%; background:var(--amber); border-radius:4px; transition:width 0.6s ease;">
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -4939,31 +5009,42 @@
           <div>
             <div class="breadcrumb">Dashboard <span class="bc-arrow">›</span> Appeal Center</div>
             <div class="page-title" id="appeal-page-title">Appeal Center</div>
-            <div class="page-sub" id="appeal-page-sub">Select a rejected claim to generate or review appeal dispute package</div>
+            <div class="page-sub" id="appeal-page-sub">Select a rejected claim to generate or review appeal dispute
+              package</div>
           </div>
-          <button class="btn btn-g" id="btn-send-appeal-action" onclick="handleSendAppeal()">✉️ Send Appeal Letter</button>
+          <button class="btn btn-g" id="btn-send-appeal-action" onclick="handleSendAppeal()">✉️ Send Appeal
+            Letter</button>
         </div>
 
         <!-- PATIENT / CLAIM SELECTOR TOOLBAR -->
-        <div class="card" style="margin-bottom:18px; padding:14px 20px; background:var(--surface); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:14px; border-left:4px solid var(--primary, #3b82f6); border-radius:var(--radius-sm); box-shadow:var(--shadow-sm);">
+        <div class="card"
+          style="margin-bottom:18px; padding:14px 20px; background:var(--surface); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:14px; border-left:4px solid var(--primary, #3b82f6); border-radius:var(--radius-sm); box-shadow:var(--shadow-sm);">
           <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
             <div style="display:flex; align-items:center; gap:8px;">
               <span style="font-size:18px;">🩺</span>
               <span style="font-weight:700; font-size:13px; color:var(--text);">Select Patient / Claim:</span>
             </div>
-            <select id="appeal-claim-selector" class="fi" style="margin:0; width:auto; min-width:380px; padding:7px 12px; font-weight:600; border-color:var(--border2); cursor:pointer;" onchange="switchAppealClaim(this.value)">
+            <select id="appeal-claim-selector" class="fi"
+              style="margin:0; width:auto; min-width:380px; padding:7px 12px; font-weight:600; border-color:var(--border2); cursor:pointer;"
+              onchange="switchAppealClaim(this.value)">
               <!-- Populated dynamically via JS -->
             </select>
-            <input type="text" id="appeal-claim-search" placeholder="🔍 Search patient/claim..." class="fi" style="padding:6px 12px; font-size:12px; width:180px; margin:0;" oninput="searchAppealDropdown(this.value)" />
+            <input type="text" id="appeal-claim-search" placeholder="🔍 Search patient/claim..." class="fi"
+              style="padding:6px 12px; font-size:12px; width:180px; margin:0;"
+              oninput="searchAppealDropdown(this.value)" />
             <div id="appeal-filter-pills" style="display:flex; gap:6px;">
               <button class="btn btn-p btn-xs" id="pill-appeal-all" onclick="filterAppealSelector('ALL')">All</button>
-              <button class="btn btn-w btn-xs" id="pill-appeal-rejected" onclick="filterAppealSelector('REJECTED')">Rejected</button>
-              <button class="btn btn-w btn-xs" id="pill-appeal-pending" onclick="filterAppealSelector('PENDING')">Pending</button>
-              <button class="btn btn-w btn-xs" id="pill-appeal-approved" onclick="filterAppealSelector('APPROVED')">Approved</button>
+              <button class="btn btn-w btn-xs" id="pill-appeal-rejected"
+                onclick="filterAppealSelector('REJECTED')">Rejected</button>
+              <button class="btn btn-w btn-xs" id="pill-appeal-pending"
+                onclick="filterAppealSelector('PENDING')">Pending</button>
+              <button class="btn btn-w btn-xs" id="pill-appeal-approved"
+                onclick="filterAppealSelector('APPROVED')">Approved</button>
             </div>
           </div>
           <div style="display:flex; align-items:center; gap:8px;">
-            <span style="font-size:12px; color:var(--muted);" id="appeal-status-summary">Live tracking across EHR clinical evidence &amp; insurer adjudication</span>
+            <span style="font-size:12px; color:var(--muted);" id="appeal-status-summary">Live tracking across EHR
+              clinical evidence &amp; insurer adjudication</span>
           </div>
         </div>
 
@@ -5010,7 +5091,8 @@
               <button id="btn-edit-appeal" class="btn btn-w btn-sm" onclick="toggleEditAppealLetter()">✏️ Edit</button>
             </div>
             <div class="card-body" style="padding:20px 24px">
-              <div class="appeal-letter" id="appeal-letter">Select a patient or rejected claim from the toolbar above to generate a tailored clinical appeal letter.</div>
+              <div class="appeal-letter" id="appeal-letter">Select a patient or rejected claim from the toolbar above to
+                generate a tailored clinical appeal letter.</div>
             </div>
           </div>
         </div>
@@ -5030,19 +5112,27 @@
           <div class="card-head">
             <div>
               <div class="card-title">All Claims</div>
-              <div style="font-size:12px; color:var(--muted); margin-top:2px;">Registry records synchronized across dashboard, analysis &amp; appeals</div>
+              <div style="font-size:12px; color:var(--muted); margin-top:2px;">Registry records synchronized across
+                dashboard, analysis &amp; appeals</div>
             </div>
             <div class="claims-toolbar">
               <input type="text" class="fi" id="claims-search-input" placeholder="🔍 Search claims..."
-                style="height:36px;padding:0 12px;font-size:12.5px;width:190px;margin:0;border-radius:8px;" oninput="renderAllClaimsTable()" />
-              <select class="fi" id="claims-status-filter" style="height:36px;padding:0 12px;font-size:12.5px;width:auto;margin:0;cursor:pointer;border-radius:8px;" onchange="renderAllClaimsTable()">
+                style="height:36px;padding:0 12px;font-size:12.5px;width:190px;margin:0;border-radius:8px;"
+                oninput="renderAllClaimsTable()" />
+              <select class="fi" id="claims-status-filter"
+                style="height:36px;padding:0 12px;font-size:12.5px;width:auto;margin:0;cursor:pointer;border-radius:8px;"
+                onchange="renderAllClaimsTable()">
                 <option value="ALL">All Status</option>
                 <option value="APPROVED">Approved</option>
                 <option value="REJECTED">Rejected</option>
                 <option value="PENDING">Pending</option>
               </select>
-              <button class="btn btn-r btn-sm" style="height:36px;border-radius:8px;padding:0 14px;font-size:12px;" onclick="clearAllClaimRecords()" title="Remove all claim records from history and reset dashboard">🗑️ Clear All</button>
-              <button class="btn btn-w btn-sm" style="height:36px;border-radius:8px;padding:0 14px;font-size:12px;" onclick="restoreSampleClaimRecords()" title="Restore default sample claim records">🔄 Restore Demo</button>
+              <button class="btn btn-r btn-sm" style="height:36px;border-radius:8px;padding:0 14px;font-size:12px;"
+                onclick="clearAllClaimRecords()" title="Remove all claim records from history and reset dashboard">🗑️
+                Clear All</button>
+              <button class="btn btn-w btn-sm" style="height:36px;border-radius:8px;padding:0 14px;font-size:12px;"
+                onclick="restoreSampleClaimRecords()" title="Restore default sample claim records">🔄 Restore
+                Demo</button>
             </div>
           </div>
           <div class="card-body">
@@ -5093,28 +5183,40 @@
 
   <!-- PRE-AUTH SUBMISSION CONFIRMATION MODAL -->
   <div class="loader-overlay" id="preauth-submission-modal" style="z-index: 10001;">
-    <div class="loader-box" style="max-width: 540px; width: 92%; text-align: left; padding: 32px 36px; border-radius: var(--radius-lg); position: relative; box-shadow: var(--shadow-xl);">
+    <div class="loader-box"
+      style="max-width: 540px; width: 92%; text-align: left; padding: 32px 36px; border-radius: var(--radius-lg); position: relative; box-shadow: var(--shadow-xl);">
       <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom: 20px;">
         <div style="display:flex; align-items:center; gap: 14px;">
-          <div style="width: 46px; height: 46px; border-radius: 12px; background: var(--green-light); border: 1.5px solid var(--green-mid); display:flex; align-items:center; justify-content:center; font-size: 24px; flex-shrink:0;">
+          <div
+            style="width: 46px; height: 46px; border-radius: 12px; background: var(--green-light); border: 1.5px solid var(--green-mid); display:flex; align-items:center; justify-content:center; font-size: 24px; flex-shrink:0;">
             ✅
           </div>
           <div>
-            <div style="font-family:'Outfit', sans-serif; font-size: 20px; font-weight: 800; color: var(--text); letter-spacing:-0.5px;">Package Submitted Successfully</div>
-            <div style="font-size: 12px; color: var(--muted); margin-top: 2px;">Electronic filing transmitted to payer portal</div>
+            <div
+              style="font-family:'Outfit', sans-serif; font-size: 20px; font-weight: 800; color: var(--text); letter-spacing:-0.5px;">
+              Package Submitted Successfully</div>
+            <div style="font-size: 12px; color: var(--muted); margin-top: 2px;">Electronic filing transmitted to payer
+              portal</div>
           </div>
         </div>
-        <button onclick="closePreauthModal()" style="background:none; border:none; font-size: 22px; color: var(--muted); cursor:pointer; padding: 4px; line-height:1;" title="Close">✕</button>
+        <button onclick="closePreauthModal()"
+          style="background:none; border:none; font-size: 22px; color: var(--muted); cursor:pointer; padding: 4px; line-height:1;"
+          title="Close">✕</button>
       </div>
 
-      <div style="background: var(--surface2); border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 16px 18px; margin-bottom: 20px;">
+      <div
+        style="background: var(--surface2); border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 16px 18px; margin-bottom: 20px;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
-          <span style="font-size: 11px; text-transform:uppercase; letter-spacing: 1.2px; color: var(--muted); font-weight:700;">Submission Reference</span>
+          <span
+            style="font-size: 11px; text-transform:uppercase; letter-spacing: 1.2px; color: var(--muted); font-weight:700;">Submission
+            Reference</span>
           <span class="badge b-pending" style="font-size: 11px; font-weight:700;">● Pending Review</span>
         </div>
         <div style="display:flex; align-items:center; justify-content:space-between;">
-          <span id="modal-sub-ref" style="font-family: monospace; font-size: 18px; font-weight:800; color: var(--text); letter-spacing: 1px;">AUTH-PENDING</span>
-          <button class="btn btn-w btn-sm" onclick="copySubmissionRef()" id="modal-copy-btn" style="font-size: 11px; padding: 5px 12px;">📋 Copy</button>
+          <span id="modal-sub-ref"
+            style="font-family: monospace; font-size: 18px; font-weight:800; color: var(--text); letter-spacing: 1px;">AUTH-PENDING</span>
+          <button class="btn btn-w btn-sm" onclick="copySubmissionRef()" id="modal-copy-btn"
+            style="font-size: 11px; padding: 5px 12px;">📋 Copy</button>
         </div>
       </div>
 
@@ -5141,7 +5243,8 @@
         </div>
         <div class="info-row" style="padding: 7px 0;">
           <div class="info-k" style="color:var(--muted)">Estimated Decision SLA</div>
-          <div class="info-v" id="modal-sub-sla" style="color:var(--green-deep); font-weight:700;">Within 24–48 Business Hours</div>
+          <div class="info-v" id="modal-sub-sla" style="color:var(--green-deep); font-weight:700;">Within 24–48 Business
+            Hours</div>
         </div>
       </div>
 
@@ -5154,27 +5257,35 @@
 
   <!-- CLINICAL DOCUMENT & ATTACHMENT VIEWER / PDF MODAL -->
   <div class="loader-overlay" id="clinical-doc-modal" style="z-index: 10002; display:none;">
-    <div class="loader-box" style="max-width: 860px; width: 94%; max-height: 92vh; display: flex; flex-direction: column; overflow: hidden; padding: 0; border-radius: var(--radius-md); box-shadow: var(--shadow-xl); background: var(--surface);">
+    <div class="loader-box"
+      style="max-width: 860px; width: 94%; max-height: 92vh; display: flex; flex-direction: column; overflow: hidden; padding: 0; border-radius: var(--radius-md); box-shadow: var(--shadow-xl); background: var(--surface);">
       <!-- Header Toolbar -->
-      <div style="display:flex; align-items:center; justify-content:space-between; padding: 14px 22px; background: var(--surface2); border-bottom: 1px solid var(--border); flex-wrap:wrap; gap:10px;">
+      <div
+        style="display:flex; align-items:center; justify-content:space-between; padding: 14px 22px; background: var(--surface2); border-bottom: 1px solid var(--border); flex-wrap:wrap; gap:10px;">
         <div style="display:flex; align-items:center; gap: 10px;">
           <span style="font-size: 22px;" id="doc-modal-icon">📄</span>
           <div>
-            <div style="font-family:'Outfit', sans-serif; font-size: 16px; font-weight: 800; color: var(--text);" id="doc-modal-title">Clinical Document Viewer</div>
+            <div style="font-family:'Outfit', sans-serif; font-size: 16px; font-weight: 800; color: var(--text);"
+              id="doc-modal-title">Clinical Document Viewer</div>
             <div style="font-size: 11px; color: var(--muted);" id="doc-modal-subtitle">Patient: — · Claim: —</div>
           </div>
         </div>
         <div style="display:flex; align-items:center; gap: 8px;">
           <span class="badge b-approved" id="doc-modal-badge" style="font-size:11px;">● Verified in EHR</span>
-          <button class="btn btn-w btn-sm" onclick="printCurrentDocument()" title="Print this document">🖨️ Print</button>
-          <button class="btn btn-g btn-sm" onclick="downloadCurrentDocumentPDF()" id="doc-modal-download-btn" title="Download as PDF">⬇ Download PDF</button>
-          <button onclick="closeClinicalDocModal()" style="background:none; border:none; font-size: 20px; color: var(--muted); cursor:pointer; padding: 4px 8px; line-height:1; margin-left:6px;" title="Close">✕</button>
+          <button class="btn btn-w btn-sm" onclick="printCurrentDocument()" title="Print this document">🖨️
+            Print</button>
+          <button class="btn btn-g btn-sm" onclick="downloadCurrentDocumentPDF()" id="doc-modal-download-btn"
+            title="Download as PDF">⬇ Download PDF</button>
+          <button onclick="closeClinicalDocModal()"
+            style="background:none; border:none; font-size: 20px; color: var(--muted); cursor:pointer; padding: 4px 8px; line-height:1; margin-left:6px;"
+            title="Close">✕</button>
         </div>
       </div>
 
       <!-- Document Content Body (Printable Paper View) -->
       <div style="overflow-y: auto; padding: 24px; background: var(--surface3); flex: 1;">
-        <div id="doc-report-paper" style="max-width: 760px; margin: 0 auto; background: #ffffff; color: #1e293b; padding: 38px 44px; border-radius: 6px; box-shadow: 0 4px 18px rgba(0,0,0,0.06); font-family: 'Plus Jakarta Sans', -apple-system, sans-serif; line-height: 1.55; position: relative;">
+        <div id="doc-report-paper"
+          style="max-width: 760px; margin: 0 auto; background: #ffffff; color: #1e293b; padding: 38px 44px; border-radius: 6px; box-shadow: 0 4px 18px rgba(0,0,0,0.06); font-family: 'Plus Jakarta Sans', -apple-system, sans-serif; line-height: 1.55; position: relative;">
           <!-- Content dynamically injected via renderClinicalDocument() -->
         </div>
       </div>
@@ -5251,7 +5362,7 @@
     async function apiFetch(endpoint, options = {}) {
       return fetch(`${API_BASE_URL}${endpoint}`, options);
     }
-    
+
     let sb = null;
     try {
       if (typeof supabase !== 'undefined' && supabase && supabase.createClient) {
@@ -5269,7 +5380,7 @@
           signUp: async () => ({ data: null, error: new Error('Offline mode') }),
           signOut: async () => ({ error: null }),
           signInWithOAuth: async () => ({ error: new Error('OAuth requires cloud connection') }),
-          onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
+          onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => { } } } }),
           refreshSession: async () => ({ data: { session: null } }),
           resend: async () => ({ error: null }),
           resetPasswordForEmail: async () => ({ error: null })
@@ -5297,7 +5408,7 @@
         if (profileObj && userObj?.id) {
           localStorage.setItem('clearclaim_profile_' + userObj.id, JSON.stringify(profileObj));
         }
-      } catch (e) {}
+      } catch (e) { }
     }
 
     // ============================================================
@@ -5357,7 +5468,7 @@
             showScreen('login');
           }
         });
-      } catch (e) {}
+      } catch (e) { }
     }
 
     function hideBoot() {
@@ -5377,12 +5488,12 @@
       try {
         const local = localStorage.getItem('clearclaim_profile_' + currentUser.id);
         if (local) currentProfile = JSON.parse(local);
-      } catch (e) {}
+      } catch (e) { }
       if (isUUID(currentUser.id)) {
         try {
           const { data, error } = await sb.from('profiles').select('*').eq('id', currentUser.id).single();
           if (!error && data) currentProfile = { ...currentProfile, ...data };
-        } catch (e) {}
+        } catch (e) { }
       }
     }
 
@@ -5391,11 +5502,11 @@
       if (currentUser?.id) {
         try {
           localStorage.setItem('clearclaim_profile_' + currentUser.id, JSON.stringify(currentProfile));
-        } catch (e) {}
+        } catch (e) { }
         if (isUUID(currentUser.id)) {
           try {
             await sb.from('profiles').upsert({ id: currentUser.id, ...profileData, updated_at: new Date().toISOString() });
-          } catch (e) {}
+          } catch (e) { }
         }
       }
     }
@@ -5548,7 +5659,7 @@
     //  LOGOUT
     // ============================================================
     async function handleLogout() {
-      try { await sb.auth.signOut(); } catch (e) {}
+      try { await sb.auth.signOut(); } catch (e) { }
       localStorage.removeItem('clearclaim_local_session');
       currentUser = null; currentProfile = null;
       document.getElementById('login-email').value = '';
@@ -5892,16 +6003,26 @@
         initClaimStepper();
       }
       if (page === 'analysis') {
-        if (!window.__currentClaimId) window.__currentClaimId = 'CLM-2402';
-        switchAnalysisClaim(window.__currentClaimId);
+        if (!window.__currentClaimId || !window.CLAIMS_REGISTRY?.[window.__currentClaimId]) {
+          const keys = Object.keys(window.CLAIMS_REGISTRY || {});
+          window.__currentClaimId = keys.length ? keys[0] : null;
+        }
+        if (window.__currentClaimId) switchAnalysisClaim(window.__currentClaimId);
       }
       if (page === 'preauth') {
-        if (!window.__currentClaimId) window.__currentClaimId = 'CLM-2402';
-        switchPreauthClaim(window.__currentClaimId);
+        if (!window.__currentClaimId || !window.CLAIMS_REGISTRY?.[window.__currentClaimId]) {
+          const keys = Object.keys(window.CLAIMS_REGISTRY || {});
+          window.__currentClaimId = keys.length ? keys[0] : null;
+        }
+        if (window.__currentClaimId) switchPreauthClaim(window.__currentClaimId);
       }
       if (page === 'appeal') {
-        if (!window.__currentAppealClaimId) window.__currentAppealClaimId = 'CLM-2402';
-        switchAppealClaim(window.__currentAppealClaimId);
+        if (!window.__currentAppealClaimId || !window.CLAIMS_REGISTRY?.[window.__currentAppealClaimId]) {
+          const keys = Object.keys(window.CLAIMS_REGISTRY || {});
+          const rej = keys.find(k => window.CLAIMS_REGISTRY[k].status === 'Rejected');
+          window.__currentAppealClaimId = rej || (keys.length ? keys[0] : null);
+        }
+        if (window.__currentAppealClaimId) switchAppealClaim(window.__currentAppealClaimId);
       }
       if (page === 'history') {
         if (typeof renderAllClaimsTable === 'function') renderAllClaimsTable();
@@ -6562,6 +6683,7 @@
         if (window.CLAIMS_REGISTRY) {
           window.CLAIMS_REGISTRY[newClaimId] = finalClaim;
           window.__currentClaimId = newClaimId;
+          if (typeof saveClaimsRegistryToStorage === 'function') saveClaimsRegistryToStorage();
           if (typeof populateClaimDropdowns === 'function') populateClaimDropdowns();
           if (typeof syncDashboardWithClaims === 'function') syncDashboardWithClaims();
           if (typeof renderAllClaimsTable === 'function') renderAllClaimsTable();
@@ -6875,7 +6997,7 @@
         else if (level === 'MEDIUM') lbl.style.color = 'var(--amber)';
         else lbl.style.color = 'var(--green)';
       }
-      
+
       const isAlreadySubmitted = regClaim?.status === 'Pending' || regClaim?.status === 'Submitted';
       if (badge) {
         if (isAlreadySubmitted) {
@@ -6955,11 +7077,11 @@
       else if (insurer.toLowerCase().includes('bajaj')) insurerCode = 'BAJAJ';
       else if (insurer.toLowerCase().includes('care')) insurerCode = 'CARE';
       else if (insurer.toLowerCase().includes('niva')) insurerCode = 'NIVA';
-      
+
       const refNum = `AUTH-${insurerCode}-${Math.floor(10000 + Math.random() * 90000)}`;
       const now = new Date();
       const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-      const timestampStr = `${monthNames[now.getMonth()]} ${now.getDate().toString().padStart(2, '0')}, ${now.getFullYear()} · ` + 
+      const timestampStr = `${monthNames[now.getMonth()]} ${now.getDate().toString().padStart(2, '0')}, ${now.getFullYear()} · ` +
         now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
 
       // 1. Update Registry
@@ -7330,7 +7452,7 @@
             <div style="text-align:right;">
               <div style="font-size:11px; color:#64748b;">Authorized Hospital Signatory</div>
               <div style="font-family:'Fraunces', serif; font-size:15px; color:#0f172a; margin-top:6px;">${doctor}</div>
-              <div style="font-size:10px; color:#94a3b8;">Chief Operating Surgeon · Medical Board Reg No. ${Math.floor(10000+Math.random()*80000)}</div>
+              <div style="font-size:10px; color:#94a3b8;">Chief Operating Surgeon · Medical Board Reg No. ${Math.floor(10000 + Math.random() * 80000)}</div>
             </div>
           </div>
         </div>
@@ -7607,7 +7729,7 @@
           <div>
             <div style="font-family:'Outfit', sans-serif; font-size:22px; font-weight:800; color:#0f172a; letter-spacing:-0.5px;">${hospital}</div>
             <div style="font-size:11px; color:#64748b; margin-top:2px;">NABH Certified Multi-Speciality Tertiary Care Hospital · NABL Accredited Laboratory</div>
-            <div style="font-size:11px; color:#64748b;">Medical Records &amp; Insurance Clearance Division · Reg: HSP-${Math.floor(10000+Math.random()*90000)}</div>
+            <div style="font-size:11px; color:#64748b;">Medical Records &amp; Insurance Clearance Division · Reg: HSP-${Math.floor(10000 + Math.random() * 90000)}</div>
           </div>
           <div style="text-align:right;">
             <div style="display:inline-block; border:1px solid #cbd5e1; border-radius:4px; padding:4px 8px; font-family:monospace; font-size:11px; background:#f8fafc; font-weight:700;">
@@ -7657,7 +7779,7 @@
           <div style="text-align:right;">
             <div style="font-family:'Fraunces', serif; font-size:16px; font-style:italic; color:#0f172a; margin-bottom:4px;">${doctor}</div>
             <div style="font-size:11px; font-weight:700; color:#1e293b;">Consultant in Charge</div>
-            <div style="font-size:10px; color:#64748b;">Reg. No: MC-${Math.floor(10000+Math.random()*80000)} · Verified Stamp</div>
+            <div style="font-size:10px; color:#64748b;">Reg. No: MC-${Math.floor(10000 + Math.random() * 80000)} · Verified Stamp</div>
           </div>
         </div>
       `;
@@ -8076,6 +8198,58 @@
 
     window.__INITIAL_SAMPLE_CLAIMS = JSON.parse(JSON.stringify(window.CLAIMS_REGISTRY));
 
+    // ============================================================
+    //  PERSISTENCE STORAGE HELPERS (Preserve Manual Claims & Updates)
+    // ============================================================
+    const CLAIMS_STORAGE_KEY = 'clearclaim_registry_v3';
+
+    function saveClaimsRegistryToStorage() {
+      try {
+        if (window.CLAIMS_REGISTRY && typeof window.CLAIMS_REGISTRY === 'object') {
+          localStorage.setItem(CLAIMS_STORAGE_KEY, JSON.stringify(window.CLAIMS_REGISTRY));
+        }
+        if (window.__currentClaimId) {
+          localStorage.setItem('clearclaim_current_claim_id', window.__currentClaimId);
+        }
+        if (window.__currentAppealClaimId) {
+          localStorage.setItem('clearclaim_current_appeal_id', window.__currentAppealClaimId);
+        }
+      } catch (e) {
+        console.warn('[Storage] Could not save registry to localStorage:', e);
+      }
+    }
+
+    function loadClaimsRegistryFromStorage() {
+      try {
+        const saved = localStorage.getItem(CLAIMS_STORAGE_KEY) || localStorage.getItem('clearclaim_registry_v2');
+        if (saved !== null) {
+          const parsed = JSON.parse(saved);
+          if (parsed && typeof parsed === 'object') {
+            window.CLAIMS_REGISTRY = parsed;
+          }
+        } else {
+          // First visit: save initial sample claims so manual adds merge seamlessly
+          if (window.CLAIMS_REGISTRY && Object.keys(window.CLAIMS_REGISTRY).length > 0) {
+            saveClaimsRegistryToStorage();
+          }
+        }
+
+        const savedClaimId = localStorage.getItem('clearclaim_current_claim_id');
+        if (savedClaimId && window.CLAIMS_REGISTRY && window.CLAIMS_REGISTRY[savedClaimId]) {
+          window.__currentClaimId = savedClaimId;
+        }
+        const savedAppealId = localStorage.getItem('clearclaim_current_appeal_id');
+        if (savedAppealId && window.CLAIMS_REGISTRY && window.CLAIMS_REGISTRY[savedAppealId]) {
+          window.__currentAppealClaimId = savedAppealId;
+        }
+      } catch (e) {
+        console.warn('[Storage] Could not load registry from localStorage:', e);
+      }
+    }
+
+    // Hydrate immediately upon script execution
+    loadClaimsRegistryFromStorage();
+
     function syncDashboardWithClaims() {
       const claims = Object.values(window.CLAIMS_REGISTRY || {});
       const total = claims.length;
@@ -8285,6 +8459,7 @@
       window.__currentClaimId = null;
       window.__currentAppealClaimId = null;
       window.__lastAnalysis = null;
+      if (typeof saveClaimsRegistryToStorage === 'function') saveClaimsRegistryToStorage();
 
       renderAllClaimsTable();
       syncDashboardWithClaims();
@@ -8321,6 +8496,7 @@
       window.CLAIMS_REGISTRY = JSON.parse(JSON.stringify(window.__INITIAL_SAMPLE_CLAIMS));
       window.__currentClaimId = 'CLM-2402';
       window.__currentAppealClaimId = 'CLM-2402';
+      if (typeof saveClaimsRegistryToStorage === 'function') saveClaimsRegistryToStorage();
 
       renderAllClaimsTable();
       syncDashboardWithClaims();
@@ -8345,6 +8521,7 @@
         const rejectedKeys = remainingKeys.filter(k => window.CLAIMS_REGISTRY[k].status === 'Rejected');
         window.__currentAppealClaimId = rejectedKeys.length > 0 ? rejectedKeys[0] : (remainingKeys[0] || null);
       }
+      if (typeof saveClaimsRegistryToStorage === 'function') saveClaimsRegistryToStorage();
 
       renderAllClaimsTable();
       syncDashboardWithClaims();
@@ -8409,13 +8586,26 @@
     }
 
     function initClaimsRegistry() {
+      if (typeof loadClaimsRegistryFromStorage === 'function') loadClaimsRegistryFromStorage();
       populateClaimDropdowns();
       syncDashboardWithClaims();
-      if (!window.__currentClaimId) window.__currentClaimId = 'CLM-2402';
-      switchAnalysisClaim(window.__currentClaimId);
-      switchPreauthClaim(window.__currentClaimId);
-      if (!window.__currentAppealClaimId) window.__currentAppealClaimId = 'CLM-2402';
-      switchAppealClaim(window.__currentAppealClaimId);
+      if (typeof renderAllClaimsTable === 'function') renderAllClaimsTable();
+
+      const allKeys = Object.keys(window.CLAIMS_REGISTRY || {});
+      if (!window.__currentClaimId || !window.CLAIMS_REGISTRY?.[window.__currentClaimId]) {
+        window.__currentClaimId = allKeys.length > 0 ? allKeys[0] : null;
+      }
+      if (window.__currentClaimId) {
+        switchAnalysisClaim(window.__currentClaimId);
+        switchPreauthClaim(window.__currentClaimId);
+      }
+      if (!window.__currentAppealClaimId || !window.CLAIMS_REGISTRY?.[window.__currentAppealClaimId]) {
+        const rejKey = allKeys.find(k => window.CLAIMS_REGISTRY[k].status === 'Rejected');
+        window.__currentAppealClaimId = rejKey || (allKeys.length > 0 ? allKeys[0] : null);
+      }
+      if (window.__currentAppealClaimId) {
+        switchAppealClaim(window.__currentAppealClaimId);
+      }
     }
 
     function populateClaimDropdowns(activeFilter = 'ALL', target = 'BOTH') {
@@ -8499,6 +8689,7 @@
     function switchAnalysisClaim(claimId) {
       if (!claimId || !window.CLAIMS_REGISTRY || !window.CLAIMS_REGISTRY[claimId]) return;
       window.__currentClaimId = claimId;
+      try { localStorage.setItem('clearclaim_current_claim_id', claimId); } catch (e) {}
 
       const claim = window.CLAIMS_REGISTRY[claimId];
       const analysisData = convertRegistryToAnalysisFormat(claim);
@@ -8531,6 +8722,7 @@
     function switchPreauthClaim(claimId) {
       if (!claimId || !window.CLAIMS_REGISTRY || !window.CLAIMS_REGISTRY[claimId]) return;
       window.__currentClaimId = claimId;
+      try { localStorage.setItem('clearclaim_current_claim_id', claimId); } catch (e) {}
 
       const claim = window.CLAIMS_REGISTRY[claimId];
 
@@ -8833,6 +9025,7 @@
         if (typeof syncDashboardWithClaims === 'function') syncDashboardWithClaims();
         if (typeof renderAllClaimsTable === 'function') renderAllClaimsTable();
         if (typeof populateClaimDropdowns === 'function') populateClaimDropdowns();
+        if (typeof saveClaimsRegistryToStorage === 'function') saveClaimsRegistryToStorage();
 
         showNotif(`🎉 SUCCESS: ${claim.insurerId} has APPROVED the appeal for ${claim.claimId} (${claim.patientName})! Pre-Authorization clearance issued.`, 'success');
       }, 5500);
@@ -8841,6 +9034,7 @@
     function switchAppealClaim(claimId) {
       if (!claimId || !window.CLAIMS_REGISTRY || !window.CLAIMS_REGISTRY[claimId]) return;
       window.__currentAppealClaimId = claimId;
+      try { localStorage.setItem('clearclaim_current_appeal_id', claimId); } catch (e) {}
 
       const claim = window.CLAIMS_REGISTRY[claimId];
       const sel = document.getElementById('appeal-claim-selector');
@@ -8906,7 +9100,7 @@ Claim ID:              ${claim.claimId}
 Patient:               ${claim.patientName} (Policy: ${claim.policyNumber || 'N/A'})
 Insurer:               ${claim.insurerId}
 Procedure:             ${claim.procedure} (CPT: ${claim.cpt_code || 'N/A'})
-Authorization Code:    REV-${claim.claimId.replace('CLM-','')}-GRANTED
+Authorization Code:    REV-${claim.claimId.replace('CLM-', '')}-GRANTED
 Cleared Amount:        ₹${Number(claim.maxApproved || claim.costEstimate).toLocaleString('en-IN')}
 Clearance Date:        ${new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
 Dispatch Recipient:    Hospital Billing & Admission Desk
@@ -8952,7 +9146,7 @@ The Medical Appeals Board confirmed that all requested clinical documentation (i
             <div class="tl-item">
               <div class="tl-dot g glow-green"></div>
               <div class="tl-title" style="color:var(--green); font-weight:700;">🎉 Appeal Approved &amp; Denial Overturned!</div>
-              <div class="tl-body" style="color:var(--text);">Pre-authorization sanctioned for ₹${Number(claim.maxApproved || claim.costEstimate).toLocaleString('en-IN')}. Clearance Token: REV-${claim.claimId.replace('CLM-','')}-OK. Hospital admission desk notified.</div>
+              <div class="tl-body" style="color:var(--text);">Pre-authorization sanctioned for ₹${Number(claim.maxApproved || claim.costEstimate).toLocaleString('en-IN')}. Clearance Token: REV-${claim.claimId.replace('CLM-', '')}-OK. Hospital admission desk notified.</div>
             </div>
           `;
         }
@@ -8993,7 +9187,7 @@ Empaneled Insurer:     ${claim.insurerId}
 Policy Number:         ${claim.policyNumber || 'N/A'}
 Procedure:             ${claim.procedure} (CPT: ${claim.cpt_code || 'N/A'})
 Approved Amount:       ₹${Number(claim.maxApproved || claim.costEstimate).toLocaleString('en-IN')}
-Authorization Ref:     AUTH-${claim.claimId.replace('CLM-','')}-8821
+Authorization Ref:     AUTH-${claim.claimId.replace('CLM-', '')}-8821
 Hospital:              ${claim.hospital || 'Apollo Hospitals, Chennai'}
 Decision Status:       SANCTIONED / APPROVED
 
@@ -9021,7 +9215,7 @@ Admission authorization token has been dispatched to the hospital desk.
             <div class="tl-item">
               <div class="tl-dot g"></div>
               <div class="tl-title">Pre-Authorization Approved</div>
-              <div class="tl-body">Sanctioned for full estimated cost: ₹${Number(claim.maxApproved || claim.costEstimate).toLocaleString('en-IN')}. Authorization Ref: AUTH-${claim.claimId.replace('CLM-','')}-8821.</div>
+              <div class="tl-body">Sanctioned for full estimated cost: ₹${Number(claim.maxApproved || claim.costEstimate).toLocaleString('en-IN')}. Authorization Ref: AUTH-${claim.claimId.replace('CLM-', '')}-8821.</div>
             </div>
             <div class="tl-item">
               <div class="tl-dot b"></div>
@@ -9049,7 +9243,7 @@ Admission authorization token has been dispatched to the hospital desk.
         const reqCount = Array.isArray(claim.requiredDocs) && claim.requiredDocs.length > 0 ? claim.requiredDocs.length : Math.max(foundCount + (claim.missingDocs?.length || 0), 4);
         const missingCount = Array.isArray(claim.missingDocs) ? claim.missingDocs.length : Math.max(reqCount - foundCount, 0);
 
-        const statusDocText = missingCount > 0 
+        const statusDocText = missingCount > 0
           ? `⏳ ${foundCount} of ${reqCount} documents verified & in review (${missingCount} missing)`
           : `✅ ${foundCount} of ${reqCount} documents verified & in review`;
 
@@ -9239,6 +9433,7 @@ Our dispute model has mapped this claim against ${claim.insurerId} policy rules.
         const currClaim = window.__currentAppealClaimId || 'CLM-2402';
         if (window.CLAIMS_REGISTRY[currClaim] && window.CLAIMS_REGISTRY[currClaim].appeal) {
           window.CLAIMS_REGISTRY[currClaim].appeal.appealLetter = letterDiv.innerText;
+          if (typeof saveClaimsRegistryToStorage === 'function') saveClaimsRegistryToStorage();
         }
         showNotif('✅ Appeal letter updated and saved!', 'success');
       }
@@ -9310,6 +9505,7 @@ Our dispute model has mapped this claim against ${claim.insurerId} policy rules.
             appealLetter: payload.appeal.appealLetter
           };
           claimObj.status = 'Rejected';
+          if (typeof saveClaimsRegistryToStorage === 'function') saveClaimsRegistryToStorage();
         }
 
         populateClaimDropdowns();
@@ -9687,7 +9883,7 @@ Our dispute model has mapped this claim against ${claim.insurerId} policy rules.
       };
 
       if (window.__currentEvidenceNetwork) {
-        try { window.__currentEvidenceNetwork.destroy(); } catch (e) {}
+        try { window.__currentEvidenceNetwork.destroy(); } catch (e) { }
       }
       window.__currentEvidenceNetwork = new vis.Network(container, visData, options);
       setTimeout(() => {
