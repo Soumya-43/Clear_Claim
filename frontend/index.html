@@ -4465,16 +4465,37 @@
                 <div><label class="fg-lbl">Estimated Cost (₹)</label><input type="number" class="fi" id="f-cost"
                     placeholder="e.g. 450000" /></div>
                 <div class="fg-full" style="position:relative">
-                  <label class="fg-lbl" style="display:flex; justify-content:space-between; align-items:center;">
+                  <label class="fg-lbl" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
                     <span>Surgeon's Recommendation Note</span>
-                    <button type="button" class="btn btn-sm btn-w" id="dictate-note-btn" onclick="toggleDictation()"
-                      style="font-size:11px; padding: 4px 10px; border-radius:12px;">🎙️ Dictate Note</button>
+                    <div style="display:flex; gap:6px; align-items:center;">
+                      <button type="button" class="btn btn-sm btn-w" id="btn-insert-template" onclick="insertClinicalTemplate()"
+                        style="font-size:11px; padding: 4px 10px; border-radius:12px;" title="Insert pre-formatted clinical necessity text for this procedure">📋 Insert Medical Template</button>
+                      <button type="button" class="btn btn-sm btn-w" id="dictate-note-btn" onclick="toggleDictation()"
+                        style="font-size:11px; padding: 4px 10px; border-radius:12px;">🎙️ Dictate Note</button>
+                    </div>
                   </label>
                   <textarea class="fi" id="f-note" rows="6"
-                    placeholder="Paste the surgeon's note here, or click 'Dictate Note' to use your microphone..."></textarea>
+                    placeholder="Paste the surgeon's note here, click 'Insert Medical Template', or click 'Dictate Note' to speak..."></textarea>
                   <div id="dictation-status"
                     style="display:none; position:absolute; bottom:12px; right:12px; font-size:11px; color:var(--red); font-weight:600; align-items:center; gap:5px;">
-                    <span class="ap-dot" style="background:var(--red); width:6px; height:6px;"></span> Recording...
+                    <span class="ap-dot" style="background:var(--red); width:6px; height:6px;"></span> Recording Speech...
+                  </div>
+                  <div id="local-audio-recorder-box" style="display:none; margin-top:10px; padding:10px 14px; background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius-sm); align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                      <div style="width:10px; height:10px; border-radius:50%; background:var(--red); box-shadow:0 0 8px rgba(239,68,68,0.8);"></div>
+                      <span id="audio-rec-timer" style="font-weight:700; font-size:13px; font-family:monospace; color:var(--text);">0:00</span>
+                      <span id="audio-rec-label" style="font-size:12px; color:var(--muted);">Recording local audio note...</span>
+                    </div>
+                    <div style="display:flex; gap:8px;">
+                      <button type="button" class="btn btn-r btn-sm" id="btn-stop-audio-rec" onclick="stopLocalAudioRecording()">⏹ Stop Recording</button>
+                      <button type="button" class="btn btn-w btn-sm" onclick="cancelLocalAudioRecording()">Cancel</button>
+                    </div>
+                  </div>
+                  <div id="attached-audio-preview" style="display:none; margin-top:8px; align-items:center; gap:10px; padding:8px 12px; background:rgba(16,185,129,0.08); border:1px solid rgba(16,185,129,0.25); border-radius:var(--radius-sm);">
+                    <span style="font-size:16px;">🎙️</span>
+                    <span style="font-size:12px; font-weight:600; color:var(--text);" id="attached-audio-name">Surgeon Voice Note Attached</span>
+                    <audio id="attached-audio-player" controls style="height:28px; margin-left:auto; max-width:220px;"></audio>
+                    <button type="button" onclick="removeAttachedAudio()" style="background:none; border:none; color:var(--muted); cursor:pointer; font-size:14px; padding:2px 6px;" title="Remove recording">✕</button>
                   </div>
                 </div>
               </div>
@@ -5288,6 +5309,56 @@
           style="max-width: 760px; margin: 0 auto; background: #ffffff; color: #1e293b; padding: 38px 44px; border-radius: 6px; box-shadow: 0 4px 18px rgba(0,0,0,0.06); font-family: 'Plus Jakarta Sans', -apple-system, sans-serif; line-height: 1.55; position: relative;">
           <!-- Content dynamically injected via renderClinicalDocument() -->
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DICTATION & VOICE NOTE ASSISTANT MODAL -->
+  <div class="loader-overlay" id="dictation-help-modal" style="z-index: 10003; display:none;">
+    <div class="loader-box" style="max-width: 580px; width: 92%; padding: 26px; border-radius: var(--radius-md); box-shadow: var(--shadow-xl); background: var(--surface); text-align: left;">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 16px;">
+        <div style="display:flex; align-items:center; gap: 10px;">
+          <div style="width:40px; height:40px; border-radius:50%; background:rgba(239,68,68,0.12); display:flex; align-items:center; justify-content:center; font-size:20px;">🎙️</div>
+          <div>
+            <div style="font-family:'Outfit', sans-serif; font-size: 17px; font-weight: 700; color: var(--text);">Voice Dictation Notice</div>
+            <div style="font-size: 12px; color: var(--muted);">Browser speech service connection error</div>
+          </div>
+        </div>
+        <button onclick="closeDictationHelpModal()" style="background:none; border:none; font-size: 20px; color: var(--muted); cursor:pointer;">✕</button>
+      </div>
+
+      <div style="background:rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.3); border-radius: 8px; padding: 14px; margin-bottom: 18px; font-size: 12.5px; color: var(--text); line-height: 1.5;">
+        <strong>Why did this happen?</strong><br>
+        Your browser (e.g. <strong>Brave Browser</strong> or privacy-shielded Chromium) blocks Google's cloud speech recognition endpoint by default (<code>Microphone error: network</code>).
+      </div>
+
+      <div style="font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 10px;">Recommended Solutions:</div>
+
+      <!-- Option 1: Template Auto-Fill -->
+      <div style="border: 1px solid var(--border); border-radius: 8px; padding: 14px; margin-bottom: 12px; background: var(--surface2); display: flex; justify-content: space-between; align-items: center; gap: 14px;">
+        <div>
+          <div style="font-weight: 700; font-size: 13px; color: var(--text);">📋 Auto-Fill Clinical Note Template</div>
+          <div style="font-size: 11.5px; color: var(--muted); margin-top: 3px;">Instantly insert an insurer-compliant surgical necessity note customized to your selected procedure.</div>
+        </div>
+        <button class="btn btn-g btn-sm" onclick="insertClinicalTemplateFromModal()" style="white-space: nowrap;">Auto-Fill Note</button>
+      </div>
+
+      <!-- Option 2: Record Local Audio -->
+      <div style="border: 1px solid var(--border); border-radius: 8px; padding: 14px; margin-bottom: 12px; background: var(--surface2); display: flex; justify-content: space-between; align-items: center; gap: 14px;">
+        <div>
+          <div style="font-weight: 700; font-size: 13px; color: var(--text);">🎤 Record Local Audio Note</div>
+          <div style="font-size: 11.5px; color: var(--muted); margin-top: 3px;">Records your spoken words locally via HTML5 MediaRecorder (works in Brave without Google servers).</div>
+        </div>
+        <button class="btn btn-w btn-sm" onclick="startLocalAudioRecorder()" style="white-space: nowrap;">Record Audio</button>
+      </div>
+
+      <!-- Option 3: Browser setting info -->
+      <div style="font-size: 11.5px; color: var(--muted); line-height: 1.5; padding: 4px 6px;">
+        💡 <strong>To enable live voice typing in Brave:</strong> Go to <code>brave://settings/privacy</code> and toggle on <em>"Use Google services for push messaging / Web Speech"</em>, or open ClearClaim in Chrome/Edge.
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; margin-top: 18px;">
+        <button class="btn btn-w btn-sm" onclick="closeDictationHelpModal()">Close</button>
       </div>
     </div>
   </div>
@@ -6499,7 +6570,7 @@
         historyFiles,
         labsFiles,
         hasImaging: imagingFiles.length > 0 || !!mriDate || !!usDate || (!!labFindings && /mri|x-?ray|ultrasound|ct|echo|angiogram|biometry|pns|scan/i.test(labFindings)),
-        hasSurgeonNote: recoFiles.length > 0 || (surgeonNote.length > 15),
+        hasSurgeonNote: recoFiles.length > 0 || (surgeonNote.length > 15) || (typeof attachedAudioBlob !== 'undefined' && !!attachedAudioBlob),
         hasClinicalNote: clinicalNote.length > 10,
         hasConservativeHistory: historyFiles.length > 0 || (prevTreatments.length > 5),
         hasLabs: labsFiles.length > 0 || !!labDate || (labFindings.length > 10),
@@ -9776,13 +9847,22 @@ Our dispute model has mapped this claim against ${claim.insurerId} policy rules.
 
       recognition.onerror = function (event) {
         console.error("Speech recognition error", event.error);
-        showNotif('Microphone error: ' + event.error, 'error');
         stopDictation();
+
+        if (event.error === 'network') {
+          showDictationNetworkHelpModal();
+        } else if (event.error === 'not-allowed') {
+          showNotif('🚫 Microphone permission denied. Please allow microphone access in your browser settings.', 'error');
+        } else if (event.error === 'no-speech') {
+          showNotif('⚠️ No speech detected. Please speak closer to your microphone.', 'info');
+        } else {
+          showNotif('Microphone error: ' + event.error, 'error');
+        }
       };
 
       recognition.onend = function () {
         if (isRecording) {
-          recognition.start();
+          try { recognition.start(); } catch (e) { stopDictationUI(); }
         } else {
           stopDictationUI();
         }
@@ -9791,16 +9871,27 @@ Our dispute model has mapped this claim against ${claim.insurerId} policy rules.
 
     function toggleDictation() {
       if (!recognition) {
-        showNotif("Voice dictation is not supported in your browser. Please use Chrome, Edge, or Safari.", "error");
+        showNotif("Voice dictation is not supported in this browser. You can use '📋 Insert Medical Template' or 'Record Audio'.", "error");
+        showDictationNetworkHelpModal();
         return;
       }
-      if (isRecording) stopDictation();
-      else { try { recognition.start(); } catch (e) { console.error(e); } }
+      if (isRecording) {
+        stopDictation();
+      } else {
+        try {
+          recognition.start();
+        } catch (e) {
+          console.error("Dictation start error:", e);
+          showDictationNetworkHelpModal();
+        }
+      }
     }
 
     function stopDictation() {
       isRecording = false;
-      if (recognition) recognition.stop();
+      if (recognition) {
+        try { recognition.stop(); } catch (e) { }
+      }
       stopDictationUI();
     }
 
@@ -9813,6 +9904,173 @@ Our dispute model has mapped this claim against ${claim.insurerId} policy rules.
         btn.classList.remove('btn-r');
         btn.classList.add('btn-w');
       }
+    }
+
+    // ============================================================
+    //  CLINICAL NOTE TEMPLATE INSERTION & DICTATION MODAL
+    // ============================================================
+    function insertClinicalTemplate(force = false) {
+      const procKey = document.getElementById('f-proc')?.value || 'CPT_63030';
+      const entry = (typeof PROCEDURE_CATALOG !== 'undefined' && PROCEDURE_CATALOG[procKey])
+        ? PROCEDURE_CATALOG[procKey]
+        : {
+          name: 'Recommended Surgical Procedure',
+          cpt: 'Operative',
+          icd10: document.getElementById('f-icd')?.value || 'Clinical Indication',
+          diagDesc: document.getElementById('f-diagnosis-desc')?.value || 'Confirmed Clinical Diagnosis',
+          prevTreatments: document.getElementById('f-prev-treatments')?.value || 'Conservative therapy & medical management',
+          treatDuration: document.getElementById('f-treat-duration')?.value || '4-6 weeks',
+          treatOutcome: 'Persistent functional impairment and symptoms refractory to conservative care'
+        };
+
+      const patientName = document.getElementById('f-pname')?.value?.trim() || 'Patient';
+      const noteArea = document.getElementById('f-note');
+      if (!noteArea) return;
+
+      const existing = noteArea.value.trim();
+      const templateText = 
+`CLINICAL INDICATION & SURGICAL RECOMMENDATION:
+${patientName} presents with symptomatic ${entry.diagDesc} (ICD-10: ${entry.icd10}). Clinical evaluation and diagnostic imaging confirm structural pathology requiring operative intervention (${entry.name}, CPT ${entry.cpt}).
+
+PREVIOUS CONSERVATIVE MANAGEMENT:
+Prior to surgical recommendation, patient underwent ${entry.treatDuration} of structured non-surgical care including: ${entry.prevTreatments}.
+Outcome: ${entry.treatOutcome}. Despite conservative trial, symptoms remain disabling and refractory to non-operative measures.
+
+MEDICAL NECESSITY & OPERATIVE PLAN:
+Surgical intervention via ${entry.name} is medically urgent and necessary to restore physiological function, avert permanent secondary deficit, and ensure timely clinical recovery. Recommended pre-authorization clearance requested for admission.`;
+
+      if (existing && !force) {
+        if (confirm("Replace existing note with the standardized medical necessity template? (Click 'Cancel' to append instead)")) {
+          noteArea.value = templateText;
+        } else {
+          noteArea.value = existing + "\n\n" + templateText;
+        }
+      } else {
+        noteArea.value = templateText;
+      }
+      showNotif(`📋 Clinical necessity note inserted for ${entry.name}!`, 'success');
+      noteArea.focus();
+    }
+
+    function insertClinicalTemplateFromModal() {
+      closeDictationHelpModal();
+      insertClinicalTemplate();
+    }
+
+    function showDictationNetworkHelpModal() {
+      const modal = document.getElementById('dictation-help-modal');
+      if (modal) modal.style.display = 'flex';
+    }
+
+    function closeDictationHelpModal() {
+      const modal = document.getElementById('dictation-help-modal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    // ============================================================
+    //  LOCAL AUDIO RECORDER (Brave & Privacy-Browser Compatible)
+    // ============================================================
+    let localMediaStream = null;
+    let localMediaRecorder = null;
+    let localAudioChunks = [];
+    let localAudioTimer = null;
+    let localAudioSeconds = 0;
+    let attachedAudioBlob = null;
+
+    async function startLocalAudioRecorder() {
+      closeDictationHelpModal();
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        showNotif("Your browser does not support audio recording.", "error");
+        return;
+      }
+
+      try {
+        localMediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        localAudioChunks = [];
+        localMediaRecorder = new MediaRecorder(localMediaStream);
+
+        localMediaRecorder.ondataavailable = (e) => {
+          if (e.data && e.data.size > 0) {
+            localAudioChunks.push(e.data);
+          }
+        };
+
+        localMediaRecorder.onstop = () => {
+          attachedAudioBlob = new Blob(localAudioChunks, { type: 'audio/webm' });
+          const audioUrl = URL.createObjectURL(attachedAudioBlob);
+          const player = document.getElementById('attached-audio-player');
+          if (player) player.src = audioUrl;
+
+          const previewBox = document.getElementById('attached-audio-preview');
+          if (previewBox) previewBox.style.display = 'flex';
+
+          const recBox = document.getElementById('local-audio-recorder-box');
+          if (recBox) recBox.style.display = 'none';
+
+          if (localMediaStream) {
+            localMediaStream.getTracks().forEach(t => t.stop());
+            localMediaStream = null;
+          }
+
+          showNotif('🎙️ Voice note recording saved and attached to claim!', 'success');
+
+          const noteArea = document.getElementById('f-note');
+          if (noteArea && (!noteArea.value || noteArea.value.trim() === '')) {
+            insertClinicalTemplate(true);
+          }
+        };
+
+        localMediaRecorder.start();
+        localAudioSeconds = 0;
+        const timerEl = document.getElementById('audio-rec-timer');
+        if (timerEl) timerEl.textContent = '0:00';
+
+        const recBox = document.getElementById('local-audio-recorder-box');
+        if (recBox) recBox.style.display = 'flex';
+
+        clearInterval(localAudioTimer);
+        localAudioTimer = setInterval(() => {
+          localAudioSeconds++;
+          const mins = Math.floor(localAudioSeconds / 60);
+          const secs = (localAudioSeconds % 60).toString().padStart(2, '0');
+          if (timerEl) timerEl.textContent = `${mins}:${secs}`;
+        }, 1000);
+
+        showNotif('🔴 Recording voice note from your local microphone... Speak now.', 'info');
+      } catch (err) {
+        console.error("Microphone access error:", err);
+        showNotif('🚫 Could not access microphone: ' + (err.message || String(err)), 'error');
+      }
+    }
+
+    function stopLocalAudioRecording() {
+      clearInterval(localAudioTimer);
+      if (localMediaRecorder && localMediaRecorder.state !== 'inactive') {
+        localMediaRecorder.stop();
+      }
+    }
+
+    function cancelLocalAudioRecording() {
+      clearInterval(localAudioTimer);
+      if (localMediaRecorder && localMediaRecorder.state !== 'inactive') {
+        localMediaRecorder.stop();
+      }
+      if (localMediaStream) {
+        localMediaStream.getTracks().forEach(t => t.stop());
+        localMediaStream = null;
+      }
+      const recBox = document.getElementById('local-audio-recorder-box');
+      if (recBox) recBox.style.display = 'none';
+      showNotif('Audio recording cancelled.', 'info');
+    }
+
+    function removeAttachedAudio() {
+      attachedAudioBlob = null;
+      const player = document.getElementById('attached-audio-player');
+      if (player) player.src = '';
+      const previewBox = document.getElementById('attached-audio-preview');
+      if (previewBox) previewBox.style.display = 'none';
+      showNotif('Attached voice note removed.', 'info');
     }
 
     // ============================================================
