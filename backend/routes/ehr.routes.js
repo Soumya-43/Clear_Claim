@@ -14,11 +14,13 @@ async function readMockEhr() {
 
 router.get("/:patientId", async (req, res) => {
   try {
-    const ehr = await readMockEhr();
-    if (ehr?.patient_id && ehr.patient_id !== req.params.patientId) {
-      return res.status(404).json({ error: "patient not found" });
+    const allEhr = await readMockEhr();
+    const pid = req.params.patientId;
+    const patient = allEhr[pid] || (allEhr.patient_id === pid ? allEhr : null);
+    if (!patient) {
+      return res.status(404).json({ error: `Patient ${pid} not found` });
     }
-    return res.json(ehr);
+    return res.json(patient);
   } catch (err) {
     return res.status(500).json({ error: err?.message || "Unknown error" });
   }

@@ -4202,8 +4202,9 @@
         <!-- BOLD DASHBOARD HERO -->
         <div class="dash-hero">
           <div class="dh-left">
-            <div class="dh-eyebrow">
+            <div class="dh-eyebrow" style="display:flex; justify-content:space-between; align-items:center;">
               <span class="dh-pill">[✦] AGENT ONLINE</span>
+              <span id="clock" class="topbar-clock" style="font-size:12px; font-weight:600; color:var(--muted); font-variant-numeric:tabular-nums;"></span>
             </div>
             <h1 class="dh-title">
               YOUR CLAIM<br>
@@ -6463,7 +6464,7 @@
     // ============================================================
     const demoCases = [
       {
-        pid: 'PAT_001', pname: 'Rajesh Kumar', dob: '1978-04-12', gender: 'Male', insurer: 'INS_A', policy: 'POL-2024-88321', doc: 'Dr. Sharma',
+        pid: 'PAT_001', pname: 'Rajesh Kumar', dob: '1978-04-12', gender: 'Male', insurer: 'Star Health and Allied Insurance', policy: 'POL-2024-88321', doc: 'Dr. Sharma',
         diagDesc: 'Lumbar Disc Herniation', icd: 'M51.1', diagDate: '2023-06-10',
         diagNotes: 'Chronic low back pain with radiculopathy. MRI confirms lumbar disc herniation with nerve root compression. Failed conservative management.',
         proc: 'CPT_63030', sdate: '2024-02-15', hospital: 'Apollo Hospital', cost: '450000',
@@ -6478,7 +6479,7 @@
         reqAmt: '450000', procEst: '450000', bmi: '32', age: '46', consDur: '6 weeks', mriDate: '2023-11-20', label: '✅ Lumbar discectomy case loaded! (1/3)'
       },
       {
-        pid: 'PAT_002', pname: 'Priya Subramaniam', dob: '1990-08-25', gender: 'Female', insurer: 'INS_B', policy: 'HDFC-20938472', doc: 'Dr. Anand Krishnan',
+        pid: 'PAT_002', pname: 'Priya Subramaniam', dob: '1990-08-25', gender: 'Female', insurer: 'HDFC ERGO Health Insurance', policy: 'HDFC-20938472', doc: 'Dr. Anand Krishnan',
         diagDesc: 'Acute Appendicitis', icd: 'K37', diagDate: '2026-03-04',
         diagNotes: 'Patient presented with acute right lower quadrant pain. Failed antibiotic therapy after 5 days.',
         proc: 'CPT_44950', sdate: '2026-03-08', hospital: 'Kathir Memorial Hospital', cost: '180000',
@@ -6493,7 +6494,7 @@
         reqAmt: '180000', procEst: '180000', bmi: '24', age: '35', consDur: '5 days', mriDate: '', label: '✅ Acute appendicitis case loaded! (2/3)'
       },
       {
-        pid: 'PAT_003', pname: 'Arun Mehta', dob: '1965-11-03', gender: 'Male', insurer: 'INS_C', policy: 'BAJAJ-ALZ-8847291', doc: 'Dr. Suresh Rajan',
+        pid: 'PAT_003', pname: 'Arun Mehta', dob: '1965-11-03', gender: 'Male', insurer: 'Bajaj Allianz General Insurance', policy: 'BAJAJ-ALZ-8847291', doc: 'Dr. Suresh Rajan',
         diagDesc: 'Atherosclerotic heart disease', icd: 'I25.10', diagDate: '2026-03-02',
         diagNotes: 'Patient experiencing angina pectoris. Coronary angiogram shows 72% LAD stenosis.',
         proc: 'CPT_92928', sdate: '2026-03-15', hospital: 'Fortis Escorts Heart Institute', cost: '280000',
@@ -6508,7 +6509,7 @@
         reqAmt: '280000', procEst: '280000', bmi: '28', age: '60', consDur: '3 months', mriDate: '', label: '✅ Cardiac stenting case loaded! (3/4)'
       },
       {
-        pid: 'PAT_004', pname: 'Deepa Nair', dob: '1984-07-18', gender: 'Female', insurer: 'INS_A', policy: 'INSA-POL-44821', doc: 'Dr. Priya Menon',
+        pid: 'PAT_004', pname: 'Deepa Nair', dob: '1984-07-18', gender: 'Female', insurer: 'Care Health Insurance', policy: 'INSA-POL-44821', doc: 'Dr. Priya Menon',
         diagDesc: 'Calculous Cholecystitis', icd: 'K80.20', diagDate: '2026-03-01',
         diagNotes: 'Patient has recurrent right upper quadrant pain since 6 months. Ultrasound confirms multiple gallstones. Failed medical stone dissolution therapy over 4 months.',
         proc: 'CPT_47562', sdate: '2026-03-12', hospital: 'Amrita Hospital', cost: '210000',
@@ -6531,7 +6532,13 @@
       const set = (id, v) => { const e = document.getElementById(id); if (e) e.value = v; };
 
       set('f-pid', c.pid); set('f-pname', c.pname); set('f-dob', c.dob);
-      set('f-gender', c.gender); set('f-insurer', c.insurer); set('f-policy', c.policy);
+      set('f-gender', c.gender);
+      const resolvedInsurer = (c.insurer === 'INS_A') ? 'Star Health and Allied Insurance' :
+                             (c.insurer === 'INS_B') ? 'HDFC ERGO Health Insurance' :
+                             (c.insurer === 'INS_C') ? 'Bajaj Allianz General Insurance' :
+                             c.insurer;
+      set('f-insurer', resolvedInsurer);
+      set('f-policy', c.policy);
       set('f-doc', c.doc); set('f-diagnosis-desc', c.diagDesc); set('f-icd', c.icd);
       set('f-diagnosis-date', c.diagDate);
       set('f-diagnosis-notes', c.diagNotes);
@@ -6985,6 +6992,19 @@
       }
     }
 
+    function setPrevTreatPreset(val) {
+      const el = document.getElementById('f-prev-treatments');
+      if (el) el.value = val;
+    }
+
+    function setDurationPreset(val) {
+      const el = document.getElementById('f-treat-duration');
+      if (el) {
+        el.value = val;
+        syncDurationToCert(val);
+      }
+    }
+
     function syncDocToCert(val) {
       const el = document.getElementById('f-doc-name-cert');
       if (el) el.value = val;
@@ -7002,8 +7022,10 @@
     }
 
     function syncDurationToCert(val) {
-      const el = document.getElementById('f-treat-dur-cert');
+      const el = document.getElementById('f-conservative-duration');
       if (el) el.value = val;
+      const el2 = document.getElementById('f-treat-dur-cert');
+      if (el2) el2.value = val;
     }
 
     function syncAllToCert() {
@@ -7046,6 +7068,7 @@
       setIfEmpty('f-requested-amount', p.cost);
       setIfEmpty('f-prev-treatments', p.prevTreatments);
       setIfEmpty('f-treat-duration', p.treatDuration);
+      setIfEmpty('f-conservative-duration', p.treatDuration);
       setIfEmpty('f-treat-dur-cert', p.treatDuration);
       setIfEmpty('f-treat-outcome', p.treatOutcome);
 

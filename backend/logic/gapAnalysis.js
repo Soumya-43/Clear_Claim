@@ -92,6 +92,13 @@ class GapAnalysisService {
      */
     checkDocumentAvailability(insurerId, procedureCode, providedDocs = []) {
         let insurer = this.policies?.[insurerId];
+        if (!insurer && insurerId) {
+            const query = insurerId.toLowerCase().trim();
+            insurer = Object.values(this.policies || {}).find(ins => 
+                (ins.name && (ins.name.toLowerCase().includes(query) || query.includes(ins.name.toLowerCase()))) ||
+                (ins.insurer_id && ins.insurer_id.toLowerCase() === query)
+            );
+        }
         if (!insurer) {
             const firstKey = Object.keys(this.policies || {})[0];
             insurer = this.policies?.[firstKey];

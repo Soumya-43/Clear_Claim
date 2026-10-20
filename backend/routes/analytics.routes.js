@@ -131,12 +131,13 @@ router.get("/", async (req, res) => {
     stats.approved += submittedApproved;
     stats.rejected += submittedRejected;
     stats.pending += submittedPending;
+    const finalApprovalRate = stats.totalClaims > 0 ? ((stats.approved / stats.totalClaims) * 100).toFixed(1) : 0;
 
     return res.json({
       stats: {
         ...stats,
-        approvalRate: `${approvalRate}%`,
-        successRate: `${approvalRate}%`,
+        approvalRate: `${finalApprovalRate}%`,
+        successRate: `${finalApprovalRate}%`,
       },
       charts: {
         byInsurer: { labels: Object.keys(byInsurer), data: Object.values(byInsurer) },

@@ -39,10 +39,20 @@ class RiskEngine {
         }
 
         // 2. Check Historical Rejection Trends for this Insurer/Procedure
-        const history = this.historicalData.filter(d => 
-            d.insurer_id === claimPackage.insurerId && 
-            d.cpt_code === claimPackage.procedureCode
-        );
+        const reqIns = (claimPackage.insurerId || '').toLowerCase().trim();
+        const reqCpt = (claimPackage.procedureCode || '').trim();
+        const history = this.historicalData.filter(d => {
+            const rowIns = (d.insurer_id || '').toLowerCase().trim();
+            const insMatches = rowIns === reqIns ||
+                (reqIns.includes('star') && rowIns === 'ins_a') ||
+                (reqIns.includes('hdfc') && rowIns === 'ins_b') ||
+                (reqIns.includes('care') && rowIns === 'ins_c') ||
+                (reqIns.includes('bajaj') && (rowIns === 'ins_c' || rowIns === 'ins_b'));
+            const cptMatches = d.cpt_code === reqCpt ||
+                d.cpt_code === reqCpt.replace('CPT_', '') ||
+                `CPT_${d.cpt_code}` === reqCpt;
+            return insMatches && cptMatches;
+        });
 
         if (history.length > 0) {
             const rejectionRate = history.filter(d => d.label_rejected === '1').length / history.length;

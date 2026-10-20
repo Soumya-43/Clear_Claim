@@ -399,7 +399,16 @@ router.post("/", async (req, res) => {
     ehr.cpt_code   = cptKey;
 
     const insurerKey = insurerId || ehr.insurer_id;
-    const procedurePolicy = policies[insurerKey]?.procedures?.[cptKey];
+    let matchedPolicy = policies[insurerKey];
+    if (!matchedPolicy && insurerKey) {
+      const q = insurerKey.toLowerCase().trim();
+      matchedPolicy = Object.values(policies).find(p =>
+        (p.name && (p.name.toLowerCase().includes(q) || q.includes(p.name.toLowerCase()))) ||
+        (p.insurer_id && p.insurer_id.toLowerCase() === q)
+      );
+    }
+    const procedurePolicy = matchedPolicy?.procedures?.[cptKey] ||
+      Object.values(policies).map(p => p.procedures?.[cptKey]).find(Boolean);
     let requirements = procedurePolicy?.required_documents || [];
 
     // Fallback if the user typed a completely unmapped/novel procedure
@@ -489,7 +498,7 @@ router.post("/", async (req, res) => {
       procedure: parsedNote.procedure || "Procedure",
       cpt_code: cptKey,
       insurerId: insurerKey,
-      insurerName: policies[insurerKey]?.name || insurerKey,
+      insurerName: matchedPolicy?.name || policies[insurerKey]?.name || insurerKey,
       cost: costEstimate ? `₹${Number(costEstimate).toLocaleString("en-IN")}` : "₹0",
       submitted: new Date().toLocaleDateString("en-US", { month: "short", day: "2-digit" }),
       submittedAt: new Date().toISOString(),

@@ -27,32 +27,35 @@ function assemblePreauthForm(options) {
   (requiredDocuments || []).forEach((doc) => {
     const normalized = String(doc).toLowerCase().trim();
     const found = (foundDocuments || []).some(
-      (d) => String(d).toLowerCase().trim() === normalized
+      (d) => {
+        const dNorm = String(d).toLowerCase().trim();
+        return dNorm === normalized || dNorm.includes(normalized) || normalized.includes(dNorm);
+      }
     );
     let citation = null;
-    if (ehrEvidence) {
+    if (found && ehrEvidence) {
       if (ehrEvidence.relevant_labs && ehrEvidence.relevant_labs.length) {
         const lab = ehrEvidence.relevant_labs.find(
           (l) => (l.type || "").toLowerCase().includes(normalized) || normalized.includes((l.type || "").toLowerCase())
         );
         if (lab) citation = `EHR Lab: ${lab.type} (${lab.date}) — ${(lab.result || lab.findings || "").slice(0, 80)}`;
       }
-      if (!citation && ehrEvidence.matched_diagnoses && ehrEvidence.matched_diagnoses.length)
-        citation = `EHR Diagnosis: ${ehrEvidence.matched_diagnoses.map((d) => d.icd10 || d.description).join(", ")}`;
-      if (!citation && normalized.includes("surgeon") && ehrEvidence.patient_name)
-        citation = `Patient: ${ehrEvidence.patient_name}; Treating physician documentation on file.`;
-      if (!citation && (normalized.includes("physiotherapy") || normalized.includes("physical therapy")) && ehrEvidence.prior_treatments && ehrEvidence.prior_treatments.length)
+      if (!citation && (normalized.includes("physiotherapy") || normalized.includes("conservative") || normalized.includes("therapy")) && ehrEvidence.prior_treatments && ehrEvidence.prior_treatments.length) {
         citation = `EHR Prior treatments: ${ehrEvidence.prior_treatments.map((t) => `${t.type} (${t.duration || "—"})`).join("; ")}`;
-      if (!citation && (normalized.includes("medical necessity") || normalized.includes("necessity") || normalized.includes("medication")) && ehrEvidence.medications && ehrEvidence.medications.length) {
-        const medList = ehrEvidence.medications.map((m) => (typeof m === "string" ? m : m.name || "")).filter(Boolean).join(", ");
-        if (medList) citation = `EHR Current medications: ${medList}`;
+      }
+      if (!citation && (normalized.includes("surgeon") || normalized.includes("certificate") || normalized.includes("necessity")) && ehrEvidence.patient_name) {
+        citation = `Treating physician documentation on file for ${ehrEvidence.patient_name}.`;
+      }
+      if (!citation && (normalized.includes("diagnosis") || normalized.includes("icd")) && ehrEvidence.matched_diagnoses && ehrEvidence.matched_diagnoses.length) {
+        citation = `EHR Diagnosis: ${ehrEvidence.matched_diagnoses.map((d) => d.icd10 || d.description).join(", ")}`;
       }
     }
-    if (found || citation) {
+
+    if (found) {
       cited.push({
         document: doc,
         status: "provided",
-        citation: citation || "Attached",
+        citation: citation || "Attached and verified in dossier",
       });
     } else {
       missing.push({
