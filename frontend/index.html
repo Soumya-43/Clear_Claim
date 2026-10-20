@@ -4351,36 +4351,68 @@
           <div class="card nc-card active" id="nc-card-patient">
             <div class="card-head">
               <div class="card-title">Patient Details</div>
+              <div style="font-size:11px; color:var(--muted);">Select suggestions from dropdown lists or type custom info</div>
             </div>
             <div class="card-body">
               <div class="nc-section-title">Patient profile</div>
-              <div class="nc-section-sub">Start with the core demographics and coverage details.</div>
+              <div class="nc-section-sub">Start with core demographics and coverage details. Choose from sample options or enter custom values.</div>
               <div class="fgrid">
-                <div><label class="fg-lbl">Patient ID</label><input type="text" class="fi" id="f-pid"
-                    placeholder="e.g. PAT-1042" /></div>
-                <div><label class="fg-lbl">Patient Name</label><input type="text" class="fi" id="f-pname"
-                    placeholder="Full name" /></div>
-                <div><label class="fg-lbl">Date of Birth</label><input type="date" class="fi" id="f-dob" /></div>
-                <div><label class="fg-lbl">Gender</label><select class="fi" id="f-gender">
+                <div>
+                  <label class="fg-lbl">Patient ID</label>
+                  <input type="text" class="fi" id="f-pid" list="dl-pid" placeholder="e.g. PAT-1042" />
+                </div>
+                <div>
+                  <label class="fg-lbl">Patient Name</label>
+                  <input type="text" class="fi" id="f-pname" list="dl-pname" placeholder="Full name (e.g. Soumya Mukherjee)" />
+                </div>
+                <div>
+                  <label class="fg-lbl">
+                    Date of Birth
+                    <span id="dob-age-calc-badge" style="font-size:11px; color:var(--green); font-weight:700; margin-left:6px;"></span>
+                  </label>
+                  <input type="date" class="fi" id="f-dob" onchange="onDobChange(this.value)" />
+                  <div style="display:flex; gap:5px; margin-top:5px; flex-wrap:wrap;">
+                    <button type="button" class="btn btn-w btn-sm" style="font-size:10px; padding:2px 8px;" onclick="setDobPreset('1992-05-14')">1992 (34y)</button>
+                    <button type="button" class="btn btn-w btn-sm" style="font-size:10px; padding:2px 8px;" onclick="setDobPreset('1985-08-22')">1985 (41y)</button>
+                    <button type="button" class="btn btn-w btn-sm" style="font-size:10px; padding:2px 8px;" onclick="setDobPreset('1972-04-10')">1972 (54y)</button>
+                    <button type="button" class="btn btn-w btn-sm" style="font-size:10px; padding:2px 8px;" onclick="setDobPreset('1965-11-28')">1965 (61y)</button>
+                  </div>
+                </div>
+                <div>
+                  <label class="fg-lbl">Gender</label>
+                  <select class="fi" id="f-gender">
                     <option value="">Select gender...</option>
-                    <option>Male</option>
-                    <option>Female</option>
-                    <option>Other</option>
-                  </select></div>
-                <div><label class="fg-lbl">Insurance Provider</label>
-                  <select class="fi" id="f-insurer">
-                    <option value="">Select insurer...</option>
-                    <option value="INS_A">InsureCo Alpha</option>
-                    <option value="INS_B">BlueStar Health</option>
-                    <option value="INS_C">CareShield Insurance</option>
+                    <option value="Female">Female</option>
+                    <option value="Male">Male</option>
+                    <option value="Other">Other</option>
                   </select>
                 </div>
-                <div><label class="fg-lbl">Policy Number</label><input type="text" class="fi" id="f-policy"
-                    placeholder="e.g. STAR-0029481" /></div>
-                <div><label class="fg-lbl">Treating Doctor</label><input type="text" class="fi" id="f-doc"
-                    placeholder="Dr. Name" /></div>
-                <div><label class="fg-lbl">Hospital Name</label><input type="text" class="fi" id="f-hospital"
-                    placeholder="e.g. Apollo Hospital" /></div>
+                <div>
+                  <label class="fg-lbl">Insurance Provider</label>
+                  <select class="fi" id="f-insurer" onchange="onInsurerChange(this.value)">
+                    <option value="">Select insurer...</option>
+                    <option value="Star Health and Allied Insurance">Star Health and Allied Insurance</option>
+                    <option value="HDFC ERGO Health Insurance">HDFC ERGO Health Insurance</option>
+                    <option value="Care Health Insurance">Care Health Insurance</option>
+                    <option value="ICICI Lombard General Insurance">ICICI Lombard General Insurance</option>
+                    <option value="Niva Bupa Health Insurance">Niva Bupa Health Insurance</option>
+                    <option value="Bajaj Allianz General Insurance">Bajaj Allianz General Insurance</option>
+                    <option value="Tata AIG General Insurance">Tata AIG General Insurance</option>
+                    <option value="New India Assurance">New India Assurance</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="fg-lbl">Policy Number</label>
+                  <input type="text" class="fi" id="f-policy" list="dl-policy" placeholder="e.g. HDFC-20938472" />
+                </div>
+                <div>
+                  <label class="fg-lbl">Treating Doctor</label>
+                  <input type="text" class="fi" id="f-doc" list="dl-doc" placeholder="e.g. Dr. Anand Krishnan, MS" oninput="syncDocToCert(this.value)" />
+                </div>
+                <div>
+                  <label class="fg-lbl">Hospital Name</label>
+                  <input type="text" class="fi" id="f-hospital" list="dl-hospital" placeholder="e.g. Apollo Hospitals, Chennai" />
+                </div>
               </div>
               <div class="nc-nav">
                 <button class="btn btn-w" type="button" onclick="resetForm()">Reset Form</button>
@@ -4395,19 +4427,48 @@
           <div class="card nc-card" id="nc-card-diagnosis">
             <div class="card-head">
               <div class="card-title">Diagnosis</div>
+              <div style="font-size:11px; color:var(--muted);">Select diagnosis to automatically link ICD-10 &amp; surgical options</div>
             </div>
             <div class="card-body">
               <div class="nc-section-title">Clinical picture</div>
-              <div class="nc-section-sub">Capture primary and secondary diagnoses with ICD codes.</div>
+              <div class="nc-section-sub">Capture primary and secondary diagnoses with ICD codes. Pick from suggestions or enter manually.</div>
               <div class="fgrid">
-                <div class="fg-full"><label class="fg-lbl">Diagnosis Description</label><input type="text" class="fi"
-                    id="f-diagnosis-desc" placeholder="e.g. Lumbar Disc Herniation" /></div>
-                <div><label class="fg-lbl">ICD-10 Code</label><input type="text" class="fi" id="f-icd"
-                    placeholder="e.g. M51.1" /></div>
-                <div><label class="fg-lbl">Diagnosis Date</label><input type="date" class="fi" id="f-diagnosis-date" />
+                <div class="fg-full">
+                  <label class="fg-lbl" style="display:flex; justify-content:space-between; align-items:center;">
+                    <span>Diagnosis Description</span>
+                    <span style="font-size:11px; color:var(--muted);">Auto-maps ICD-10 &amp; Procedure</span>
+                  </label>
+                  <input type="text" class="fi" id="f-diagnosis-desc" list="dl-diag-desc"
+                    placeholder="Type or select condition (e.g. Rotator Cuff Tear, Appendicitis...)"
+                    oninput="onDiagnosisSelect(this.value)" />
+                  <div style="display:flex; gap:6px; margin-top:6px; flex-wrap:wrap;">
+                    <span style="font-size:11px; color:var(--muted); line-height:22px;">Quick Pick:</span>
+                    <button type="button" class="btn btn-w btn-sm" style="font-size:10.5px; padding:2px 8px;" onclick="applyQuickDiagnosis('Rotator Cuff Tear')">Shoulder Tear</button>
+                    <button type="button" class="btn btn-w btn-sm" style="font-size:10.5px; padding:2px 8px;" onclick="applyQuickDiagnosis('Osteoarthritis of Right Knee')">Knee Osteoarthritis</button>
+                    <button type="button" class="btn btn-w btn-sm" style="font-size:10.5px; padding:2px 8px;" onclick="applyQuickDiagnosis('Acute Appendicitis')">Appendicitis</button>
+                    <button type="button" class="btn btn-w btn-sm" style="font-size:10.5px; padding:2px 8px;" onclick="applyQuickDiagnosis('Lumbar Disc')">Lumbar Herniation</button>
+                    <button type="button" class="btn btn-w btn-sm" style="font-size:10.5px; padding:2px 8px;" onclick="applyQuickDiagnosis('Cholelithiasis')">Gallstones</button>
+                    <button type="button" class="btn btn-w btn-sm" style="font-size:10.5px; padding:2px 8px;" onclick="applyQuickDiagnosis('Coronary')">Coronary Artery</button>
+                  </div>
                 </div>
-                <div class="fg-full"><label class="fg-lbl">Clinical Notes</label><textarea class="fi"
-                    id="f-diagnosis-notes" rows="3" placeholder="Key clinical findings..."></textarea></div>
+                <div>
+                  <label class="fg-lbl">ICD-10 Code</label>
+                  <input type="text" class="fi" id="f-icd" list="dl-icd" placeholder="e.g. M75.121" />
+                </div>
+                <div>
+                  <label class="fg-lbl">Diagnosis Date</label>
+                  <input type="date" class="fi" id="f-diagnosis-date" />
+                  <div style="display:flex; gap:5px; margin-top:5px;">
+                    <button type="button" class="btn btn-w btn-sm" style="font-size:10px; padding:2px 8px;" onclick="setDateOffset('f-diagnosis-date', 0)">Today</button>
+                    <button type="button" class="btn btn-w btn-sm" style="font-size:10px; padding:2px 8px;" onclick="setDateOffset('f-diagnosis-date', -3)">3d ago</button>
+                    <button type="button" class="btn btn-w btn-sm" style="font-size:10px; padding:2px 8px;" onclick="setDateOffset('f-diagnosis-date', -7)">1w ago</button>
+                  </div>
+                </div>
+                <div class="fg-full">
+                  <label class="fg-lbl">Clinical Notes &amp; Findings</label>
+                  <textarea class="fi" id="f-diagnosis-notes" rows="3" list="dl-diag-notes"
+                    placeholder="Key clinical findings (e.g. positive impingement signs, restriction in abduction, tenderness...)"></textarea>
+                </div>
               </div>
               <div class="nc-nav">
                 <button class="btn btn-w" type="button" onclick="prevClaimStep()">Back: Patient</button>
@@ -4422,12 +4483,14 @@
           <div class="card nc-card" id="nc-card-procedure">
             <div class="card-head">
               <div class="card-title">Procedure</div>
+              <div style="font-size:11px; color:var(--muted);">17 Comprehensive Surgical Procedures Supported</div>
             </div>
             <div class="card-body">
               <div class="nc-section-title">Planned intervention</div>
-              <div class="nc-section-sub">Describe the requested procedure and financials.</div>
+              <div class="nc-section-sub">Describe the requested procedure and financials. Auto-populates typical costs and requirement rules.</div>
               <div class="fgrid">
-                <div><label class="fg-lbl">Planned Procedure</label>
+                <div>
+                  <label class="fg-lbl">Planned Procedure</label>
                   <select class="fi" id="f-proc" onchange="onProcedureSelect(this.value)">
                     <option value="">Select procedure...</option>
                     <optgroup label="🦴 Orthopedics &amp; Spine">
@@ -4461,9 +4524,19 @@
                     </optgroup>
                   </select>
                 </div>
-                <div><label class="fg-lbl">Surgery Date</label><input type="date" class="fi" id="f-sdate" /></div>
-                <div><label class="fg-lbl">Estimated Cost (₹)</label><input type="number" class="fi" id="f-cost"
-                    placeholder="e.g. 450000" /></div>
+                <div>
+                  <label class="fg-lbl">Surgery Date</label>
+                  <input type="date" class="fi" id="f-sdate" />
+                  <div style="display:flex; gap:5px; margin-top:5px;">
+                    <button type="button" class="btn btn-w btn-sm" style="font-size:10px; padding:2px 8px;" onclick="setDateOffset('f-sdate', 2)">In 2d</button>
+                    <button type="button" class="btn btn-w btn-sm" style="font-size:10px; padding:2px 8px;" onclick="setDateOffset('f-sdate', 7)">In 1w</button>
+                    <button type="button" class="btn btn-w btn-sm" style="font-size:10px; padding:2px 8px;" onclick="setDateOffset('f-sdate', 14)">In 2w</button>
+                  </div>
+                </div>
+                <div>
+                  <label class="fg-lbl">Estimated Cost (₹)</label>
+                  <input type="number" class="fi" id="f-cost" list="dl-cost" placeholder="e.g. 220000" oninput="syncCostToCert(this.value)" />
+                </div>
                 <div class="fg-full" style="position:relative">
                   <label class="fg-lbl" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
                     <span>Surgeon's Recommendation Note</span>
@@ -4512,19 +4585,58 @@
           <div class="card nc-card" id="nc-card-documents">
             <div class="card-head">
               <div class="card-title">Documents</div>
+              <div style="font-size:11px; color:var(--muted);">Attach custom hospital PDFs or use 1-click diagnostic document bundles</div>
             </div>
             <div class="card-body">
-              <div class="nc-section-title">Supporting documents upload</div>
-              <div class="nc-section-sub">Attach imaging, letters, and lab evidence that support this claim.</div>
+              <div class="nc-section-title">Supporting clinical evidence upload</div>
+              <div class="nc-section-sub">Insurer policy guidelines require specific clinical records based on your selected diagnosis &amp; surgery.</div>
+
+              <!-- DYNAMIC RECOMMENDED DOCUMENT BUNDLE BOX -->
+              <div id="rec-docs-box" style="margin-bottom:20px; padding:16px 18px; background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius-sm);">
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:12px;">
+                  <div>
+                    <div style="font-weight:700; font-size:13.5px; color:var(--text); display:flex; align-items:center; gap:6px;">
+                      <span>📋</span> Insurer Required Documents for <span id="rec-docs-proc-name" style="color:var(--green); font-weight:800;">Procedure</span>
+                    </div>
+                    <div style="font-size:11.5px; color:var(--muted); margin-top:2px;">
+                      Click 1-click bundle to auto-attach compliant clinical evidence, or upload individual files below.
+                    </div>
+                  </div>
+                  <div style="display:flex; gap:8px;">
+                    <button type="button" class="btn btn-g btn-sm" id="btn-attach-all-bundle" onclick="attachAllDemoDocuments()" style="white-space:nowrap;">
+                      ⚡ Attach Complete Clinical Bundle (All 4 Docs)
+                    </button>
+                    <button type="button" class="btn btn-w btn-sm" onclick="clearAttachedDemoDocuments()" style="font-size:11px;">Clear All</button>
+                  </div>
+                </div>
+                <div id="rec-docs-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:10px;">
+                  <!-- Populated dynamically via refreshRecommendedDocuments() -->
+                </div>
+              </div>
+
+              <div class="nc-section-title" style="font-size:13px; margin-top:14px;">Custom Hospital PDF Uploads</div>
+              <div class="nc-section-sub">You can also upload real PDF records, imaging scans, and referral letters from your computer:</div>
               <div class="fgrid">
-                <div class="fg-full"><label class="fg-lbl">Imaging (MRI / X-Ray / Ultrasound)</label><input type="file"
-                    class="fi" id="f-doc-imaging" multiple /></div>
-                <div class="fg-full"><label class="fg-lbl">Doctor Recommendation Letter</label><input type="file"
-                    class="fi" id="f-doc-reco" multiple /></div>
-                <div class="fg-full"><label class="fg-lbl">Treatment History Records</label><input type="file"
-                    class="fi" id="f-doc-history" multiple /></div>
-                <div class="fg-full"><label class="fg-lbl">Lab Reports / Medical Certificates</label><input type="file"
-                    class="fi" id="f-doc-labs" multiple /></div>
+                <div class="fg-full">
+                  <label class="fg-lbl">Imaging (MRI / X-Ray / CT / Ultrasound)</label>
+                  <input type="file" class="fi" id="f-doc-imaging" accept=".pdf,.jpg,.jpeg,.png" multiple onchange="onFileInputChange('imaging')" />
+                  <div id="file-badge-imaging" style="display:none; font-size:11.5px; color:var(--green); margin-top:4px; font-weight:600;"></div>
+                </div>
+                <div class="fg-full">
+                  <label class="fg-lbl">Doctor Recommendation Letter</label>
+                  <input type="file" class="fi" id="f-doc-reco" accept=".pdf,.jpg,.jpeg,.png" multiple onchange="onFileInputChange('reco')" />
+                  <div id="file-badge-reco" style="display:none; font-size:11.5px; color:var(--green); margin-top:4px; font-weight:600;"></div>
+                </div>
+                <div class="fg-full">
+                  <label class="fg-lbl">Treatment History Records / Physiotherapy Logs</label>
+                  <input type="file" class="fi" id="f-doc-history" accept=".pdf,.jpg,.jpeg,.png" multiple onchange="onFileInputChange('history')" />
+                  <div id="file-badge-history" style="display:none; font-size:11.5px; color:var(--green); margin-top:4px; font-weight:600;"></div>
+                </div>
+                <div class="fg-full">
+                  <label class="fg-lbl">Lab Reports / Medical Certificates</label>
+                  <input type="file" class="fi" id="f-doc-labs" accept=".pdf,.jpg,.jpeg,.png" multiple onchange="onFileInputChange('labs')" />
+                  <div id="file-badge-labs" style="display:none; font-size:11.5px; color:var(--green); margin-top:4px; font-weight:600;"></div>
+                </div>
               </div>
               <div class="nc-nav">
                 <button class="btn btn-w" type="button" onclick="prevClaimStep()">Back: Procedure</button>
@@ -4539,35 +4651,70 @@
           <div class="card nc-card" id="nc-card-history">
             <div class="card-head">
               <div class="card-title">History</div>
+              <div style="font-size:11px; color:var(--muted);">Select options to demonstrate mandatory conservative trial proof</div>
             </div>
             <div class="card-body">
               <div class="nc-section-title">Treatment history</div>
-              <div class="nc-section-sub">Summarize what has already been tried for this patient.</div>
+              <div class="nc-section-sub">Summarize previous conservative interventions tried for this patient.</div>
               <div class="fgrid">
-                <div><label class="fg-lbl">Previous Treatments</label><textarea class="fi" id="f-prev-treatments"
-                    rows="3" placeholder="e.g. Physiotherapy, analgesics..."></textarea></div>
-                <div><label class="fg-lbl">Treatment Duration</label><input type="text" class="fi" id="f-treat-duration"
-                    placeholder="e.g. 6 weeks" /></div>
-                <div class="fg-full"><label class="fg-lbl">Outcome</label><textarea class="fi" id="f-treat-outcome"
-                    rows="3" placeholder="e.g. Partial relief..."></textarea></div>
-                <div><label class="fg-lbl">Primary Report Type</label><select class="fi" id="f-lab-type">
+                <div>
+                  <label class="fg-lbl">Previous Treatments</label>
+                  <textarea class="fi" id="f-prev-treatments" list="dl-prev-treatments" rows="3"
+                    placeholder="e.g. Supervised physical therapy, oral NSAIDs, subacromial injection..."></textarea>
+                  <div style="display:flex; gap:5px; margin-top:5px; flex-wrap:wrap;">
+                    <button type="button" class="btn btn-w btn-sm" style="font-size:10px; padding:2px 7px;" onclick="setPrevTreatPreset('Physiotherapy & NSAIDs')">PT &amp; NSAIDs</button>
+                    <button type="button" class="btn btn-w btn-sm" style="font-size:10px; padding:2px 7px;" onclick="setPrevTreatPreset('Injections & Immobilization')">Corticosteroid Injections</button>
+                    <button type="button" class="btn btn-w btn-sm" style="font-size:10px; padding:2px 7px;" onclick="setPrevTreatPreset('Medical Management (Analgesics)')">Oral Analgesics</button>
+                  </div>
+                </div>
+                <div>
+                  <label class="fg-lbl">Treatment Duration</label>
+                  <input type="text" class="fi" id="f-treat-duration" list="dl-treat-duration" placeholder="e.g. 6 weeks" oninput="syncDurationToCert(this.value)" />
+                  <div style="display:flex; gap:5px; margin-top:5px; flex-wrap:wrap;">
+                    <button type="button" class="btn btn-w btn-sm" style="font-size:10px; padding:2px 7px;" onclick="setDurationPreset('4 weeks')">4 weeks</button>
+                    <button type="button" class="btn btn-w btn-sm" style="font-size:10px; padding:2px 7px;" onclick="setDurationPreset('6 weeks')">6 weeks</button>
+                    <button type="button" class="btn btn-w btn-sm" style="font-size:10px; padding:2px 7px;" onclick="setDurationPreset('8 weeks')">8 weeks</button>
+                    <button type="button" class="btn btn-w btn-sm" style="font-size:10px; padding:2px 7px;" onclick="setDurationPreset('12 weeks')">12 weeks</button>
+                  </div>
+                </div>
+                <div class="fg-full">
+                  <label class="fg-lbl">Clinical Outcome</label>
+                  <textarea class="fi" id="f-treat-outcome" list="dl-treat-outcome" rows="3"
+                    placeholder="e.g. Persistent severe pain and functional limitation; refractory to conservative therapy..."></textarea>
+                </div>
+                <div>
+                  <label class="fg-lbl">Primary Report Type</label>
+                  <select class="fi" id="f-lab-type">
                     <option value="">Select type...</option>
-                    <option>MRI</option>
-                    <option>X-Ray</option>
-                    <option>CBC</option>
-                    <option>LFT</option>
-                    <option>Pain scale</option>
-                    <option>Other</option>
-                  </select></div>
-                <div><label class="fg-lbl">Report Date</label><input type="date" class="fi" id="f-lab-date" /></div>
-                <div class="fg-full"><label class="fg-lbl">Key Findings</label><textarea class="fi" id="f-lab-findings"
-                    rows="3" placeholder="e.g. MRI Lumbar Spine..."></textarea></div>
+                    <option value="MRI">MRI Study</option>
+                    <option value="X-Ray">High-Resolution X-Ray</option>
+                    <option value="Ultrasound">Ultrasound (USG)</option>
+                    <option value="CT Scan">CT Scan</option>
+                    <option value="CBC">Complete Blood Count (CBC)</option>
+                    <option value="LFT">Liver Function Test (LFT)</option>
+                    <option value="Angiogram">Coronary Angiogram</option>
+                    <option value="Endoscopy">Endoscopy / Biopsy</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="fg-lbl">Report Date</label>
+                  <input type="date" class="fi" id="f-lab-date" />
+                  <div style="display:flex; gap:5px; margin-top:5px;">
+                    <button type="button" class="btn btn-w btn-sm" style="font-size:10px; padding:2px 8px;" onclick="setDateOffset('f-lab-date', 0)">Today</button>
+                    <button type="button" class="btn btn-w btn-sm" style="font-size:10px; padding:2px 8px;" onclick="setDateOffset('f-lab-date', -5)">5d ago</button>
+                    <button type="button" class="btn btn-w btn-sm" style="font-size:10px; padding:2px 8px;" onclick="setDateOffset('f-lab-date', -14)">2w ago</button>
+                  </div>
+                </div>
+                <div class="fg-full">
+                  <label class="fg-lbl">Key Diagnostic Findings</label>
+                  <textarea class="fi" id="f-lab-findings" list="dl-lab-findings" rows="3"
+                    placeholder="e.g. Full-thickness supraspinatus tear 2.2 cm with subacromial impingement..."></textarea>
+                </div>
               </div>
               <div class="nc-nav">
                 <button class="btn btn-w" type="button" onclick="prevClaimStep()">Back: Documents</button>
                 <div class="nc-nav-right">
-                  <button class="btn btn-g" type="button" onclick="nextClaimStep()">Next: Certification &amp;
-                    Risk</button>
+                  <button class="btn btn-g" type="button" onclick="nextClaimStep()">Next: Certification &amp; Risk</button>
                 </div>
               </div>
             </div>
@@ -4577,41 +4724,75 @@
           <div class="card nc-card" id="nc-card-cert">
             <div class="card-head">
               <div class="card-title">Certification &amp; Risk</div>
+              <div style="font-size:11px; color:var(--muted);">Age auto-calculated from DOB · Cross-checked with payer thresholds</div>
             </div>
             <div class="card-body">
               <div class="nc-section-title">Final certification &amp; risk factors</div>
-              <div class="nc-section-sub">Capture clinician sign-off, claim details, and optional risk info.</div>
+              <div class="nc-section-sub">Capture clinician sign-off, claim numbers, and pre-auth risk metrics. (Age is auto-calculated from Date of Birth).</div>
               <div class="fgrid">
-                <div><label class="fg-lbl">Surgeon Name</label><input type="text" class="fi" id="f-cert-surgeon"
-                    placeholder="e.g. Dr. Sharma" /></div>
-                <div><label class="fg-lbl">Medical License ID</label><input type="text" class="fi" id="f-license"
-                    placeholder="e.g. TN-XXXX" /></div>
-                <div class="fg-full"><label class="fg-lbl">Certification Notes</label><textarea class="fi"
-                    id="f-cert-notes" rows="3" placeholder="Surgeon justification..."></textarea></div>
-                <div><label class="fg-lbl">Claim ID</label><input type="text" class="fi" id="f-claim-id"
-                    placeholder="e.g. CLM_011" /></div>
-                <div><label class="fg-lbl">Claim Submission Date</label><input type="date" class="fi"
-                    id="f-claim-date" /></div>
-                <div><label class="fg-lbl">Requested Amount (₹)</label><input type="number" class="fi"
-                    id="f-requested-amount" placeholder="e.g. 175000" /></div>
-                <div><label class="fg-lbl">Procedure Cost Estimate (₹)</label><input type="number" class="fi"
-                    id="f-proc-cost-est" placeholder="e.g. 175000" /></div>
-                <div class="fg-full"><label class="fg-lbl">Internal Claim Notes</label><textarea class="fi"
-                    id="f-claim-notes" rows="3" placeholder="Co-pay, sub-limits..."></textarea></div>
-                <div><label class="fg-lbl">BMI</label><input type="number" step="0.1" class="fi" id="f-bmi"
-                    placeholder="e.g. 32" /></div>
-                <div><label class="fg-lbl">Age (years)</label><input type="number" class="fi" id="f-age"
-                    placeholder="e.g. 47" /></div>
-                <div><label class="fg-lbl">Conservative Treatment Duration</label><input type="text" class="fi"
-                    id="f-conservative-duration" placeholder="e.g. 6 weeks" /></div>
-                <div><label class="fg-lbl">MRI / Key Imaging Date</label><input type="date" class="fi"
-                    id="f-mri-date" /></div>
-                <div><label class="fg-lbl">Ultrasound / X-Ray Date</label><input type="date" class="fi"
-                    id="f-ultrasound-date" /></div>
-                <div><label class="fg-lbl">Latest Lab Report Date</label><input type="date" class="fi"
-                    id="f-lab-latest-date" /></div>
-                <div class="fg-full"><label class="fg-lbl">Risk Notes</label><textarea class="fi" id="f-risk-notes"
-                    rows="3" placeholder="e.g. BMI above threshold..."></textarea></div>
+                <div>
+                  <label class="fg-lbl">Surgeon Name</label>
+                  <input type="text" class="fi" id="f-cert-surgeon" list="dl-doc" placeholder="e.g. Dr. Anand Krishnan, MS" />
+                </div>
+                <div>
+                  <label class="fg-lbl">Medical License ID</label>
+                  <input type="text" class="fi" id="f-license" list="dl-license" placeholder="e.g. TN-18472 / IMA" />
+                </div>
+                <div class="fg-full">
+                  <label class="fg-lbl">Certification Notes</label>
+                  <textarea class="fi" id="f-cert-notes" rows="3" placeholder="I hereby certify clinical necessity for operative admission and intervention..."></textarea>
+                </div>
+                <div>
+                  <label class="fg-lbl">Claim ID</label>
+                  <input type="text" class="fi" id="f-claim-id" list="dl-claim-id" placeholder="e.g. CLM-2404" />
+                </div>
+                <div>
+                  <label class="fg-lbl">Claim Submission Date</label>
+                  <input type="date" class="fi" id="f-claim-date" />
+                </div>
+                <div>
+                  <label class="fg-lbl">Requested Amount (₹)</label>
+                  <input type="number" class="fi" id="f-requested-amount" list="dl-cost" placeholder="e.g. 220000" />
+                </div>
+                <div>
+                  <label class="fg-lbl">Procedure Cost Estimate (₹)</label>
+                  <input type="number" class="fi" id="f-proc-cost-est" list="dl-cost" placeholder="e.g. 220000" />
+                </div>
+                <div class="fg-full">
+                  <label class="fg-lbl">Internal Claim Notes</label>
+                  <textarea class="fi" id="f-claim-notes" rows="3" placeholder="Room rent sub-limit, co-pay clauses, or pre-existing disease declaration..."></textarea>
+                </div>
+                <div>
+                  <label class="fg-lbl">BMI (Body Mass Index)</label>
+                  <input type="number" step="0.1" class="fi" id="f-bmi" list="dl-bmi" placeholder="e.g. 26.4" />
+                </div>
+                <div>
+                  <label class="fg-lbl" style="display:flex; justify-content:space-between; align-items:center;">
+                    <span>Age (years)</span>
+                    <span id="cert-age-badge" style="font-size:11px; color:var(--green); font-weight:700;">(Auto-filled from DOB)</span>
+                  </label>
+                  <input type="number" class="fi" id="f-age" placeholder="Auto-calculated from DOB" style="font-weight:600;" />
+                </div>
+                <div>
+                  <label class="fg-lbl">Conservative Treatment Duration</label>
+                  <input type="text" class="fi" id="f-conservative-duration" list="dl-treat-duration" placeholder="e.g. 6 weeks" />
+                </div>
+                <div>
+                  <label class="fg-lbl">MRI / Key Imaging Date</label>
+                  <input type="date" class="fi" id="f-mri-date" />
+                </div>
+                <div>
+                  <label class="fg-lbl">Ultrasound / X-Ray Date</label>
+                  <input type="date" class="fi" id="f-ultrasound-date" />
+                </div>
+                <div>
+                  <label class="fg-lbl">Latest Lab Report Date</label>
+                  <input type="date" class="fi" id="f-lab-latest-date" />
+                </div>
+                <div class="fg-full">
+                  <label class="fg-lbl">Risk Factors &amp; Medical Necessity Notes</label>
+                  <textarea class="fi" id="f-risk-notes" list="dl-risk-notes" rows="3" placeholder="Surgical necessity justification, risk mitigations, absence of comorbidities..."></textarea>
+                </div>
               </div>
               <div class="nc-nav">
                 <button class="btn btn-w" type="button" onclick="prevClaimStep()">Back: History</button>
@@ -4622,6 +4803,164 @@
               </div>
             </div>
           </div>
+
+          <!-- ============================================================
+               REUSABLE DATALISTS FOR NEW CLAIM FORM OPTIONS (ALL STEPS)
+               ============================================================ -->
+          <datalist id="dl-pid">
+            <option value="PAT-1042">PAT-1042 (Soumya Mukherjee)</option>
+            <option value="PAT-2091">PAT-2091 (Pooja Patel)</option>
+            <option value="PAT-3482">PAT-3482 (Aarav Sharma)</option>
+            <option value="PAT-4109">PAT-4109 (Rohan Mehta)</option>
+            <option value="PAT-5820">PAT-5820 (Ananya Iyer)</option>
+          </datalist>
+
+          <datalist id="dl-pname">
+            <option value="Soumya Mukherjee">Soumya Mukherjee (34y · Male)</option>
+            <option value="Pooja Patel">Pooja Patel (29y · Female)</option>
+            <option value="Aarav Sharma">Aarav Sharma (42y · Male)</option>
+            <option value="Rohan Mehta">Rohan Mehta (51y · Male)</option>
+            <option value="Ananya Iyer">Ananya Iyer (38y · Female)</option>
+            <option value="Vikramaditya Sen">Vikramaditya Sen (63y · Male)</option>
+            <option value="Priya Subramaniam">Priya Subramaniam (34y · Female)</option>
+            <option value="Ramesh Kumar">Ramesh Kumar (58y · Male)</option>
+          </datalist>
+
+          <datalist id="dl-policy">
+            <option value="HDFC-20938472">HDFC ERGO Optima Restore · Sum Insured ₹15L</option>
+            <option value="STAR-88392110">Star Health Comprehensive · Sum Insured ₹20L</option>
+            <option value="CARE-77182900">Care Health Supreme · Sum Insured ₹10L</option>
+            <option value="ICICI-40192833">ICICI Lombard Health Shield · Sum Insured ₹25L</option>
+            <option value="NIVA-66281900">Niva Bupa ReAssure · Sum Insured ₹15L</option>
+            <option value="BAJAJ-55192084">Bajaj Allianz Health Guard · Sum Insured ₹10L</option>
+          </datalist>
+
+          <datalist id="dl-doc">
+            <option value="Dr. Anand Krishnan, MS (General Surgery)">Dr. Anand Krishnan, MS (General &amp; Laparoscopic Surgery)</option>
+            <option value="Dr. Vikramaditya Sen, MS (Orthopedics)">Dr. Vikramaditya Sen, MS (Orthopedics &amp; Joint Replacement)</option>
+            <option value="Dr. Rajeshwar Rao, MCh (Neurosurgery)">Dr. Rajeshwar Rao, MCh (Spine &amp; Neurosurgery)</option>
+            <option value="Dr. Sunita Deshmukh, MD, DM (Cardiology)">Dr. Sunita Deshmukh, MD, DM (Interventional Cardiology)</option>
+            <option value="Dr. V. Ramanathan, MS (Ortho), DNB">Dr. V. Ramanathan, MS (Ortho) · Senior Consultant</option>
+            <option value="Dr. Meenakshi Sundaram, MS (OB-GYN)">Dr. Meenakshi Sundaram, MS (Gynecology &amp; Obstetrics)</option>
+            <option value="Dr. Arvind Swaminathan, MS, MCh (Urology)">Dr. Arvind Swaminathan, MCh (Urology &amp; Renal Surgery)</option>
+          </datalist>
+
+          <datalist id="dl-hospital">
+            <option value="Apollo Hospitals, Greams Road, Chennai">Apollo Hospitals, Greams Road, Chennai</option>
+            <option value="Fortis Malar Hospital, Adyar, Chennai">Fortis Malar Hospital, Adyar, Chennai</option>
+            <option value="Manipal Hospital, Old Airport Road, Bangalore">Manipal Hospital, Old Airport Road, Bangalore</option>
+            <option value="Kathir Memorial Hospital, Chennai">Kathir Memorial Hospital, Chennai</option>
+            <option value="Max Super Speciality Hospital, Saket, New Delhi">Max Super Speciality Hospital, Saket, New Delhi</option>
+            <option value="Kokilaben Dhirubhai Ambani Hospital, Mumbai">Kokilaben Dhirubhai Ambani Hospital, Mumbai</option>
+          </datalist>
+
+          <datalist id="dl-diag-desc">
+            <option value="Complete Rotator Cuff Tear, Right Shoulder">M75.121 · Complete Rotator Cuff Tear, Right Shoulder</option>
+            <option value="Primary Unilateral Osteoarthritis of Right Knee">M17.11 · Primary Osteoarthritis of Right Knee (Grade IV)</option>
+            <option value="Lumbar Disc Herniation with Radiculopathy">M51.1 · Lumbar Disc Herniation with Radiculopathy (L4-L5)</option>
+            <option value="Complete Tear of Anterior Cruciate Ligament (ACL)">S83.511A · Complete ACL Tear, Right Knee</option>
+            <option value="Primary Osteoarthritis of Right Hip (Severe)">M16.11 · Primary Osteoarthritis of Right Hip</option>
+            <option value="Acute Appendicitis with Localized Peritonitis">K37 · Acute Appendicitis</option>
+            <option value="Chronic Cholelithiasis with Acute Cholecystitis">K80.20 · Gallbladder Calculus with Cholecystitis</option>
+            <option value="Coronary Artery Disease - Severe Triple Vessel Disease">I25.10 · Coronary Artery Disease with Angina</option>
+            <option value="Cervical Disc Protrusion with Radiculopathy (C5-C6)">M50.20 · Cervical Disc Herniation</option>
+            <option value="Unilateral Inguinal Hernia (Direct/Indirect)">K40.90 · Unilateral Inguinal Hernia</option>
+            <option value="Senile Nuclear Cataract, Both Eyes">H25.13 · Senile Nuclear Cataract</option>
+            <option value="Benign Prostatic Hyperplasia with Urinary Retention">N40.1 · BPH with Lower Urinary Tract Symptoms</option>
+            <option value="Uterine Leiomyoma (Fibroids) with Menorrhagia">D25.9 · Uterine Fibroids</option>
+          </datalist>
+
+          <datalist id="dl-icd">
+            <option value="M75.121">M75.121 · Complete Rotator Cuff Tear, Right Shoulder</option>
+            <option value="M17.11">M17.11 · Primary Osteoarthritis of Right Knee</option>
+            <option value="M51.1">M51.1 · Lumbar Disc Herniation with Radiculopathy</option>
+            <option value="S83.511A">S83.511A · Complete Tear of ACL, Right Knee</option>
+            <option value="M16.11">M16.11 · Primary Osteoarthritis of Right Hip</option>
+            <option value="K37">K37 · Acute Appendicitis</option>
+            <option value="K80.20">K80.20 · Calculus of Gallbladder</option>
+            <option value="I25.10">I25.10 · Atherosclerotic Heart Disease</option>
+            <option value="I20.0">I20.0 · Unstable Angina Pectoris</option>
+            <option value="M50.20">M50.20 · Other Cervical Disc Displacement</option>
+            <option value="K40.90">K40.90 · Unilateral Inguinal Hernia without Obstruction</option>
+            <option value="H25.13">H25.13 · Age-Related Nuclear Cataract, Bilateral</option>
+            <option value="N40.1">N40.1 · Benign Prostatic Hyperplasia with LUTS</option>
+            <option value="D25.9">D25.9 · Leiomyoma of Uterus</option>
+          </datalist>
+
+          <datalist id="dl-cost">
+            <option value="180000">₹1,80,000 (Standard Laparoscopy / TURP)</option>
+            <option value="220000">₹2,20,000 (Rotator Cuff Repair / Discectomy)</option>
+            <option value="240000">₹2,40,000 (ACL Reconstruction / Cholecystectomy)</option>
+            <option value="350000">₹3,50,000 (Spine Fusion ACDF / Stenting)</option>
+            <option value="420000">₹4,20,000 (Total Hip Replacement)</option>
+            <option value="450000">₹4,50,000 (Total Knee Replacement)</option>
+            <option value="580000">₹5,80,000 (Coronary Artery Bypass CABG)</option>
+          </datalist>
+
+          <datalist id="dl-prev-treatments">
+            <option value="Structured Physical Therapy (supervised exercises, stretching, strengthening)">Structured Physical Therapy (supervised exercises &amp; strengthening)</option>
+            <option value="Subacromial Corticosteroid Injection &amp; Non-steroidal Anti-inflammatory Drugs">Subacromial Corticosteroid Injection &amp; NSAIDs</option>
+            <option value="Oral NSAIDs (Naproxen 500mg BD), ice therapy &amp; activity modification">Oral NSAIDs (Naproxen 500mg BD) &amp; activity modification</option>
+            <option value="Oral Analgesics, muscle relaxants &amp; lumbar epidural steroid injection">Oral Analgesics, muscle relaxants &amp; lumbar epidural injection</option>
+            <option value="Anti-platelet therapy (Aspirin + Clopidogrel) &amp; Atorvastatin 40mg">Anti-platelet therapy (Aspirin + Clopidogrel) &amp; Atorvastatin</option>
+            <option value="Medical therapy with Alpha-blockers (Tamsulosin 0.4mg daily)">Medical therapy with Alpha-blockers (Tamsulosin 0.4mg daily)</option>
+            <option value="Proton Pump Inhibitors (Pantoprazole 40mg BD) &amp; dietary restriction">Proton Pump Inhibitors (Pantoprazole 40mg BD)</option>
+          </datalist>
+
+          <datalist id="dl-treat-duration">
+            <option value="4 weeks">4 weeks</option>
+            <option value="6 weeks">6 weeks (Payer standard trial)</option>
+            <option value="8 weeks">8 weeks</option>
+            <option value="12 weeks">12 weeks</option>
+            <option value="3 months">3 months</option>
+            <option value="6 months">6 months</option>
+          </datalist>
+
+          <datalist id="dl-treat-outcome">
+            <option value="Persistent pain and functional limitation; refractory to conservative care">Persistent severe pain and functional limitation; refractory to conservative care</option>
+            <option value="Partial initial relief for 2 weeks followed by severe symptom relapse">Partial initial relief for 2 weeks followed by severe symptom relapse</option>
+            <option value="Gross functional deficit with progressive muscle weakness and sleep disturbance">Gross functional deficit with progressive muscle weakness and sleep disturbance</option>
+            <option value="No clinical improvement; severe impairment in daily occupational activities">No clinical improvement; severe impairment in daily occupational activities</option>
+          </datalist>
+
+          <datalist id="dl-lab-findings">
+            <option value="Full-thickness supraspinatus tear 2.2 cm with subacromial impingement">Full-thickness supraspinatus tear 2.2 cm with subacromial impingement</option>
+            <option value="Severe Grade IV tricompartmental osteoarthritis with bone-on-bone contact">Severe Grade IV tricompartmental osteoarthritis with bone-on-bone contact</option>
+            <option value="L4-L5 posterior disc herniation with thecal sac compression and nerve root impingement">L4-L5 posterior disc herniation with thecal sac compression</option>
+            <option value="Complete tear of mid-substance ACL fibers with bone contusion">Complete tear of mid-substance ACL fibers with bone contusion</option>
+            <option value="Appendix diameter 9.5 mm, wall thickening, periappendiceal fluid accumulation">Appendix diameter 9.5 mm, wall thickening, periappendiceal fluid accumulation</option>
+            <option value="Multiple gallstones with gallbladder wall thickening (4.2 mm) and acoustic shadowing">Multiple gallstones with gallbladder wall thickening (4.2 mm)</option>
+            <option value="Coronary angiography: 85% stenosis in mid-LAD, 75% stenosis in proximal RCA">Coronary angiography: 85% stenosis in mid-LAD, 75% RCA</option>
+          </datalist>
+
+          <datalist id="dl-license">
+            <option value="TN-18472 / IMA">TN-18472 / Indian Medical Association</option>
+            <option value="MCI-2012-0941">MCI-2012-0941 / Medical Council of India</option>
+            <option value="DMC-67210">DMC-67210 / Delhi Medical Council</option>
+            <option value="KMC-44910">KMC-44910 / Karnataka Medical Council</option>
+            <option value="MMC-58201">MMC-58201 / Maharashtra Medical Council</option>
+          </datalist>
+
+          <datalist id="dl-claim-id">
+            <option value="CLM-2404">CLM-2404 (Orthopedic Claim)</option>
+            <option value="CLM-2405">CLM-2405 (General Surgery Claim)</option>
+            <option value="CLM-2406">CLM-2406 (Cardiology Claim)</option>
+            <option value="CLM-2407">CLM-2407 (Spine Surgery Claim)</option>
+          </datalist>
+
+          <datalist id="dl-bmi">
+            <option value="22.4">22.4 (Normal range)</option>
+            <option value="24.8">24.8 (Normal threshold)</option>
+            <option value="27.5">27.5 (Overweight Class I)</option>
+            <option value="31.2">31.2 (Obesity Class I)</option>
+            <option value="34.6">34.6 (Obesity Class II)</option>
+          </datalist>
+
+          <datalist id="dl-risk-notes">
+            <option value="Normal surgical risk profile; all preliminary parameters within acceptable thresholds">Normal surgical risk profile; all parameters within thresholds</option>
+            <option value="Elevated rejection risk due to conservative management documentation gap">Elevated rejection risk due to conservative trial duration gap</option>
+            <option value="High clinical urgency; emergency surgical clearance warranted to avert systemic complications">High clinical urgency; emergency surgical clearance warranted</option>
+          </datalist>
         </div>
       </div>
 
@@ -6035,6 +6374,17 @@
         }
       });
 
+      // Step-specific dynamic preparation
+      if (stepId === 'documents') {
+        if (typeof refreshRecommendedDocuments === 'function') {
+          setTimeout(refreshRecommendedDocuments, 20);
+        }
+      } else if (stepId === 'cert') {
+        if (typeof syncAllToCert === 'function') {
+          syncAllToCert();
+        }
+      }
+
       if (scrollIntoView) {
         const el = document.getElementById('page-new-claim');
         if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -6199,13 +6549,27 @@
       set('f-bmi', c.bmi); set('f-age', c.age); set('f-conservative-duration', c.consDur);
       set('f-mri-date', c.mriDate);
 
+      // Auto-update age calculation badge from DOB
+      if (typeof onDobChange === 'function') onDobChange(c.dob);
+      // Auto-attach recommended clinical document bundle for this procedure
+      if (typeof attachAllDemoDocuments === 'function') attachAllDemoDocuments();
+
       showNotif(c.label, 'success');
       currentDemoIndex = (currentDemoIndex + 1) % demoCases.length;
     }
 
     function resetForm() {
-      ['f-pid', 'f-pname', 'f-dob', 'f-gender', 'f-insurer', 'f-policy', 'f-doc', 'f-diagnosis-desc', 'f-icd', 'f-diagnosis-date', 'f-diagnosis-notes', 'f-proc', 'f-sdate', 'f-hospital', 'f-note', 'f-cost', 'f-prev-treatments', 'f-treat-duration', 'f-treat-outcome', 'f-lab-type', 'f-lab-date', 'f-lab-findings', 'f-cert-surgeon', 'f-license', 'f-cert-notes', 'f-claim-id', 'f-claim-date', 'f-requested-amount', 'f-proc-cost-est', 'f-claim-notes', 'f-bmi', 'f-age', 'f-conservative-duration', 'f-mri-date', 'f-ultrasound-date', 'f-lab-latest-date', 'f-risk-notes']
+      ['f-pid', 'f-pname', 'f-dob', 'f-gender', 'f-insurer', 'f-policy', 'f-doc', 'f-doc-name-cert', 'f-hospital', 'f-diagnosis-desc', 'f-icd', 'f-diagnosis-date', 'f-diagnosis-notes', 'f-proc', 'f-sdate', 'f-note', 'f-cost', 'f-est-cost-cert', 'f-prev-treatments', 'f-treat-duration', 'f-treat-dur-cert', 'f-treat-outcome', 'f-lab-type', 'f-lab-date', 'f-lab-findings', 'f-cert-surgeon', 'f-license', 'f-doc-lic', 'f-cert-notes', 'f-claim-id', 'f-claim-id-cert', 'f-claim-date', 'f-requested-amount', 'f-proc-cost-est', 'f-claim-notes', 'f-bmi', 'f-age', 'f-conservative-duration', 'f-mri-date', 'f-ultrasound-date', 'f-lab-latest-date', 'f-risk-notes', 'f-high-risk-notes']
         .forEach(id => { const e = document.getElementById(id); if (e) e.value = ''; });
+      const badge = document.getElementById('dob-age-calc-badge');
+      if (badge) badge.textContent = '';
+      ['imaging', 'reco', 'history', 'labs'].forEach(t => {
+        const b = document.getElementById('file-badge-' + t);
+        if (b) b.style.display = 'none';
+        const fi = document.getElementById('f-doc-' + t);
+        if (fi) fi.value = '';
+      });
+      if (typeof clearAttachedDemoDocuments === 'function') clearAttachedDemoDocuments();
     }
 
     async function useSampleAiPipeline() {
@@ -6523,6 +6887,149 @@
       }
     };
 
+    // ============================================================
+    //  FIELD OPTION HANDLERS, DOB AUTO-AGE & CLINICAL BUNDLES
+    // ============================================================
+    function calculateAgeFromDob(dobString) {
+      if (!dobString) return '';
+      const birth = new Date(dobString);
+      if (isNaN(birth.getTime())) return '';
+      const today = new Date();
+      let age = today.getFullYear() - birth.getFullYear();
+      const m = today.getMonth() - birth.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
+        age--;
+      }
+      return age >= 0 ? age : '';
+    }
+
+    function onDobChange(dob) {
+      const age = calculateAgeFromDob(dob);
+      const badge = document.getElementById('dob-age-calc-badge');
+      if (badge) {
+        badge.textContent = age !== '' ? `(Age: ${age} yrs)` : '';
+      }
+      const fAge = document.getElementById('f-age');
+      if (fAge && age !== '') {
+        fAge.value = age;
+      }
+    }
+
+    function setDobPreset(dob) {
+      const el = document.getElementById('f-dob');
+      if (el) {
+        el.value = dob;
+        onDobChange(dob);
+      }
+    }
+
+    function setDateOffset(elemId, dayOffset) {
+      const el = document.getElementById(elemId);
+      if (!el) return;
+      const d = new Date();
+      d.setDate(d.getDate() + dayOffset);
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      el.value = `${yyyy}-${mm}-${dd}`;
+    }
+
+    function applyQuickDiagnosis(term) {
+      if (!term) return;
+      const lower = term.toLowerCase();
+      let matchedKey = Object.keys(PROCEDURE_CATALOG).find(k => {
+        const p = PROCEDURE_CATALOG[k];
+        return p.name.toLowerCase().includes(lower) ||
+               p.diagDesc.toLowerCase().includes(lower) ||
+               (p.icd10 && p.icd10.toLowerCase().includes(lower));
+      });
+
+      const diagDescEl = document.getElementById('f-diagnosis-desc');
+      const icdEl = document.getElementById('f-icd');
+      const notesEl = document.getElementById('f-diagnosis-notes');
+      const procEl = document.getElementById('f-proc');
+
+      if (matchedKey) {
+        const p = PROCEDURE_CATALOG[matchedKey];
+        if (diagDescEl) diagDescEl.value = p.diagDesc;
+        if (icdEl) icdEl.value = p.icd10;
+        if (procEl) {
+          procEl.value = matchedKey;
+          onProcedureSelect(matchedKey);
+        }
+        if (notesEl && (!notesEl.value || notesEl.value.trim() === '')) {
+          notesEl.value = `Patient evaluated for ${p.diagDesc}. Imaging confirms pathology; standard conservative management attempted with insufficient response.`;
+        }
+        showNotif(`Loaded clinical template: ${p.name}`, 'info');
+      } else {
+        if (diagDescEl) diagDescEl.value = term;
+      }
+    }
+
+    function onDiagnosisSelect(diagDesc) {
+      if (!diagDesc) return;
+      const lower = diagDesc.toLowerCase();
+      const matchedKey = Object.keys(PROCEDURE_CATALOG).find(k => {
+        const p = PROCEDURE_CATALOG[k];
+        return p.diagDesc.toLowerCase().includes(lower) || p.name.toLowerCase().includes(lower);
+      });
+      if (matchedKey) {
+        const p = PROCEDURE_CATALOG[matchedKey];
+        const icdEl = document.getElementById('f-icd');
+        const procEl = document.getElementById('f-proc');
+        if (icdEl && (!icdEl.value || icdEl.value.trim() === '')) icdEl.value = p.icd10;
+        if (procEl && (!procEl.value || procEl.value.trim() === '')) {
+          procEl.value = matchedKey;
+          onProcedureSelect(matchedKey);
+        }
+      }
+    }
+
+    function syncDocToCert(val) {
+      const el = document.getElementById('f-doc-name-cert');
+      if (el) el.value = val;
+      const el2 = document.getElementById('f-cert-surgeon');
+      if (el2) el2.value = val;
+    }
+
+    function syncCostToCert(val) {
+      const el = document.getElementById('f-est-cost-cert');
+      if (el) el.value = val;
+      const el2 = document.getElementById('f-requested-amount');
+      if (el2) el2.value = val;
+      const el3 = document.getElementById('f-proc-cost-est');
+      if (el3) el3.value = val;
+    }
+
+    function syncDurationToCert(val) {
+      const el = document.getElementById('f-treat-dur-cert');
+      if (el) el.value = val;
+    }
+
+    function syncAllToCert() {
+      // Step 6 Auto-fill: Calculate & fill age from Step 1 DOB
+      const dob = document.getElementById('f-dob')?.value;
+      if (dob) {
+        const age = calculateAgeFromDob(dob);
+        const fAge = document.getElementById('f-age');
+        if (fAge && age !== '') fAge.value = age;
+      }
+      // Sync doctor name
+      const doc = document.getElementById('f-doc')?.value;
+      if (doc) syncDocToCert(doc);
+      // Sync cost
+      const cost = document.getElementById('f-cost')?.value;
+      if (cost) syncCostToCert(cost);
+      // Sync duration
+      const dur = document.getElementById('f-treat-duration')?.value;
+      if (dur) syncDurationToCert(dur);
+    }
+
+    function onInsurerChange(val) {
+      // Provide user feedback if specific network guidelines apply
+      if (val) console.log(`[Insurer Selected] Policy guidelines mapped for ${val}`);
+    }
+
     function onProcedureSelect(procVal) {
       if (!procVal || !PROCEDURE_CATALOG[procVal]) return;
       const p = PROCEDURE_CATALOG[procVal];
@@ -6534,13 +7041,144 @@
       setIfEmpty('f-diagnosis-desc', p.diagDesc);
       setIfEmpty('f-icd', p.icd10);
       setIfEmpty('f-cost', p.cost);
+      setIfEmpty('f-est-cost-cert', p.cost);
       setIfEmpty('f-proc-cost-est', p.cost);
       setIfEmpty('f-requested-amount', p.cost);
       setIfEmpty('f-prev-treatments', p.prevTreatments);
       setIfEmpty('f-treat-duration', p.treatDuration);
+      setIfEmpty('f-treat-dur-cert', p.treatDuration);
       setIfEmpty('f-treat-outcome', p.treatOutcome);
 
+      // Refresh document recommendations if on or visiting documents step
+      refreshRecommendedDocuments();
       console.log(`[Procedure Selected] ${p.name}. Policy required docs:`, p.requiredDocs);
+    }
+
+    // Dynamic Clinical Document Bundle Store
+    window.__attachedDemoDocs = window.__attachedDemoDocs || {};
+
+    function refreshRecommendedDocuments() {
+      const proc = document.getElementById('f-proc')?.value;
+      const procKey = proc && proc.startsWith('CPT_') ? proc : (proc ? `CPT_${proc}` : 'CPT_63030');
+      const catalog = PROCEDURE_CATALOG[procKey] || PROCEDURE_CATALOG['CPT_63030'];
+
+      const nameEl = document.getElementById('rec-docs-proc-name');
+      if (nameEl) nameEl.textContent = catalog.name;
+
+      const grid = document.getElementById('rec-docs-grid');
+      if (!grid) return;
+
+      const docDefs = [
+        {
+          key: 'imaging',
+          type: 'Imaging / Diagnostic Scan',
+          icon: '🩻',
+          title: catalog.requiredDocs?.[1] || 'Primary Diagnostic Imaging (MRI / CT / Ultrasound)',
+          desc: 'Corroborates anatomical pathology & structural severity with radiologist sign-off.',
+          fileName: `${catalog.cpt}_Imaging_Study.pdf`
+        },
+        {
+          key: 'reco',
+          type: 'Surgeon Clinical Recommendation',
+          icon: '🩺',
+          title: catalog.requiredDocs?.[0] || 'Attending Surgeon Clinical Evaluation Letter',
+          desc: 'Itemizes clinical rationale, operative plan, and CPT code indications.',
+          fileName: `${catalog.cpt}_Surgeon_Recommendation.pdf`
+        },
+        {
+          key: 'history',
+          type: 'Conservative Treatment History',
+          icon: '📋',
+          title: catalog.requiredDocs?.[2] || 'Conservative Management & Rehabilitation Log',
+          desc: 'Demonstrates mandatory prior therapy trial, drug adherence, or failed outpatient care.',
+          fileName: `${catalog.cpt}_Conservative_Therapy_Log.pdf`
+        },
+        {
+          key: 'labs',
+          type: 'Lab Findings & Medical Certificate',
+          icon: '🔬',
+          title: catalog.requiredDocs?.[3] || 'Pre-Operative Pathology & Certificate of Necessity',
+          desc: 'Pre-anesthetic profile, CBC, LFT, and verified surgeon license certification.',
+          fileName: `${catalog.cpt}_Medical_Necessity_Cert.pdf`
+        }
+      ];
+
+      grid.innerHTML = docDefs.map(d => {
+        const isAttached = !!window.__attachedDemoDocs[d.key];
+        return `
+          <div class="rec-doc-card" id="rec-card-${d.key}" style="background:var(--surface); border:1.5px solid ${isAttached ? 'var(--green)' : 'var(--border)'}; border-radius:var(--radius-sm); padding:12px 14px; display:flex; flex-direction:column; justify-content:space-between; transition:all 0.2s ease;">
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px;">
+                <span style="font-size:20px;">${d.icon}</span>
+                <span class="badge ${isAttached ? 'b-approved' : 'b-pending'}" id="badge-doc-${d.key}" style="font-size:10px;">
+                  ${isAttached ? '✓ Attached' : 'Required'}
+                </span>
+              </div>
+              <div style="font-weight:700; font-size:12.5px; color:var(--text); line-height:1.3; margin-bottom:4px;">${d.title}</div>
+              <div style="font-size:11px; color:var(--muted); line-height:1.4;">${d.desc}</div>
+            </div>
+            <div style="margin-top:10px; display:flex; justify-content:space-between; align-items:center; border-top:1px dashed var(--border); padding-top:8px;">
+              <span style="font-family:monospace; font-size:10.5px; color:var(--muted); overflow:hidden; text-overflow:ellipsis; max-width:140px; white-space:nowrap;">${d.fileName}</span>
+              <button type="button" class="btn ${isAttached ? 'btn-w' : 'btn-g'} btn-sm" style="font-size:10.5px; padding:3px 8px;" onclick="attachSingleDemoDoc('${d.key}', '${d.fileName}')">
+                ${isAttached ? 'Remove' : '+ Attach'}
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function attachAllDemoDocuments() {
+      const proc = document.getElementById('f-proc')?.value;
+      const procKey = proc && proc.startsWith('CPT_') ? proc : (proc ? `CPT_${proc}` : 'CPT_63030');
+      const catalog = PROCEDURE_CATALOG[procKey] || PROCEDURE_CATALOG['CPT_63030'];
+
+      window.__attachedDemoDocs = {
+        imaging: true,
+        imagingName: `${catalog.cpt}_Imaging_Study.pdf`,
+        reco: true,
+        recoName: `${catalog.cpt}_Surgeon_Recommendation.pdf`,
+        history: true,
+        historyName: `${catalog.cpt}_Conservative_Therapy_Log.pdf`,
+        labs: true,
+        labsName: `${catalog.cpt}_Medical_Necessity_Cert.pdf`
+      };
+
+      refreshRecommendedDocuments();
+      showNotif(`⚡ Attached complete clinical bundle (4 docs) for ${catalog.name}!`, 'success');
+    }
+
+    function attachSingleDemoDoc(key, fileName) {
+      window.__attachedDemoDocs = window.__attachedDemoDocs || {};
+      if (window.__attachedDemoDocs[key]) {
+        delete window.__attachedDemoDocs[key];
+        delete window.__attachedDemoDocs[key + 'Name'];
+        showNotif(`Removed ${fileName}`, 'info');
+      } else {
+        window.__attachedDemoDocs[key] = true;
+        window.__attachedDemoDocs[key + 'Name'] = fileName;
+        showNotif(`Attached ${fileName}`, 'success');
+      }
+      refreshRecommendedDocuments();
+    }
+
+    function clearAttachedDemoDocuments() {
+      window.__attachedDemoDocs = {};
+      refreshRecommendedDocuments();
+      showNotif('Cleared attached demo documents', 'info');
+    }
+
+    function onFileInputChange(type) {
+      const input = document.getElementById('f-doc-' + type);
+      const badge = document.getElementById('file-badge-' + type);
+      if (!input || !badge) return;
+      if (input.files && input.files.length > 0) {
+        const names = Array.from(input.files).map(f => f.name).join(', ');
+        badge.textContent = `✓ Attached custom file (${input.files.length}): ${names}`;
+        badge.style.display = 'block';
+      } else {
+        badge.style.display = 'none';
+      }
     }
 
     function getProvidedEvidence() {
@@ -6555,26 +7193,38 @@
       const historyFiles = getFiles('f-doc-history');
       const labsFiles = getFiles('f-doc-labs');
 
+      // Bridge with 1-click clinical bundle attachments
+      const attachedDemo = window.__attachedDemoDocs || {};
+      const hasDemoImaging = !!attachedDemo.imaging;
+      const hasDemoReco = !!attachedDemo.reco;
+      const hasDemoHistory = !!attachedDemo.history;
+      const hasDemoLabs = !!attachedDemo.labs;
+
+      const allImagingFiles = [...imagingFiles, ...(hasDemoImaging ? [attachedDemo.imagingName || 'Imaging_Study.pdf'] : [])];
+      const allRecoFiles = [...recoFiles, ...(hasDemoReco ? [attachedDemo.recoName || 'Surgeon_Recommendation.pdf'] : [])];
+      const allHistoryFiles = [...historyFiles, ...(hasDemoHistory ? [attachedDemo.historyName || 'Therapy_History_Log.pdf'] : [])];
+      const allLabsFiles = [...labsFiles, ...(hasDemoLabs ? [attachedDemo.labsName || 'Medical_Necessity_Cert.pdf'] : [])];
+
       const surgeonNote = getVal('f-note') || getVal('f-cert-notes');
       const clinicalNote = getVal('f-diagnosis-notes');
-      const prevTreatments = getVal('f-prev-treatments') || getVal('f-conservative-duration');
+      const prevTreatments = getVal('f-prev-treatments') || getVal('f-conservative-duration') || getVal('f-treat-dur-cert');
       const labFindings = getVal('f-lab-findings');
       const mriDate = getVal('f-mri-date');
       const usDate = getVal('f-ultrasound-date');
       const labDate = getVal('f-lab-date') || getVal('f-lab-latest-date');
-      const docCert = getVal('f-cert-surgeon') || getVal('f-license');
+      const docCert = getVal('f-cert-surgeon') || getVal('f-doc-name-cert') || getVal('f-license') || getVal('f-doc-lic');
 
       return {
-        imagingFiles,
-        recoFiles,
-        historyFiles,
-        labsFiles,
-        hasImaging: imagingFiles.length > 0 || !!mriDate || !!usDate || (!!labFindings && /mri|x-?ray|ultrasound|ct|echo|angiogram|biometry|pns|scan/i.test(labFindings)),
-        hasSurgeonNote: recoFiles.length > 0 || (surgeonNote.length > 15) || (typeof attachedAudioBlob !== 'undefined' && !!attachedAudioBlob),
+        imagingFiles: allImagingFiles,
+        recoFiles: allRecoFiles,
+        historyFiles: allHistoryFiles,
+        labsFiles: allLabsFiles,
+        hasImaging: allImagingFiles.length > 0 || !!mriDate || !!usDate || (!!labFindings && /mri|x-?ray|ultrasound|ct|echo|angiogram|biometry|pns|scan/i.test(labFindings)),
+        hasSurgeonNote: allRecoFiles.length > 0 || (surgeonNote.length > 15) || (typeof attachedAudioBlob !== 'undefined' && !!attachedAudioBlob),
         hasClinicalNote: clinicalNote.length > 10,
-        hasConservativeHistory: historyFiles.length > 0 || (prevTreatments.length > 5),
-        hasLabs: labsFiles.length > 0 || !!labDate || (labFindings.length > 10),
-        hasCert: recoFiles.length > 0 || (docCert.length > 2 && surgeonNote.length > 10)
+        hasConservativeHistory: allHistoryFiles.length > 0 || (prevTreatments.length > 5),
+        hasLabs: allLabsFiles.length > 0 || !!labDate || (labFindings.length > 10),
+        hasCert: allRecoFiles.length > 0 || (docCert.length > 2 && (surgeonNote.length > 10 || !!getVal('f-cert-agree')))
       };
     }
 
@@ -10076,14 +10726,22 @@ Surgical intervention via ${entry.name} is medically urgent and necessary to res
     // ============================================================
     //  INTERACTIVE EVIDENCE GRAPH (vis.js)
     // ============================================================
+    // ============================================================
+    //  INTERACTIVE EVIDENCE GRAPH (vis.js) - DYNAMIC KNOWLEDGE NETWORK
+    // ============================================================
     function renderEvidenceGraph() {
+      const activeClaimId = window.__currentClaimId || 'CLM-2402';
+      const regClaim = window.CLAIMS_REGISTRY ? window.CLAIMS_REGISTRY[activeClaimId] : null;
+
       let data = window.__lastAnalysis;
-      if (!data) {
-        const curr = window.__currentClaimId || 'CLM-2402';
-        if (window.CLAIMS_REGISTRY && window.CLAIMS_REGISTRY[curr]) {
-          data = convertRegistryToAnalysisFormat(window.CLAIMS_REGISTRY[curr]);
+      if (!data || (data?.request?.claimId && data.request.claimId !== activeClaimId)) {
+        if (regClaim) {
+          data = convertRegistryToAnalysisFormat(regClaim);
           window.__lastAnalysis = data;
         }
+      }
+      if (!data && regClaim) {
+        data = convertRegistryToAnalysisFormat(regClaim);
       }
       if (!data) return;
 
@@ -10095,117 +10753,327 @@ Surgical intervention via ${entry.name} is medically urgent and necessary to res
         return;
       }
 
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      const textColor = isDark ? '#f8fafc' : '#0f172a';
+      const subtextColor = isDark ? '#94a3b8' : '#64748b';
+      const nodeBg = isDark ? '#1e2430' : '#ffffff';
+      const nodeBorder = isDark ? '#334155' : '#cbd5e1';
+      const edgeColor = isDark ? '#64748b' : '#94a3b8';
+
+      // Extract comprehensive patient, clinical, and policy attributes
+      const pName = data.request?.patientName || regClaim?.patientName || 'Rajesh Kumar';
+      const pId = data.request?.patientId || regClaim?.patientId || 'PAT-1042';
+      const docName = data.request?.doctorId || regClaim?.doctor || 'Dr. Anand Krishnan, MS';
+      const hospName = regClaim?.hospital || 'Apollo Hospitals';
+      const insurer = data.request?.insurerId || regClaim?.insurerId || 'Star Health';
+      const policyNo = data.ehrEvidence?.policy_number || regClaim?.policyNumber || 'POL-88321';
+      const claimId = data.request?.claimId || regClaim?.claimId || activeClaimId;
+      const procName = data.parsedNote?.procedure || regClaim?.procedure || 'Lumbar Discectomy';
+      const cptCode = data.parsedNote?.cpt_code || (regClaim?.cpt_code || '63030');
+      const costVal = data.request?.costEstimate || regClaim?.costEstimate || 220000;
+      const formattedCost = Number(costVal).toLocaleString('en-IN');
+      const icdCode = data.parsedNote?.icd10_code || regClaim?.icd10_code || 'M51.1';
+      const icdDesc = data.parsedNote?.icd10_desc || regClaim?.icd10_desc || 'Lumbar Disc Herniation';
+
+      // Clinical evidence findings
+      const hasApprovedAppeal = regClaim?.appeal && regClaim.appeal.status === 'APPROVED';
+      const isApprovedStatus = regClaim?.status === 'Approved' || hasApprovedAppeal;
+
+      const missingDocsList = isApprovedStatus ? [] : (data.ehrEvidence?.missing_documents || regClaim?.missingDocs || []);
+      const allRequired = data.policy_used?.required_documents || regClaim?.requiredDocs || [
+        'Surgeon Recommendation Letter',
+        'MRI report confirming disc herniation',
+        'Proof of failed conservative treatment (min 6 weeks)',
+        'Certificate of Medical Necessity'
+      ];
+      const foundDocsList = isApprovedStatus ? allRequired : allRequired.filter(d => !missingDocsList.includes(d));
+
+      const imagingLabel = regClaim?.imagingFindings || (icdCode.startsWith('M') ? 'MRI Lumbar Spine\nDisc Protrusion & L5-S1 Compression' : (icdCode.startsWith('K') ? 'USG Abdomen\nGallstones / Inflamed Appendix' : 'Angiogram / Diagnostic Scan'));
+      const labLabel = regClaim?.labFindings || 'CBC, LFT, Pre-Anesthetic Blood Profile Normal';
+      const consTrial = regClaim?.conservativeDuration || '6 Weeks NSAIDs & Physical Therapy';
+      const consOutcome = regClaim?.treatmentOutcome || 'Persistent Symptoms & Functional Deficit';
+
+      const riskLevel = hasApprovedAppeal ? 'LOW' : (data.risk?.level || regClaim?.riskLevel || 'MEDIUM');
+      const riskScore = hasApprovedAppeal ? 5 : (data.risk?.score ?? regClaim?.riskScore ?? 35);
+
       const nodes = [];
       const edges = [];
 
-      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-      const textColor = isDark ? '#f1f5f9' : '#111827';
-      const nodeBg = isDark ? '#22262f' : '#ffffff';
-      const nodeBorder = isDark ? '#3d4455' : '#c8d0dc';
-      const edgeColor = isDark ? '#64748b' : '#9ca3af';
-
-      const defaultNode = {
+      const baseNode = {
         shape: 'box',
-        borderWidth: 2,
-        font: { color: textColor, face: 'Outfit', size: 13 },
-        color: { background: nodeBg, border: nodeBorder, highlight: { background: nodeBg, border: '#16a34a' } },
-        margin: 12,
-        shadow: { enabled: true, color: 'rgba(0,0,0,0.1)', size: 8, x: 0, y: 4 }
+        borderWidth: 1.8,
+        margin: { top: 9, bottom: 9, left: 12, right: 12 },
+        font: { color: textColor, face: 'Outfit', size: 12 },
+        shadow: { enabled: true, color: 'rgba(0,0,0,0.12)', size: 6, x: 0, y: 3 }
       };
 
-      // Central Node
+      // 1. Patient Demographics Node
       nodes.push({
-        ...defaultNode,
-        id: 'claim',
-        label: 'Claim Request\n' + (data.parsedNote?.procedure || data.request?.procedureId || 'Procedure'),
-        shape: 'circle',
-        color: { background: isDark ? '#2c3140' : '#f2f4f7', border: nodeBorder }
+        ...baseNode,
+        id: 'node_patient',
+        label: `👤 Patient Profile\n${pName}\n(${pId})`,
+        color: { background: isDark ? '#172554' : '#eff6ff', border: '#3b82f6', highlight: { border: '#60a5fa', background: isDark ? '#1e3a8a' : '#dbeafe' } },
+        font: { color: isDark ? '#bfdbfe' : '#1d4ed8', face: 'Outfit', size: 12, bold: true },
+        title: `Patient Demographics\nName: ${pName}\nID: ${pId}\nCoverage: Active`
       });
 
-      // EHR Data Nodes
-      const ehrNodes = [];
-      if (data.parsedNote?.icd10_code) {
-        ehrNodes.push({ id: 'icd', label: 'ICD: ' + data.parsedNote.icd10_code, ...defaultNode });
-      }
-
-      const foundDocs = data.policy_used?.required_documents?.filter(d => !(data.ehrEvidence?.missing_documents || []).includes(d)) || [];
-      foundDocs.forEach((doc, i) => {
-        ehrNodes.push({ id: 'doc_f_' + i, label: 'EHR: ' + doc, ...defaultNode });
+      // 2. Treating Doctor & Facility Node
+      nodes.push({
+        ...baseNode,
+        id: 'node_provider',
+        label: `🏥 Attending Provider\n${docName}\n${hospName}`,
+        color: { background: isDark ? '#134e4a' : '#f0fdfa', border: '#14b8a6', highlight: { border: '#2dd4bf', background: isDark ? '#115e59' : '#ccfbf1' } },
+        font: { color: isDark ? '#99f6e4' : '#0f766e', face: 'Outfit', size: 12 },
+        title: `Healthcare Provider\nPhysician: ${docName}\nFacility: ${hospName}`
       });
 
-      const missingDocs = data.ehrEvidence?.missing_documents || [];
-      missingDocs.forEach((doc, i) => {
-        ehrNodes.push({
-          id: 'doc_m_' + i,
-          label: 'Missing: ' + doc,
-          color: { background: isDark ? '#451a1a' : '#fee2e2', border: isDark ? '#dc2626' : '#fca5a5' },
-          font: { color: isDark ? '#fca5a5' : '#dc2626' },
-          ...defaultNode
+      // 3. Payer / Insurer Node
+      nodes.push({
+        ...baseNode,
+        id: 'node_insurer',
+        label: `🛡️ Payer & Policy\n${insurer}\nPolicy: ${policyNo}`,
+        color: { background: isDark ? '#312e81' : '#eef2ff', border: '#6366f1', highlight: { border: '#818cf8', background: isDark ? '#3730a3' : '#e0e7ff' } },
+        font: { color: isDark ? '#c7d2fe' : '#4338ca', face: 'Outfit', size: 12 },
+        title: `Payer Organization\nInsurer: ${insurer}\nPolicy Number: ${policyNo}`
+      });
+
+      // 4. Focal Hub: Claim Pre-Authorization Request
+      nodes.push({
+        ...baseNode,
+        id: 'node_claim',
+        label: `📄 Pre-Auth Request\n${claimId} • ₹${formattedCost}\n${procName}`,
+        shape: 'box',
+        borderWidth: 2.8,
+        color: { background: isDark ? '#1e293b' : '#f8fafc', border: '#0284c7', highlight: { border: '#38bdf8', background: isDark ? '#0f172a' : '#f1f5f9' } },
+        font: { color: textColor, face: 'Outfit', size: 13, bold: true },
+        title: `Claim Submission\nID: ${claimId}\nProcedure: ${procName} (CPT ${cptCode})\nRequested Amount: ₹${formattedCost}`
+      });
+
+      // 5. Clinical Diagnosis & ICD-10 Node
+      nodes.push({
+        ...baseNode,
+        id: 'node_diag',
+        label: `🩺 ICD-10: ${icdCode}\n${icdDesc}`,
+        color: { background: isDark ? '#3b0764' : '#faf5ff', border: '#a855f7', highlight: { border: '#c084fc', background: isDark ? '#581c87' : '#f3e8ff' } },
+        font: { color: isDark ? '#e9d5ff' : '#7e22ce', face: 'Outfit', size: 12 },
+        title: `Clinical Diagnosis\nICD-10 Code: ${icdCode}\nIndication: ${icdDesc}`
+      });
+
+      // 6. Diagnostic Imaging Scans Node
+      nodes.push({
+        ...baseNode,
+        id: 'node_imaging',
+        label: `🩻 Imaging Evidence\n${imagingLabel}`,
+        color: { background: isDark ? '#064e3b' : '#ecfdf5', border: '#10b981', highlight: { border: '#34d399', background: isDark ? '#065f46' : '#d1fae5' } },
+        font: { color: isDark ? '#a7f3d0' : '#047857', face: 'Outfit', size: 12 },
+        title: `Diagnostic Imaging Study\nFindings: ${imagingLabel}\nStatus: Corroborated with radiologist report`
+      });
+
+      // 7. Clinical Labs & Pathology Node
+      nodes.push({
+        ...baseNode,
+        id: 'node_labs',
+        label: `🔬 Labs & Pathology\n${labLabel}`,
+        color: { background: isDark ? '#064e3b' : '#ecfdf5', border: '#10b981', highlight: { border: '#34d399', background: isDark ? '#065f46' : '#d1fae5' } },
+        font: { color: isDark ? '#a7f3d0' : '#047857', face: 'Outfit', size: 12 },
+        title: `Laboratory Diagnostics\nFindings: ${labLabel}`
+      });
+
+      // 8. Conservative Treatment History Node
+      nodes.push({
+        ...baseNode,
+        id: 'node_therapy',
+        label: `⏱️ Prior Conservative Care\n${consTrial}\nOutcome: ${consOutcome}`,
+        color: { background: isDark ? '#451a03' : '#fffbeb', border: '#f59e0b', highlight: { border: '#fbbf24', background: isDark ? '#78350f' : '#fef3c7' } },
+        font: { color: isDark ? '#fde68a' : '#b45309', face: 'Outfit', size: 12 },
+        title: `Prior Conservative Trial\nProtocol: ${consTrial}\nResult: ${consOutcome}`
+      });
+
+      // 9. Found Clinical Documents (Verified Green Nodes)
+      foundDocsList.forEach((doc, i) => {
+        nodes.push({
+          ...baseNode,
+          id: `doc_f_${i}`,
+          label: `✓ Verified in EHR\n${doc}`,
+          color: { background: isDark ? '#052e16' : '#f0fdf4', border: '#16a34a', highlight: { border: '#4ade80', background: isDark ? '#14532d' : '#dcfce7' } },
+          font: { color: isDark ? '#86efac' : '#15803d', face: 'Outfit', size: 11.5, bold: true },
+          title: `Required Clinical Record: ${doc}\nStatus: Verified and attached to package`
         });
       });
 
-      ehrNodes.forEach(n => nodes.push(n));
+      // 10. Missing Document Gaps (Alert Red Nodes)
+      missingDocsList.forEach((doc, i) => {
+        nodes.push({
+          ...baseNode,
+          id: `doc_m_${i}`,
+          label: `⚠️ Missing Evidence\n${doc}`,
+          color: { background: isDark ? '#450a0a' : '#fef2f2', border: '#dc2626', highlight: { border: '#f87171', background: isDark ? '#7f1d1d' : '#fee2e2' } },
+          font: { color: isDark ? '#fca5a5' : '#b91c1c', face: 'Outfit', size: 11.5, bold: true },
+          title: `Missing Clinical Requirement: ${doc}\nAction: Needs supplementary filing or peer-to-peer appeal`
+        });
+      });
 
-      // Policy Rules
-      const policyNodes = [];
-      policyNodes.push({ id: 'rule_dx', label: 'Policy Rule:\nCondition Covered', ...defaultNode });
-      if (data.policy_used?.required_documents?.length > 0) {
-        policyNodes.push({ id: 'rule_docs', label: 'Policy Rule:\nRequired Docs', ...defaultNode });
-      }
-      policyNodes.forEach(n => nodes.push(n));
-
-      // Risk Node
-      const isHighRisk = data.risk?.level === 'HIGH';
-      const isMedRisk = data.risk?.level === 'MEDIUM';
-      const riskBorderColor = isHighRisk ? '#dc2626' : (isMedRisk ? '#d97706' : '#16a34a');
+      // 11. Insurer Policy Rules
       nodes.push({
-        ...defaultNode,
-        id: 'risk',
-        label: (data.risk?.level || 'UNKNOWN') + ' RISK\nScore: ' + (data.risk?.score || '?') + '%',
-        borderWidth: 3,
-        color: { border: riskBorderColor, background: nodeBg },
-        font: { color: riskBorderColor, face: 'Outfit', size: 14, bold: true }
+        ...baseNode,
+        id: 'rule_necessity',
+        label: `📜 Policy Clinical Rule\nMedical Necessity (CPT ${cptCode})`,
+        color: { background: nodeBg, border: nodeBorder, highlight: { border: '#0ea5e9' } },
+        font: { color: textColor, face: 'Outfit', size: 12 },
+        title: `Clinical Policy Criteria\nRequires documented structural pathology on imaging and failure of conservative management.`
       });
 
-      // Edges
-      ehrNodes.forEach(n => {
-        if (n.id === 'icd') {
-          edges.push({ from: 'claim', to: n.id, color: edgeColor, arrows: 'to' });
-          edges.push({ from: n.id, to: 'rule_dx', color: edgeColor, arrows: 'to' });
-        } else if (n.id.startsWith('doc_f_')) {
-          edges.push({ from: 'claim', to: n.id, color: edgeColor, arrows: 'to' });
-          edges.push({ from: n.id, to: 'rule_docs', color: '#16a34a', arrows: 'to', label: 'Satisfies', font: { color: '#16a34a', size: 11, background: isDark ? '#1c222b' : '#ffffff' }, dashes: false });
-        } else if (n.id.startsWith('doc_m_')) {
-          edges.push({ from: 'claim', to: n.id, color: edgeColor, arrows: 'to' });
-          edges.push({ from: n.id, to: 'rule_docs', color: '#dc2626', arrows: 'to', label: 'Fails', dashes: true, font: { color: '#dc2626', size: 11, background: isDark ? '#1c222b' : '#ffffff' } });
-        }
+      nodes.push({
+        ...baseNode,
+        id: 'rule_docs',
+        label: `📜 Documentation Rule\nEvidence Protocol Checklist`,
+        color: { background: nodeBg, border: nodeBorder, highlight: { border: '#0ea5e9' } },
+        font: { color: textColor, face: 'Outfit', size: 12 },
+        title: `Documentation Completeness Policy\nAll required clinical reports must be filed before final authorization approval.`
       });
 
-      policyNodes.forEach(n => {
-        edges.push({ from: n.id, to: 'risk', color: edgeColor, arrows: 'to' });
+      nodes.push({
+        ...baseNode,
+        id: 'rule_finance',
+        label: `💰 Tariff & Cost Rule\nApproved Cap: ₹${formattedCost}`,
+        color: { background: nodeBg, border: nodeBorder, highlight: { border: '#0ea5e9' } },
+        font: { color: textColor, face: 'Outfit', size: 12 },
+        title: `Financial Coverage Policy\nEstimated cost falls within agreed institutional tariff and insurer sub-limits.`
+      });
+
+      // 12. AI Risk Scoring Engine Node
+      const isHigh = riskLevel === 'HIGH';
+      const isMed = riskLevel === 'MEDIUM';
+      const riskBorder = isHigh ? '#dc2626' : (isMed ? '#d97706' : '#16a34a');
+      const riskBg = isHigh ? (isDark ? '#450a0a' : '#fef2f2') : (isMed ? (isDark ? '#451a03' : '#fffbeb') : (isDark ? '#052e16' : '#f0fdf4'));
+      const riskColor = isHigh ? '#ef4444' : (isMed ? '#f59e0b' : '#10b981');
+
+      nodes.push({
+        ...baseNode,
+        id: 'node_risk',
+        label: `⚡ AI Risk Engine\n${riskLevel} RISK (${riskScore}%)\n${missingDocsList.length > 0 ? `${missingDocsList.length} Evidence Gap(s)` : 'Full Policy Compliance'}`,
+        borderWidth: 2.5,
+        color: { background: riskBg, border: riskBorder, highlight: { border: riskBorder, background: riskBg } },
+        font: { color: riskColor, face: 'Outfit', size: 13, bold: true },
+        title: `Risk Engine Assessment\nScore: ${riskScore}%\nLevel: ${riskLevel}\nAudit: ${missingDocsList.length === 0 ? 'Optimal pre-auth approval readiness' : 'Evidence gaps detected'}`
+      });
+
+      // 13. Final Adjudication Recommendation Verdict
+      const verdictLabel = isApprovedStatus ? 'APPROVED\nAuthorized by Insurer' : (missingDocsList.length > 0 ? 'PENDING EVIDENCE\nAdditional Docs Required' : 'OPTIMAL\nReady for Instant Filing');
+      const verdictBorder = isApprovedStatus ? '#16a34a' : (missingDocsList.length > 0 ? '#d97706' : '#0284c7');
+      const verdictColor = isApprovedStatus ? '#10b981' : (missingDocsList.length > 0 ? '#f59e0b' : '#0ea5e9');
+
+      nodes.push({
+        ...baseNode,
+        id: 'node_verdict',
+        label: `⚖️ Adjudication\n${verdictLabel}`,
+        shape: 'box',
+        borderWidth: 2.5,
+        color: { background: isDark ? '#1e2430' : '#ffffff', border: verdictBorder },
+        font: { color: verdictColor, face: 'Outfit', size: 12.5, bold: true },
+        title: `Adjudication Decision Status\nStatus: ${verdictLabel.replace('\n', ' - ')}`
+      });
+
+      // ==========================================
+      //  EDGES / CONNECTIONS
+      // ==========================================
+      // Demographics & Facility -> Claim
+      edges.push({ from: 'node_patient', to: 'node_claim', color: edgeColor, arrows: 'to', label: 'Patient', font: { color: subtextColor, size: 10 } });
+      edges.push({ from: 'node_provider', to: 'node_claim', color: edgeColor, arrows: 'to', label: 'Recommends', font: { color: subtextColor, size: 10 } });
+      edges.push({ from: 'node_insurer', to: 'rule_necessity', color: '#6366f1', arrows: 'to', label: 'Guidelines', font: { color: '#6366f1', size: 10 } });
+      edges.push({ from: 'node_insurer', to: 'rule_docs', color: '#6366f1', arrows: 'to' });
+      edges.push({ from: 'node_insurer', to: 'rule_finance', color: '#6366f1', arrows: 'to' });
+
+      // Claim -> Clinical Findings
+      edges.push({ from: 'node_claim', to: 'node_diag', color: '#a855f7', arrows: 'to', label: 'Primary Dx', font: { color: '#a855f7', size: 10 } });
+      edges.push({ from: 'node_claim', to: 'node_imaging', color: edgeColor, arrows: 'to', label: 'Diagnostic', font: { color: subtextColor, size: 10 } });
+      edges.push({ from: 'node_claim', to: 'node_labs', color: edgeColor, arrows: 'to', label: 'Pathology', font: { color: subtextColor, size: 10 } });
+      edges.push({ from: 'node_claim', to: 'node_therapy', color: edgeColor, arrows: 'to', label: 'Prior Care', font: { color: subtextColor, size: 10 } });
+      edges.push({ from: 'node_claim', to: 'rule_finance', color: edgeColor, arrows: 'to', label: 'Package Cost', font: { color: subtextColor, size: 10 } });
+
+      // Clinical Findings -> Policy Rules
+      edges.push({ from: 'node_diag', to: 'rule_necessity', color: edgeColor, arrows: 'to', label: 'Covers CPT', font: { color: subtextColor, size: 10 } });
+      edges.push({ from: 'node_imaging', to: 'rule_necessity', color: '#10b981', arrows: 'to', label: 'Confirms', font: { color: '#10b981', size: 10 } });
+      edges.push({ from: 'node_therapy', to: 'rule_necessity', color: '#f59e0b', arrows: 'to', label: 'Failed Trial', font: { color: '#f59e0b', size: 10 } });
+
+      // Documents -> Documentation Rule
+      foundDocsList.forEach((_, i) => {
+        edges.push({ from: 'node_claim', to: `doc_f_${i}`, color: '#10b981', arrows: 'to' });
+        edges.push({ from: `doc_f_${i}`, to: 'rule_docs', color: '#10b981', arrows: 'to', label: 'Satisfies', font: { color: '#10b981', size: 10 } });
+      });
+
+      missingDocsList.forEach((_, i) => {
+        edges.push({ from: 'node_claim', to: `doc_m_${i}`, color: '#dc2626', arrows: 'to', dashes: true });
+        edges.push({ from: `doc_m_${i}`, to: 'rule_docs', color: '#dc2626', arrows: 'to', label: 'Gap', dashes: true, font: { color: '#dc2626', size: 10 } });
+      });
+
+      // Rules -> AI Risk Engine
+      edges.push({ from: 'rule_necessity', to: 'node_risk', color: edgeColor, arrows: 'to', label: 'Clinical Weight', font: { color: subtextColor, size: 10 } });
+      edges.push({ from: 'rule_docs', to: 'node_risk', color: missingDocsList.length > 0 ? '#dc2626' : '#10b981', arrows: 'to', label: 'Completeness', font: { color: missingDocsList.length > 0 ? '#dc2626' : '#10b981', size: 10 } });
+      edges.push({ from: 'rule_finance', to: 'node_risk', color: edgeColor, arrows: 'to', label: 'Financial Limit', font: { color: subtextColor, size: 10 } });
+
+      // AI Risk Engine -> Final Adjudication Verdict
+      edges.push({
+        from: 'node_risk',
+        to: 'node_verdict',
+        color: verdictBorder,
+        width: 2.2,
+        arrows: 'to',
+        label: isApprovedStatus ? 'Approved' : 'Evaluation',
+        font: { color: verdictColor, size: 11, bold: true }
       });
 
       const visData = { nodes: new vis.DataSet(nodes), edges: new vis.DataSet(edges) };
+
+      // Dynamic Force-Directed Physics Layout
       const options = {
-        layout: {
-          hierarchical: {
-            direction: 'LR',
-            sortMethod: 'directed',
-            levelSeparation: 250,
-            nodeSpacing: 60
+        physics: {
+          enabled: true,
+          solver: 'forceAtlas2Based',
+          forceAtlas2Based: {
+            gravitationalConstant: -75,
+            centralGravity: 0.015,
+            springLength: 135,
+            springConstant: 0.08,
+            damping: 0.48,
+            avoidOverlap: 0.7
+          },
+          stabilization: {
+            enabled: true,
+            iterations: 140,
+            updateInterval: 25
           }
         },
-        physics: false,
-        interaction: { dragNodes: false, zoomView: true, dragView: true }
+        interaction: {
+          dragNodes: true,
+          dragView: true,
+          zoomView: true,
+          hover: true,
+          tooltipDelay: 120
+        },
+        edges: {
+          smooth: {
+            type: 'continuous',
+            roundness: 0.2
+          }
+        }
       };
 
       if (window.__currentEvidenceNetwork) {
         try { window.__currentEvidenceNetwork.destroy(); } catch (e) { }
       }
+
       window.__currentEvidenceNetwork = new vis.Network(container, visData, options);
+
+      // Fit to container after physics settle
+      window.__currentEvidenceNetwork.once('stabilizationIterationsDone', function () {
+        if (window.__currentEvidenceNetwork) {
+          window.__currentEvidenceNetwork.fit({ animation: { duration: 400, easingFunction: 'easeInOutQuad' } });
+        }
+      });
       setTimeout(() => {
         if (window.__currentEvidenceNetwork) window.__currentEvidenceNetwork.fit();
-      }, 100);
+      }, 350);
     }
 
     // Ensure the graph refreshes if theme changes
